@@ -4,7 +4,8 @@ using UnityEngine.UI;
 
 // Панель сложности во время ночи: F1 — открыть / закрыть (в редакторе и dev-сборке).
 // Уровень ИИ каждого фурри кнопками − / + (0 — выключен, до 20), пресеты Easy / Normal / Hard,
-// «Только Нова» (Нова 20, остальные выключены) и «Нова → батл» (сразу на дэнс пол — мог-батл).
+// «Только Нова» (Нова 20, остальные выключены), «Нова → батл» (сразу на дэнс пол — мог-батл)
+// и «Вызвать звонок» (телефон звонит сразу, не дожидаясь плана).
 // Меняет уровни только текущей ночи; постоянная сложность — в Difficulty.cs.
 public class DifficultyPanel : MonoBehaviour
 {
@@ -14,7 +15,8 @@ public class DifficultyPanel : MonoBehaviour
     public Text[] values;             // по FurryId
     public Button[] minus;            // по FurryId
     public Button[] plus;             // по FurryId
-    public Button easy, normal, hard, onlyNova, novaBattle;
+    public Button easy, normal, hard, onlyNova, novaBattle, ringCall;
+    public CallDirector calls;
     public Text info;
 
     Night Night => director.Night;
@@ -36,6 +38,12 @@ public class DifficultyPanel : MonoBehaviour
             Debug.Log("[SSDFNC] Панель F1: Нова → дэнс пол");
             Night.ForceNovaBattle();
         });
+        ringCall.onClick.AddListener(() =>
+        {
+            bool rang = calls != null && calls.RingNow();
+            Debug.Log(rang ? "[SSDFNC] Панель F1: звонок"
+                           : "[SSDFNC] Панель F1: звонок не вызван — телефон занят или идёт мог-батл");
+        });
         panel.SetActive(false);
         hint.gameObject.SetActive(Debug.isDebugBuild);
     }
@@ -52,7 +60,9 @@ public class DifficultyPanel : MonoBehaviour
             values[i].text = !f.Active ? "выкл" : f.Level == f.BaseLevel ? f.BaseLevel.ToString() : $"{f.BaseLevel} → {f.Level}";
         }
         info.text = $"Четверть смены: {Night.Quarter + 1}/4, рост +{Night.Quarter * Difficulty.RampPerQuarter}" +
-                    (Night.Nova.RestLeft > 0f ? $"\nНова отдыхает ещё {Night.Nova.RestLeft:0} с" : "");
+                    (Night.Nova.RestLeft > 0f ? $"\nНова отдыхает ещё {Night.Nova.RestLeft:0} с" : "") +
+                    (calls != null ? $"\nЗвонки: верно {calls.Right}, ошибок {calls.Answered - calls.Right}, " +
+                                     $"пропущено {calls.Missed}, +{calls.Earned} $" : "");
     }
 
     void Change(FurryId id, int delta)

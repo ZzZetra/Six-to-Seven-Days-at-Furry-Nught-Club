@@ -9,9 +9,9 @@ public static class MainMenuBuilder
     const string GameScenePath = "Assets/Scenes/SampleScene.unity";
 
     // Версия сборщика меню, как у TestPlatformBuilder: устарело — Unity предложит пересобрать.
-    // 2 — вкладки «Главная» и «Настройка ночи».
-    const int Version = 2;
-    const string VersionNote = "вкладка «Настройка ночи»: уровни фурри до начала ночи";
+    // 2 — вкладки «Главная» и «Настройка ночи». 3 — счётчик денег.
+    const int Version = 3;
+    const string VersionNote = "счётчик денег в правом верхнем углу";
     static string VersionKey => "SSDFNC.MainMenuVersion." + Application.dataPath;
 
     [InitializeOnLoadMethod]
@@ -64,6 +64,15 @@ public static class MainMenuBuilder
         Place(title.rectTransform, new Vector2(0, 360), new Vector2(1600, 200));
 
         var menu = canvasGo.AddComponent<MainMenu>();
+
+        // Деньги — в правом верхнем углу
+        menu.moneyLabel = TestPlatformBuilder.NewText("Money", root, 44);
+        menu.moneyLabel.alignment = TextAnchor.UpperRight;
+        menu.moneyLabel.color = new Color(1f, 0.85f, 0.35f);
+        var money = menu.moneyLabel.rectTransform;
+        money.anchorMin = money.anchorMax = money.pivot = Vector2.one;
+        money.anchoredPosition = new Vector2(-40, -30);
+        money.sizeDelta = new Vector2(600, 70);
 
         // Вкладки: цвет кнопки вкладки задаёт MainMenu.ShowTab (подсветка выбранной)
         menu.mainTabButton = TabButton("MainTabButton", root, "Главная", new Vector2(-180, 210));
@@ -126,7 +135,7 @@ public static class MainMenuBuilder
         return go.transform;
     }
 
-    static Button NewButton(string name, Transform parent, string label, Vector2 pos, Vector2 size, int fontSize)
+    internal static Button NewButton(string name, Transform parent, string label, Vector2 pos, Vector2 size, int fontSize)
     {
         var go = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button));
         go.transform.SetParent(parent, false);

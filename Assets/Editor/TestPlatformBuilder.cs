@@ -15,8 +15,8 @@ public static class TestPlatformBuilder
     // 5 — пробел: дэнс пол (если смотришь вперёд) и рычаг двери (если смотришь вправо).
     // 6 — фурри: директор ночи, 8 камер с кормлением Дира, фигуры фурри, экран смерти, мог-батл.
     // 7 — панель сложности F1 во время ночи.
-    const int Version = 8;
-    const string VersionNote = "атака Новы по фазам: фаза в правом верхнем углу, скилл-чеки по раскладкам под музыку";
+    const int Version = 10;
+    const string VersionNote = "в панели F1 кнопка «Вызвать звонок»";
     static string VersionKey => "SSDFNC.TestPlatformVersion." + Application.dataPath;
 
     [InitializeOnLoadMethod]
@@ -96,7 +96,10 @@ public static class TestPlatformBuilder
         // Фурри: директор ночи, фигуры в офисе, предупреждения, экран смерти, мог-батл
         var director = BuildFurries(root.transform, cam, generator, door, danceFloor, sound, space, shift);
         monitor.director = director;
-        BuildDifficultyPanel(root.transform, director);
+        var difficulty = BuildDifficultyPanel(root.transform, director);
+
+        // Звонки клиентов: телефон на столе, табличка с расписанием над столом, окно разговора
+        difficulty.calls = BuildCalls(root.transform, cam, director);
 
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
@@ -403,8 +406,109 @@ public static class TestPlatformBuilder
         return director;
     }
 
+    // Звонки: телефон на столе слева, табличка «Программа на ночь» справа над столом (видна, когда смотришь
+    // вперёд), окно разговора внизу экрана и CallDirector, который всем этим управляет
+    static CallDirector BuildCalls(Transform parent, Camera cam, NightDirector director)
+    {
+        // Телефон: корпус, трубка сверху (дрожит, когда звонят), лампа спереди
+        var phoneGo = new GameObject("Phone", typeof(Phone), typeof(AudioSource));
+        phoneGo.transform.SetParent(parent, false);
+        phoneGo.transform.localPosition = new Vector3(-0.7f, 0.9f, 1.15f);
+        phoneGo.transform.localRotation = Quaternion.Euler(0f, 15f, 0f);
+        var dark = new Color(0.12f, 0.12f, 0.14f);
+        Make(PrimitiveType.Cube, "PhoneBody", phoneGo.transform, new Vector3(0f, 0.035f, 0f), new Vector3(0.22f, 0.07f, 0.16f), dark);
+        var handset = Make(PrimitiveType.Cube, "PhoneHandset", phoneGo.transform,
+            new Vector3(0f, 0.09f, 0.01f), new Vector3(0.26f, 0.04f, 0.07f), new Color(0.22f, 0.22f, 0.26f));
+        var lamp = Make(PrimitiveType.Sphere, "PhoneLamp", phoneGo.transform,
+            new Vector3(0.07f, 0.075f, -0.07f), Vector3.one * 0.03f, new Color(0.2f, 0.05f, 0.05f));
+        var phone = phoneGo.GetComponent<Phone>();
+        phone.handset = handset.transform;
+        phone.lamp = lamp.GetComponent<Renderer>();
+        phone.ring = phoneGo.GetComponent<AudioSource>();
+        phone.ring.playOnAwake = false;
+        phone.ring.loop = true;
+        phone.ring.spatialBlend = 0f;
+        var phoneLabel = NewCanvasAt("PhoneLabel", parent, cam, new Vector2(400, 70), new Vector3(-0.7f, 1.07f, 1.42f), scale: 0.0006f);
+        var phoneText = NewText("Text", phoneLabel.transform, 44);
+        phoneText.text = "ТЕЛЕФОН (клик)";
+        Stretch(phoneText.rectTransform);
+
+        // Табличка с расписанием: справа сверху, когда смотришь вперёд (камера тогда отъехала назад)
+        var eye = new Vector3(0f, 1.6f, -CameraLook.ForwardPullBack);
+        var boardPos = eye + Quaternion.Euler(-7f, 22f, 0f) * Vector3.forward * 2.9f; // левее часов смены
+        var boardCanvas = NewCanvasAt("ScheduleBoard", parent, cam, new Vector2(1500, 900), boardPos, scale: 0.0009f, lookFrom: eye);
+        var back = NewImage("Back", boardCanvas.transform, new Color(0.08f, 0.06f, 0.11f, 0.95f));
+        Stretch(back.rectTransform);
+        var boardTitle = NewText("Title", boardCanvas.transform, 56);
+        boardTitle.text = "ПРОГРАММА НА НОЧЬ";
+        boardTitle.color = new Color(1f, 0.85f, 0.35f);
+        Place(boardTitle.rectTransform, new Vector2(0, 395), new Vector2(1400, 80));
+        var grid = new GameObject("Grid", typeof(RectTransform));
+        grid.transform.SetParent(boardCanvas.transform, false);
+        Place((RectTransform)grid.transform, new Vector2(0, -45), new Vector2(1440, 780));
+        var board = boardCanvas.gameObject.AddComponent<ScheduleBoard>();
+        board.grid = (RectTransform)grid.transform;
+        float postHeight = boardPos.y - 0.4f;
+        Make(PrimitiveType.Cylinder, "ScheduleBoardPost", parent,
+            new Vector3(boardPos.x, postHeight / 2f, boardPos.z + 0.05f), new Vector3(0.05f, postHeight / 2f, 0.05f), dark);
+
+        // Окно разговора внизу экрана
+        var hud = new GameObject("CallHUD", typeof(Canvas), typeof(UnityEngine.UI.CanvasScaler),
+            typeof(UnityEngine.UI.GraphicRaycaster), typeof(CallDialog));
+        hud.transform.SetParent(parent, false);
+        var canvas = hud.GetComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 5; // под окном мог-батла и экраном смерти
+        var scaler = hud.GetComponent<UnityEngine.UI.CanvasScaler>();
+        scaler.uiScaleMode = UnityEngine.UI.CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1920, 1080);
+
+        var dialog = hud.GetComponent<CallDialog>();
+        var panel = NewImage("CallPanel", hud.transform, new Color(0.05f, 0.04f, 0.08f, 0.92f));
+        panel.raycastTarget = false; // клики мимо кнопок проходят в сцену (телефон, кнопки на столе)
+        var prt = panel.rectTransform;
+        prt.anchorMin = prt.anchorMax = prt.pivot = new Vector2(0.5f, 0f);
+        prt.anchoredPosition = new Vector2(0, 20);
+        prt.sizeDelta = new Vector2(1500, 260);
+        dialog.group = panel.gameObject.AddComponent<CanvasGroup>();
+        dialog.caller = NewText("Caller", panel.transform, 34);
+        dialog.caller.alignment = TextAnchor.UpperLeft;
+        dialog.caller.color = new Color(1f, 0.85f, 0.35f);
+        Place(dialog.caller.rectTransform, new Vector2(0, 95), new Vector2(1440, 46));
+        dialog.line = NewText("Line", panel.transform, 38);
+        dialog.line.alignment = TextAnchor.UpperLeft;
+        Place(dialog.line.rectTransform, new Vector2(0, 20), new Vector2(1440, 100));
+        dialog.hint = NewText("Hint", panel.transform, 28);
+        dialog.hint.alignment = TextAnchor.MiddleRight;
+        dialog.hint.color = new Color(0.7f, 0.7f, 0.75f);
+        Place(dialog.hint.rectTransform, new Vector2(0, -85), new Vector2(1440, 50));
+        dialog.options = new UnityEngine.UI.Button[CallBuilder.MaxOptions];
+        for (int i = 0; i < dialog.options.Length; i++)
+        {
+            var button = MainMenuBuilder.NewButton("Option" + (i + 1), panel.transform, "", new Vector2(0, -80), new Vector2(470, 84), 28);
+            var label = button.GetComponentInChildren<UnityEngine.UI.Text>();
+            label.horizontalOverflow = HorizontalWrapMode.Wrap;
+            label.verticalOverflow = VerticalWrapMode.Truncate; // иначе не работает подгонка размера
+            label.resizeTextForBestFit = true;
+            label.resizeTextMinSize = 16;
+            label.resizeTextMaxSize = 28;
+            label.rectTransform.offsetMin = new Vector2(12, 4);
+            label.rectTransform.offsetMax = new Vector2(-12, -4);
+            dialog.options[i] = button;
+        }
+
+        var calls = new GameObject("CallDirector", typeof(CallDirector)).GetComponent<CallDirector>();
+        calls.transform.SetParent(parent, false);
+        calls.night = director;
+        calls.look = cam != null ? cam.GetComponent<CameraLook>() : null;
+        calls.phone = phone;
+        calls.dialog = dialog;
+        calls.board = board;
+        return calls;
+    }
+
     // Панель сложности F1: слева экрана, строка на каждого фурри (− уровень +), пресеты и кнопки для Новы
-    static void BuildDifficultyPanel(Transform parent, NightDirector director)
+    static DifficultyPanel BuildDifficultyPanel(Transform parent, NightDirector director)
     {
         var go = new GameObject("DifficultyHUD", typeof(Canvas), typeof(UnityEngine.UI.CanvasScaler),
             typeof(UnityEngine.UI.GraphicRaycaster), typeof(DifficultyPanel));
@@ -428,14 +532,15 @@ public static class TestPlatformBuilder
         Place(h, new Vector2(20, 14), new Vector2(400, 50));
 
         var panel = NewImage("Panel", go.transform, new Color(0.06f, 0.06f, 0.08f, 0.92f));
+        panel.raycastTarget = false; // клик мимо кнопок панели проходит в сцену: телефон частично под панелью
         var pr = panel.rectTransform;
         pr.anchorMin = pr.anchorMax = pr.pivot = new Vector2(0f, 0.5f);
-        Place(pr, new Vector2(20, 0), new Vector2(560, 640));
+        Place(pr, new Vector2(20, 0), new Vector2(560, 760));
         ui.panel = panel.gameObject;
 
         var title = NewText("Title", panel.transform, 40);
         title.text = "СЛОЖНОСТЬ (F1)";
-        Place(title.rectTransform, new Vector2(0, 280), new Vector2(520, 60));
+        Place(title.rectTransform, new Vector2(0, 340), new Vector2(520, 60));
 
         string[] names = { "Дир", "Стрей", "Нова", "Дали", "Доли" };
         ui.values = new UnityEngine.UI.Text[5];
@@ -443,7 +548,7 @@ public static class TestPlatformBuilder
         ui.plus = new UnityEngine.UI.Button[5];
         for (int i = 0; i < 5; i++)
         {
-            float y = 200 - i * 70;
+            float y = 260 - i * 70;
             var name = NewText("Name" + i, panel.transform, 36);
             name.text = names[i];
             name.alignment = TextAnchor.MiddleLeft;
@@ -454,16 +559,18 @@ public static class TestPlatformBuilder
             ui.plus[i] = PanelButton(panel.transform, "Plus" + i, "+", new Vector2(220, y), new Vector2(64, 56));
         }
 
-        ui.easy = PanelButton(panel.transform, "Easy", "Easy", new Vector2(-170, -175), new Vector2(160, 56));
-        ui.normal = PanelButton(panel.transform, "Normal", "Normal", new Vector2(0, -175), new Vector2(160, 56));
-        ui.hard = PanelButton(panel.transform, "Hard", "Hard", new Vector2(170, -175), new Vector2(160, 56));
-        ui.onlyNova = PanelButton(panel.transform, "OnlyNova", "Только Нова", new Vector2(-130, -245), new Vector2(240, 56));
-        ui.novaBattle = PanelButton(panel.transform, "NovaBattle", "Нова → батл", new Vector2(130, -245), new Vector2(240, 56));
+        ui.easy = PanelButton(panel.transform, "Easy", "Easy", new Vector2(-170, -115), new Vector2(160, 56));
+        ui.normal = PanelButton(panel.transform, "Normal", "Normal", new Vector2(0, -115), new Vector2(160, 56));
+        ui.hard = PanelButton(panel.transform, "Hard", "Hard", new Vector2(170, -115), new Vector2(160, 56));
+        ui.onlyNova = PanelButton(panel.transform, "OnlyNova", "Только Нова", new Vector2(-130, -185), new Vector2(240, 56));
+        ui.novaBattle = PanelButton(panel.transform, "NovaBattle", "Нова → батл", new Vector2(130, -185), new Vector2(240, 56));
+        ui.ringCall = PanelButton(panel.transform, "RingCall", "Вызвать звонок", new Vector2(0, -255), new Vector2(500, 56));
 
         ui.info = NewText("Info", panel.transform, 26);
         ui.info.color = new Color(0.75f, 0.75f, 0.8f);
-        Place(ui.info.rectTransform, new Vector2(0, -298), new Vector2(520, 50));
+        Place(ui.info.rectTransform, new Vector2(0, -322), new Vector2(520, 90));
         panel.gameObject.SetActive(false);
+        return ui;
     }
 
     static UnityEngine.UI.Button PanelButton(Transform parent, string name, string label, Vector2 pos, Vector2 size)

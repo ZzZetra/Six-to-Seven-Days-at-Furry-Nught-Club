@@ -52,6 +52,26 @@ public static class Tones
         return Make(name, data, rate);
     }
 
+    // Звонок телефона для зацикливания: два тона 440 + 480 Гц, «дзынь-дзынь» (0.4 с, пауза 0.2, 0.4 с), потом тишина 1.6 с
+    public static AudioClip Ring(string name, float volume = 0.2f)
+    {
+        const int rate = 44100;
+        const float seconds = 2.6f;
+        var data = new float[(int)(rate * seconds)];
+        for (int i = 0; i < data.Length; i++)
+        {
+            float t = (float)i / rate;
+            bool on = t < 0.4f || (t >= 0.6f && t < 1f);
+            if (!on) continue;
+            float local = t < 0.4f ? t : t - 0.6f;
+            float envelope = Mathf.Min(1f, local * 100f) * Mathf.Min(1f, (0.4f - local) * 100f);
+            float tone = Mathf.Sin(2f * Mathf.PI * 440f * t) + Mathf.Sin(2f * Mathf.PI * 480f * t);
+            float trill = 0.75f + 0.25f * Mathf.Sign(Mathf.Sin(2f * Mathf.PI * 20f * t)); // дребезг звонка
+            data[i] = volume * envelope * trill * tone * 0.5f;
+        }
+        return Make(name, data, rate);
+    }
+
     static AudioClip Make(string name, float[] data, int rate)
     {
         var clip = AudioClip.Create(name, data.Length, 1, rate, false);

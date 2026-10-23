@@ -5,6 +5,8 @@ using UnityEngine.InputSystem;
 // A / стрелка влево — на шаг левее, D / стрелка вправо — на шаг правее.
 // Смотришь влево и жмёшь W / стрелку вверх — проходишь в проём и встаёшь у генератора;
 // S / стрелка вниз (или D) — назад в офис.
+// Когда смотришь вперёд, камера чуть отъезжает назад и смотрит немного вниз: стол выше в кадре, под ним
+// помещается окно звонка (CallDialog).
 public class CameraLook : MonoBehaviour
 {
     const float TurnSharpness = 8f;   // больше — резче поворот
@@ -14,6 +16,8 @@ public class CameraLook : MonoBehaviour
     const float SnapAngle = 0.02f;    // с какого остатка фиксируем камеру точно
     const float SnapDistance = 0.001f;
     const float LookAngle = 30f;      // насколько можно отклониться от стороны и всё ещё «смотреть на неё»
+    public const float ForwardPullBack = 0.5f; // м, на сколько камера отъезжает назад, когда смотришь вперёд
+    public const float ForwardPitch = 12f;     // градусов вниз, когда смотришь вперёд
 
     public enum Side { Left, Forward, Right } // номера совпадают с index
     static readonly float[] Yaws = { -90f, 0f, 90f };
@@ -23,6 +27,8 @@ public class CameraLook : MonoBehaviour
 
     int index = 1;
     Vector3 officePosition;
+    Vector3 basePosition; // в офисе или у генератора, без отъезда «вперёд»
+    Vector3 lean;         // отъезд назад, когда смотришь вперёд
     Vector3 velocity;
 
     public bool AtGenerator { get; private set; }
@@ -32,15 +38,20 @@ public class CameraLook : MonoBehaviour
         !AtGenerator && Mathf.Abs(Mathf.DeltaAngle(transform.eulerAngles.y, Yaws[(int)side])) < LookAngle;
 
     Vector3 TargetPosition => AtGenerator ? generatorSpot.position : officePosition;
-    Quaternion TargetRotation => AtGenerator ? generatorSpot.rotation : Quaternion.Euler(0, Yaws[index], 0);
+    Vector3 TargetLean => !AtGenerator && index == 1 ? Vector3.back * ForwardPullBack : Vector3.zero;
+    Quaternion TargetRotation => AtGenerator ? generatorSpot.rotation
+        : Quaternion.Euler(index == 1 ? ForwardPitch : 0f, Yaws[index], 0);
 
     // Новую команду принимаем только когда камера уже встала на место
     bool Settled => Quaternion.Angle(transform.rotation, TargetRotation) < InputAngle
-                 && Vector3.Distance(transform.position, TargetPosition) < InputDistance;
+                 && Vector3.Distance(basePosition, TargetPosition) < InputDistance;
 
     void Start()
     {
         officePosition = transform.position;
+        basePosition = officePosition;
+        lean = TargetLean;
+        transform.position = basePosition + lean;
         transform.rotation = TargetRotation;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
@@ -98,11 +109,15 @@ public class CameraLook : MonoBehaviour
 
         // Перемещение: плавный разгон и торможение
         var pos = TargetPosition;
-        if (Vector3.Distance(transform.position, pos) < SnapDistance)
+        if (Vector3.Distance(basePosition, pos) < SnapDistance)
         {
-            transform.position = pos;
+            basePosition = pos;
             velocity = Vector3.zero;
         }
-        else transform.position = Vector3.SmoothDamp(transform.position, pos, ref velocity, MoveTime);
+        else basePosition = Vector3.SmoothDamp(basePosition, pos, ref velocity, MoveTime);
+
+        // Отъезд «вперёд» — с той же скоростью, что и поворот, поэтому не задерживает следующую команду
+        lean = Vector3.Lerp(lean, TargetLean, 1f - Mathf.Exp(-TurnSharpness * Time.deltaTime));
+        transform.position = basePosition + lean;
     }
 }

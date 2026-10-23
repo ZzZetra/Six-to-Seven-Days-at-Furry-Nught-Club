@@ -1,0 +1,11 @@
+{
+    "id": "what_at_time_granny",
+    "type": "WhatAtTime",
+    "caller": "Бабушка",
+    "client": "Алло, внучек? Это клуб? А что у вас там в {time} показывают?",
+    "answer": "В {time}: {activity}, {furry}.",
+    "yes": "",
+    "no": "",
+    "thanks": "Ой, спасибо, милок! Приду с подружками.",
+    "reward": 2
+}

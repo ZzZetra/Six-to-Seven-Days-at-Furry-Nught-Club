@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 // Главное меню с двумя вкладками: «Главная» («Начать ночь», «Выйти») и «Настройка ночи»
 // (уровни фурри, см. NightSettingsTab). «Начать ночь» загружает офис, «Выйти» закрывает игру.
+// В правом верхнем углу — деньги игрока (Wallet), заработанные на звонках.
 public class MainMenu : MonoBehaviour
 {
     static readonly Color TabOn = new Color(0.45f, 0.25f, 0.6f);
@@ -16,6 +17,7 @@ public class MainMenu : MonoBehaviour
     public Button settingsTabButton;
     public GameObject mainTab;
     public GameObject settingsTab;
+    public Text moneyLabel;
     public string gameScene = "SampleScene";
 
     void Awake()
@@ -28,6 +30,7 @@ public class MainMenu : MonoBehaviour
         mainTabButton.onClick.AddListener(() => ShowTab(false));
         settingsTabButton.onClick.AddListener(() => ShowTab(true));
         ShowTab(false);
+        if (moneyLabel != null) moneyLabel.text = $"Деньги: {Wallet.Money} $";
     }
 
     public void ShowTab(bool settings)

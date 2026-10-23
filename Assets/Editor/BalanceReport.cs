@@ -12,11 +12,13 @@ public static class BalanceReport
     public static void Write()
     {
         string path = Path.Combine(Directory.GetParent(Application.dataPath).FullName, "docs", "BALANCE_REPORT.md");
+        float shift = Balance.ShiftDuration; // переменная, а не константа: иначе предупреждение о недостижимом коде
         string text =
             "# Отчёт по балансу\n\n" +
             "Сгенерирован меню SSDFNC → Balance Report. Играет бот, а не человек: как он устроен — в docs/FURRY_AI.md.\n\n" +
-            $"## Текущая смена ({Balance.ShiftDuration:0} с)\n\n" + NightSimulator.Report(Nights, Balance.ShiftDuration) +
-            "\n## Смена 10 минут (по дизайну)\n\n" + NightSimulator.Report(Nights, 600f);
+            $"## Текущая смена ({shift:0} с)\n\n" + NightSimulator.Report(Nights, shift);
+        if (shift != 600f) // смена укорочена для разработки — показать и смену по дизайну
+            text += "\n## Смена 10 минут (по дизайну)\n\n" + NightSimulator.Report(Nights, 600f);
         File.WriteAllText(path, text);
         Debug.Log("[SSDFNC] Отчёт по балансу: " + path);
     }

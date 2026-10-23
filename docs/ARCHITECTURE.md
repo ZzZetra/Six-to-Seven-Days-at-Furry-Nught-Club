@@ -115,6 +115,10 @@ Menu ── MainMenu                   (Screen Space Overlay Canvas, 1920×1080)
 `InputLocked` — клавиши не работают, но камера доворачивается (атака Новы). `FaceForward()` —
 повернуть вперёд, к дэнс полу; от генератора сначала вернуться в офис.
 
+Когда смотришь вперёд, камера отъезжает назад на `ForwardPullBack` (0.5 м) и наклоняется вниз на
+`ForwardPitch` (12°): под столом остаётся место для окна звонка. Отъезд (`lean`) сглаживается отдельно от
+перемещения к генератору (`basePosition`) и с той же скоростью, что поворот, поэтому `Settled` его не ждёт.
+
 `IsLooking(Side side)` — смотрит ли камера сейчас в эту сторону офиса (`Side.Left / Forward /
 Right`). Считается по **фактическому** повороту камеры: отклонение по Y меньше `LookAngle` (30°).
 У генератора всегда false. Этим пользуется пробел.
@@ -179,7 +183,9 @@ Right`). Считается по **фактическому** повороту �
 
 **`DifficultyPanel`** (объект `DifficultyHUD` в `TestPlatform`, оверлей с `GraphicRaycaster`) —
 панель F1 (`Debug.isDebugBuild`): `Furry.SetBaseLevel` для каждого фурри, пресеты, «Только Нова»,
-`Night.ForceNovaBattle()` («Нова → батл»: `NovaAI.RushToDanceFloor`, сбрасывает отдых). Подсказка
+`Night.ForceNovaBattle()` («Нова → батл»: `NovaAI.RushToDanceFloor`, сбрасывает отдых),
+`CallDirector.RingNow()` («Вызвать звонок»: не сработает, если телефон занят или идёт мог-батл; план
+звонков не сдвигает) и счёт звонков в строке внизу. Фон панели клики не ловит: под ней край телефона. Подсказка
 «F1 — сложность» в левом нижнем углу.
 
 **Дали и Доли** связаны (`DaliAI.rival`, `DoliAI.rival`, задаёт `Night`): Доли не выбирает маршрут к
@@ -193,11 +199,21 @@ Right`). Считается по **фактическому** повороту �
 (`timeSamples / frequency − offset`), без музыки — по `Time.deltaTime`. Надпись фазы `phaseLabel` —
 в правом верхнем углу под часами. Зоны уже после каждой победы игрока (`MogZoneShrinkPerWin`).
 
-**Тесты** — `Assets/Tests/EditMode` (asmdef `SSDFNC.Tests.EditMode`), 47 штук.
+**Звонки клиентов** — подробно в [CALLS.md](CALLS.md). Логика без сцены — `Assets/Scripts/Core/Calls`
+(`Schedule`, `CallTemplate`/`CallTypes`/`CallText`, `CallBuilder`, `CallPlan`). В сцене (`TestPlatform`):
+`Phone` на столе слева (клик — `PickedUp`), `ScheduleBoard` (мировой канвас справа над столом, клетки
+создаются в `Show`), `CallHUD` с `CallDialog` (оверлей внизу, `CanvasGroup` прячет окно, когда не смотришь
+вперёд), `CallDirector` (план, состояния Idle → Ringing → ClientLine → Options → Reaction, пауза при
+`Night.Frozen`, `Wallet.Add`). Данные — `StreamingAssets/Calls` через `CallData`. Деньги — `Wallet`
+(PlayerPrefs `SSDFNC.Money`), счётчик в меню (`MainMenu.moneyLabel`, сборщик меню версии 3).
+
+**Тесты** — `Assets/Tests/EditMode` (asmdef `SSDFNC.Tests.EditMode`), 64 штуки.
 `FurryTests` (31): бросок кубика, дверь, дэнс пол, звук и ловушка Доли, порча генератора, Дир, Нова
 и мог-батл, рост уровня, детерминизм и порядок сложностей в симуляции. `MogTests` (16): метка
 приходит в центр зоны ровно в `hit`, промахи, сужение зон, запас мога, порядок фаз, и все json-раскладки
-в `StreamingAssets/MogCharts` читаются без ошибок и с музыкой на месте. Запуск: Test Runner → EditMode → Run All.
+в `StreamingAssets/MogCharts` читаются без ошибок и с музыкой на месте. `CallTests` (17): правила
+расписания, подстановка и проверка переменных, для каждого типа вопроса верный вариант правда верный, а
+неверные правда неверные (на 200 случайных расписаниях), план звонков, все json в `StreamingAssets/Calls`. Запуск: Test Runner → EditMode → Run All.
 В batchmode: `Unity.exe -batchmode -projectPath … -runTests -testPlatform EditMode -testResults out.xml`
 (без `-quit`).
 
@@ -213,8 +229,8 @@ Right`). Считается по **фактическому** повороту �
 | `PourRate` | 15 | ед./с, пока держишь «Залить» |
 | `MaxHealth` | 100 | здоровье |
 
-Расход в секунду = `FuelPerShift / ShiftTimer.Duration`. При смене 90 с (сейчас) это ≈ 1.67 ед./с,
-и полного бака хватает на 45 с, то есть на полсмены. При 600 с это 0.25 ед./с.
+Расход в секунду = `FuelPerShift / ShiftTimer.Duration`. При смене 600 с (сейчас) это 0.25 ед./с,
+и полного бака хватает на 300 с, то есть на полсмены.
 
 Состояния `State`: **Running** (работает), **Stalled** (заглох), **Broken** (сломан).
 
@@ -400,7 +416,7 @@ Right`). Считается по **фактическому** повороту �
 7. Удаляет старый `Shift` и создаёт новый: канвас поверх экрана, часы и `ShiftTimer`.
 8. Сохраняет сцену.
 
-**Версия сборщика.** `const int Version` (сейчас 8: атака Новы по фазам). После успешной
+**Версия сборщика.** `const int Version` (сейчас 10: кнопка «Вызвать звонок» в панели F1). После успешной
 сборки номер записывается в `EditorPrefs` (ключ с путём проекта). `[InitializeOnLoadMethod]`
 при загрузке скриптов сравнивает номер и, если офис собран старой версией, показывает окно
 «Пересобрать сцену офиса сейчас?». Окно появляется один раз за запуск Unity, в batchmode не

@@ -1,0 +1,11 @@
+{
+    "id": "what_at_time_party",
+    "type": "WhatAtTime",
+    "caller": "Тусовщик",
+    "client": "Йоу! Чё у вас сегодня в {time}? Хочу движа!",
+    "answer": "В {time} — {activity}, {furry}.",
+    "yes": "",
+    "no": "",
+    "thanks": "О, норм, заскочу!",
+    "reward": 3
+}

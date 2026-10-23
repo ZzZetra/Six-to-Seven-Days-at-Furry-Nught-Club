@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 public static class Balance
 {
     // ── Смена ──
-    public const float ShiftDuration = 90f;          // с; по дизайну 600 (10 минут)
+    public const float ShiftDuration = 600f;         // с, 10 минут (как по дизайну)
 
     // ── Генератор ──
     public const float TankSize = 75f;               // бак, ед.
@@ -57,6 +57,18 @@ public static class Balance
 
     // ── Нова ──
     public const float NovaRestAfterBattle = 180f;   // с после проигранного ею мог-батла сидит дома
+
+    // ── Звонки клиентов ──
+    // Диалоги и расписание — не здесь, а в Assets/StreamingAssets/Calls (формат: docs/CALLS.md)
+    public const int CallsPerNightMin = 4;
+    public const int CallsPerNightMax = 6;
+    public const float CallFirstDelay = 40f;         // с от начала смены до первого звонка (не раньше)
+    public const float CallLastMargin = 30f;         // последний звонок — не позже, чем за столько до конца
+    public const float CallRingTime = 15f;           // с, столько звенит; не взял трубку — звонок пропущен
+    public const float CallPatience = 40f;           // с, столько клиент ждёт ответа после того, как взяли трубку
+    public const float CallReactionTime = 3f;        // с, реплика клиента после ответа, потом гудки
+    public const int CallRewardMin = 2;              // $ за верный ответ, если в диалоге не задано своё «reward»
+    public const int CallRewardMax = 10;
 
     // ── Мог-батл с Новой ──
     // Скилл-чеки и музыка — не здесь, а в раскладках Assets/StreamingAssets/MogCharts/*.json

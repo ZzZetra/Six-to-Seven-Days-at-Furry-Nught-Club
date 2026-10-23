@@ -3,9 +3,11 @@
 **Six to Seven Days at the Furry Night Club**: Unity 6 (6000.6.0f1, URP 17.6) 3D FNAF-like survival
 game, Roblox-style models. The player sits in the club's reception office during a day shift and
 fends off five furries with four resources: fuel for the generator, the dance floor, the sound
-button and the right door, plus a "mog battle" duel with Nova. Early prototype; the next mechanic
-is the **generator**. This guide is in English to save tokens; the user, the README, the CHANGELOG
-and `docs/` are in Russian.
+button and the right door, plus a "mog battle" duel with Nova. Early prototype. **Next goal (user,
+2026-10-23): Nova's real skill checks** (circle and sides; now all play as a bar). Also on the list:
+re-tune the balance (10-min shift, mog lives, calls distract; the sim bot ignores calls) and polish the
+calls (draft dialogues, no penalty yet, frequency, dialogue editor). See README «Что доработать».
+This guide is in English to save tokens; the user, the README, the CHANGELOG and `docs/` are in Russian.
 
 Concept in one screen (details, numbers and the map are in `docs/GAME_DESIGN.md`):
 - Office views: **left = generator** (passage Г from corridor 5), **forward = corridor with the dance
@@ -132,8 +134,8 @@ Concept in one screen (details, numbers and the map are in `docs/GAME_DESIGN.md`
   (visible only when facing forward), and the buttons below it.
 - `MainMenu` (on the `Menu` overlay canvas in `MainMenu.unity`): wires `startButton` → load
   `SampleScene`, `quitButton` → `Application.Quit()` (stops Play mode in the editor).
-- `ShiftTimer` (on `Shift` in the office): `const Duration` (design: 600 s = 10 min; currently 90 s,
-  the user's choice on 2026-10-21), `TimeLeft` = `Duration − elapsed`, `clock` shows `m:ss` top-right, at 0
+- `ShiftTimer` (on `Shift` in the office): `const Duration` = `Balance.ShiftDuration` (600 s = 10 min,
+  as designed; the user switched from 90 s on 2026-10-23), `TimeLeft` = `Duration − elapsed`, `clock` shows `m:ss` top-right, at 0
   loads `MainMenu`. The generator's fuel rate derives from `ShiftTimer.Duration` (150 per shift).
 - `CameraLook`: office yaws −90 / 0 / +90 with A / D. `StepForward()` (W / ↑) at yaw −90 walks to
   `generatorSpot` (−4.65, 1.6, 0; pitch 20°) via SmoothDamp (`MoveTime` 0.35). `StepBack()` (S / ↓)
@@ -182,6 +184,20 @@ Concept in one screen (details, numbers and the map are in `docs/GAME_DESIGN.md`
   by the user: a skill-check tuning app (plan at the end of MOG_CHARTS.md; reuse `MogTimeline`).
   Builder version 8. Loss rule (user, 2026-10-23): "mog lives" start 3, hit +1 capped at 4, miss −1,
   0 = Nova kills at once, finish with ≥1 = survive (`Balance.MogStartLives/MaxLives/LivesPerHit`).
+- **Client calls (user's spec 2026-10-23, docs/CALLS.md):** 4–6 calls a night; click the ringing phone →
+  client line at the bottom → LMB anywhere → options (mouse or 1–3) → reaction, correct = money 2–10 $
+  (`Wallet`, PlayerPrefs `SSDFNC.Money`, counter in the main menu). Answer from the schedule board (new
+  every night, generated from `StreamingAssets/Calls/schedule.json`). Turning away hides the dialog (no
+  answering) until you face forward again; everything else stays usable, the night keeps going; paused while
+  `Night.Frozen`. Forward view has a camera lean (`CameraLook.ForwardPullBack`/`ForwardPitch`) so the
+  dialog sits "under the desk". Dialogues are data (`Calls/Dialogues/*.json`, variables `{time}` `{furry}`
+  `{furry_gen|dat|acc|ins}` `{activity}` `{room}`, gender `{he|she}`), logic in `Core/Calls`, tested in
+  `CallTests`. The client does NOT know the right answer (user's rule): the reaction follows the player's
+  choice (`Call.Reactions[i]`; `thanks`, and `thanksNo` for "no" in OrderFurry/VipFree); a wrong answer only
+  means no money (green "+N $" on right). Next planned by the user: a dialogue editor app (options listed in CALLS.md). No penalty
+  for wrong/missed calls yet. F1 panel has «Вызвать звонок» (`CallDirector.RingNow`). Builder version 10,
+  menu builder version 3. Autotests must save/restore
+  `SSDFNC.Money` (shared PlayerPrefs).
 - Generator roles (user's decision 2026-10-22): Dali stalls or drains (`DaliStallChance`), Doli breaks at
   `BreakPerSecond` until scared by the sound, max `BreakTime` (= fully broken). Sound cues, not spatial on
   purpose: Doli's growl at the door AND the generator (same sound, the player must check), drain glug only

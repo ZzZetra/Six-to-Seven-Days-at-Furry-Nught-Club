@@ -1,0 +1,11 @@
+{
+    "id": "when_furry_fan",
+    "type": "WhenFurry",
+    "caller": "Фанатка",
+    "client": "Привет! А во сколько сегодня у {furry_gen} {activity}? Не хочу пропустить!",
+    "answer": "В {time}.",
+    "yes": "",
+    "no": "",
+    "thanks": "Ура! Буду в первом ряду!",
+    "reward": 4
+}

@@ -1,0 +1,11 @@
+{
+    "id": "furry_at_time_regular",
+    "type": "FurryAtTime",
+    "caller": "Постоянный гость",
+    "client": "Добрый вечер. Подскажите, что будет делать {furry} в {time}?",
+    "answer": "{furry} в {time}: {activity}.",
+    "yes": "",
+    "no": "",
+    "thanks": "Благодарю, учту.",
+    "reward": 4
+}
