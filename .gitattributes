@@ -1,0 +1,32 @@
+# Текст: в репозитории — LF, на Windows при выгрузке — как настроен git
+* text=auto
+
+# Сцены, префабы и прочий YAML Unity — сливать умным слиянием Unity (UnityYAMLMerge), если настроено
+*.unity    text merge=unityyamlmerge
+*.prefab   text merge=unityyamlmerge
+*.asset    text merge=unityyamlmerge
+*.mat      text merge=unityyamlmerge
+*.anim     text merge=unityyamlmerge
+*.controller text merge=unityyamlmerge
+*.meta     text
+
+*.cs       text diff=csharp
+*.bat      text eol=crlf
+
+# Крупные бинарные файлы — в Git LFS (музыка для мог-батла, модели, текстуры)
+*.wav  filter=lfs diff=lfs merge=lfs -text
+*.mp3  filter=lfs diff=lfs merge=lfs -text
+*.ogg  filter=lfs diff=lfs merge=lfs -text
+*.fbx  filter=lfs diff=lfs merge=lfs -text
+*.blend filter=lfs diff=lfs merge=lfs -text
+*.psd  filter=lfs diff=lfs merge=lfs -text
+*.tga  filter=lfs diff=lfs merge=lfs -text
+*.exr  filter=lfs diff=lfs merge=lfs -text
+*.hdr  filter=lfs diff=lfs merge=lfs -text
+
+# Мелкие бинарные — обычным git
+*.png  binary
+*.jpg  binary
+*.ttf  binary
+*.otf  binary
+*.dll  binary

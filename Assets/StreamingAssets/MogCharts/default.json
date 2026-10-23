@@ -1,0 +1,22 @@
+{
+    "name": "По умолчанию (без музыки)",
+    "music": "",
+    "offset": 0,
+    "checks": [
+        { "type": "circle", "start": 2.5, "hit": 3.5, "zone": 0.22, "pos": 0.55 },
+        { "type": "circle", "start": 4.5, "hit": 5.5, "zone": 0.22, "pos": 0.7 },
+        { "type": "circle", "start": 6.5, "hit": 7.5, "zone": 0.22, "pos": 0.4 },
+        { "type": "circle", "start": 8.5, "hit": 9.5, "zone": 0.22, "pos": 0.62 },
+        { "type": "circle", "start": 10.5, "hit": 11.5, "zone": 0.22, "pos": 0.48 },
+        { "type": "bar", "start": 13.5, "hit": 14.5, "zone": 0.22, "pos": 0.55 },
+        { "type": "bar", "start": 15.5, "hit": 16.5, "zone": 0.22, "pos": 0.7 },
+        { "type": "bar", "start": 17.5, "hit": 18.5, "zone": 0.22, "pos": 0.4 },
+        { "type": "bar", "start": 19.5, "hit": 20.5, "zone": 0.22, "pos": 0.62 },
+        { "type": "bar", "start": 21.5, "hit": 22.5, "zone": 0.22, "pos": 0.48 },
+        { "type": "sides", "start": 24.5, "hit": 25.5, "zone": 0.22, "pos": 0.55 },
+        { "type": "sides", "start": 26.5, "hit": 27.5, "zone": 0.22, "pos": 0.7 },
+        { "type": "sides", "start": 28.5, "hit": 29.5, "zone": 0.22, "pos": 0.4 },
+        { "type": "sides", "start": 30.5, "hit": 31.5, "zone": 0.22, "pos": 0.62 },
+        { "type": "sides", "start": 32.5, "hit": 33.5, "zone": 0.22, "pos": 0.48 }
+    ]
+}

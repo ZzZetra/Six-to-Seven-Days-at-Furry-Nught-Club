@@ -1,0 +1,22 @@
+{
+    "name": "Метроном 120 BPM (пример)",
+    "music": "examples/metronome.wav",
+    "offset": 0,
+    "checks": [
+        { "type": "circle", "start": 7, "hit": 8, "zone": 0.22, "pos": 0.55 },
+        { "type": "circle", "start": 9, "hit": 10, "zone": 0.22, "pos": 0.7 },
+        { "type": "circle", "start": 11, "hit": 12, "zone": 0.22, "pos": 0.4 },
+        { "type": "circle", "start": 13, "hit": 14, "zone": 0.22, "pos": 0.62 },
+        { "type": "circle", "start": 15, "hit": 16, "zone": 0.22, "pos": 0.48 },
+        { "type": "bar", "start": 19, "hit": 20, "zone": 0.22, "pos": 0.55 },
+        { "type": "bar", "start": 21, "hit": 22, "zone": 0.22, "pos": 0.7 },
+        { "type": "bar", "start": 23, "hit": 24, "zone": 0.22, "pos": 0.4 },
+        { "type": "bar", "start": 25, "hit": 26, "zone": 0.22, "pos": 0.62 },
+        { "type": "bar", "start": 27, "hit": 28, "zone": 0.22, "pos": 0.48 },
+        { "type": "sides", "start": 31, "hit": 32, "zone": 0.22, "pos": 0.55 },
+        { "type": "sides", "start": 33, "hit": 34, "zone": 0.22, "pos": 0.7 },
+        { "type": "sides", "start": 35, "hit": 36, "zone": 0.22, "pos": 0.4 },
+        { "type": "sides", "start": 37, "hit": 38, "zone": 0.22, "pos": 0.62 },
+        { "type": "sides", "start": 39, "hit": 40, "zone": 0.22, "pos": 0.48 }
+    ]
+}
