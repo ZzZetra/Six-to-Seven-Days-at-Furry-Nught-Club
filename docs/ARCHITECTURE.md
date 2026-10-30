@@ -9,9 +9,11 @@ MainMenu.unity ──«Начать ночь»──▶ SampleScene.unity (оф�
       ▲                                   │
       └──────── время смены вышло ────────┘
 «Выйти» — закрыть игру (в редакторе — остановить Play)
+
+MogEditor.unity — редактор раскладок, отдельная программа (в игру не входит)
 ```
 
-В Build Settings: `0 — MainMenu`, `1 — SampleScene`. Сцены грузятся по имени через
+В Build Settings игры: `0 — MainMenu`, `1 — SampleScene`. Сцены грузятся по имени через
 `SceneManager.LoadScene`. Имена лежат в полях `MainMenu.gameScene` и `ShiftTimer.menuScene`.
 
 ## Офис (SampleScene)
@@ -59,14 +61,65 @@ Directional Light, Global Volume          (из шаблона URP)
 ```
 Main Camera                        (чёрный фон)
 EventSystem ── InputSystemUIInputModule
-Menu ── MainMenu                   (Screen Space Overlay Canvas, 1920×1080)
+Menu ── MainMenu, CanvasGroup      (Screen Space Overlay Canvas, 1920×1080)
  ├─ Background (Image)             тёмно-фиолетовый на весь экран
  ├─ Title (Text)                   «Six to Seven Days at the Furry Night Club»
- ├─ StartButton └─ Label           «Начать ночь»
- └─ QuitButton  └─ Label           «Выйти»
+ ├─ Money (Text)                   деньги, правый верхний угол
+ ├─ MainTabButton, SettingsTabButton, ChecksTabButton   вкладки
+ ├─ MainTab                        StartButton «Начать ночь», QuitButton «Выйти»
+ ├─ SettingsTab ── NightSettingsTab   уровни фурри, пресеты, «Начать ночь»
+ └─ ChecksTab                      Header, List (кнопки раскладок), ChartEditorButton, Result
+MogTestHUD ── Canvas (sorting 10), MogBattle, AudioSource, MogTestTab
+ └─ MogBattlePanel …               окно мог-батла (MogBattleBuilder), то же, что в офисе
 ```
 
 Сцену целиком создаёт `MainMenuBuilder`.
+
+## Редактор раскладок (MogEditor)
+
+```
+Main Camera                        (тёмный фон)
+MogChartEditor ── MogChartEditor, AudioSource   весь интерфейс — IMGUI (OnGUI), музыка
+MogPreviewHUD ── Canvas, MogBattle, AudioSource   окно мог-батла для «Проверить»
+```
+
+Сцену создаёт `MogEditorBuilder`: SSDFNC → Chart Editor → Open in Play Mode (собрать и запустить в Unity;
+`PlayFromMenu` эту сцену меню не подменяет) или → Build App (.exe). Как пользоваться — [MOG_CHARTS.md](MOG_CHARTS.md).
+
+**Программа.** `MogEditorBuilder.BuildApp(outDir, chartsFolder)` собирает только сцену `MogEditor`, на время
+сборки подменяя настройки игры (`productName` = «SSDFNC Chart Editor», окно 1600×900, `resizableWindow`) и
+возвращая их. Путь папки раскладок пишет в `<программа>_Data/StreamingAssets/chart_editor_folder.txt`.
+`MogChartEditor.Awake` выбирает папку: в Unity — папка проекта; в программе — последняя выбранная
+(PlayerPrefs программы `SSDFNC.ChartEditor.Folder`), иначе из этого файла, иначе своя StreamingAssets.
+`MogCharts.Folder` можно присвоить — так её видят и музыка, и превью.
+
+**`MogChartEditor`** — сцена с IMGUI: для инструмента так проще всего, а `GUI.matrix` растягивает раскладку
+1920×1080 на любое окно. Фон — цвет камеры (IMGUI его не закрашивает, иначе закрыл бы окно чека).
+- Файлы — `*.json` в `MogCharts.Folder` (с подпапками). Читает `JsonUtility`, пишет `MogChart.ToJson()`
+  (числа через точку при любой локали). Перед сохранением — `MogChart.Validate()`. Несохранённые правки —
+  `ToJson()` раскладки не совпадает с сохранённым; тогда «Выход», ◄ ►, «Новая», «Открыть…» срабатывают со
+  второго нажатия (`Confirmed`).
+- «Открыть…» и «Импорт…» — `NativeFileDialog.Open`: в программе — окно Windows `GetOpenFileNameW`
+  (comdlg32, P/Invoke), в Unity — `EditorUtility.OpenFilePanel`.
+- Музыка — `MogCharts.LoadClip` (целиком, не потоком), из `AudioClip.GetData` строится громкость по
+  кусочкам 1/200 с (`peaks`), из неё — текстура волны под видимый участок (перерисовывается, только
+  когда сдвинули или растянули полосу). «Импорт…» копирует файл в `MogCharts/Music`.
+- **Окно чека посередине** — настоящий `MogBattle` в режиме превью: `LateUpdate` ставит его в прямоугольник
+  (`FitPanel`, пиксели экрана) и показывает выбранный чек неподвижно в момент красной линии или в его бит
+  (`ShowStill`; пока играет музыка — чек, который сейчас у игрока). Мышь в этом прямоугольнике
+  (`DragPreview`) переводится в пиксели экрана и обратно в параметры чека через `MogBattle.PlaceAt`,
+  `CircleTurnAt`, `BarPosAt`: ЛКМ — место кнопки или где зона, ПКМ — ширина зоны.
+- Время `head` — секунды раскладки: пока играет музыка, `music.time − offset`. Сетка — `60 / BPM` от
+  «1-го бита», `Snapped` ставит чек на ближайший бит.
+- Выбранный чек — ссылка на `MogCheck` в `chart.checks`, правки идут прямо в него. Когда меняется
+  число элементов на экране (выбрали, добавили, удалили, сменили вид), `Changed` зовёт
+  `GUIUtility.ExitGUI()` — IMGUI бросает проход и рисует заново, иначе путается в раскладке.
+- Числовые поля (`Number`) держат набранный текст, пока поле в фокусе («-», «0.»), точка или запятая.
+- Ошибка (`Validate`) и предупреждение «не успеть» (`DenseWarning`: в следующий чек можно попасть раньше
+  бита этого) считаются раз в кадр в `Update`.
+- «Проверить» — `MogBattle.BeginTest(копия, итог, from)`: копия через `ToJson`/`FromJson`, без чеков,
+  что начались до `from`; окно во весь размер (`FitPanel(null)`), часы и музыка батла стартуют за 0.5 с до
+  первого чека. Esc — `MogBattle.Abort()`.
 
 ---
 
@@ -157,9 +210,13 @@ Right`). Считается по **фактическому** повороту �
 - `Night` — ночь: пятеро, рост уровня по четвертям, `SoundFired`, `FeedDir`, мог-батл
   (`Frozen`, `FinishMogBattle`), смерть (`PlayerKilled`), `Describe(room)` для камер.
 - `MogChart` / `MogCheck` — раскладка мог-батла (музыка и скилл-чеки по времени, читается из json
-  через `JsonUtility`), `Validate()`, `Default()`. `MogTimeline` — ход батла по раскладке: где метка
-  (`MarkerPos`), `Press`, `Update` (промах, если метка ушла за край или начался следующий чек), запас мога
-  `Lives` (с `MogStartLives`, попал — плюс до `MogMaxLives`, промах — минус; 0 — `Lost`, батл окончен сразу).
+  через `JsonUtility`), `Validate()`, `Default()`, `ToJson()`. У чека вид (`Type`: кружок, кнопка, стрелка,
+  полоска) и время: `StartTime` (появился), `ReadyTime` (уже можно попасть), `EndTime` (не попал —
+  промах), у полоски `BarPos(t)` — метка со сменами скорости (`speedKeys`) и отскоком от краёв.
+  `MogTimeline` — ход батла по раскладке: чеки по очереди, на экране один; `NeedleAngle`, `RingProgress`,
+  `MarkerPos`, `InZone`; `Press` (ПРОБЕЛ или клик), `Swipe` (стрелка), `Update` (промах, если чек кончился
+  или в следующий уже можно попасть); фазы — группы чеков одного вида подряд; запас мога `Lives`
+  (с `MogStartLives`, попал — плюс до `MogMaxLives`, промах — минус; 0 — `Lost`, батл окончен сразу).
   Формат — [MOG_CHARTS.md](MOG_CHARTS.md).
 - `IOffice` — что фурри видят и делают: дверь закрыта, дэнс пол горит, заглушить / сломать /
   слить бензин. В игре это `NightDirector`, в тестах — `FakeOffice`, в симуляции — `SimOffice`.
@@ -176,7 +233,7 @@ Right`). Считается по **фактическому** повороту �
   сливает бензин (`Roamer.Draining`);
 - **мог-батл:** `CameraLook.InputLocked` и выключенный `SpaceAction`, `CameraLook.FaceForward()`
   (Нова разворачивает к дэнс полу), генератор на паузе, Нова зажигает пол (`DanceFloor.SetForced`),
-  запускает `MogBattle` с капсулой Новы (`FurryAvatar.body`), по итогу `Night.FinishMogBattle`;
+  запускает `MogBattle`, по итогу `Night.FinishMogBattle`;
 - **смерть:** красный экран с именем и причиной, через 2.5 с сцена офиса загружается заново
   (смена сначала).
 
@@ -192,9 +249,22 @@ Right`). Считается по **фактическому** повороту �
 **Дали и Доли** связаны (`DaliAI.rival`, `DoliAI.rival`, задаёт `Night`): Доли не выбирает маршрут к
 генератору, пока `Dali.HeadingToGenerator`; Дали не идёт дальше прохода 8, пока `Doli.HeadingToGenerator`.
 
-**`MogBattle`** (на `FurryHUD`) — атака Новы по фазам: `Intro` (до первого чека раскладки, капсула
-Новы крутится) → `Checks` (группы кружок / полоска / в стороны, пока все — «полоска», ПРОБЕЛ)
-→ `Outro` (`Balance.MogOutroTime`: Нова уходит в пол или растёт на игрока) → `done(won)`.
+**`MogBattle`** (на `FurryHUD`; такое же окно в меню и в редакторе раскладок, его строит
+`MogBattleBuilder`) — атака Новы по фазам: `Intro` (до первого чека раскладки)
+→ `Checks` (группы чеков из раскладки) → `Outro` (`Balance.MogOutroTime`: Нова уходит или смерть)
+→ `done(won)`. Ввод по виду чека: кружок и полоска — ПРОБЕЛ, кнопка — ЛКМ внутри круга кнопки (с запасом
+15%), стрелка — `Mouse.delta` копится с открытия окна попадания, набралось `MogSwipeDistance` × высота
+экрана — взмах в сторону, куда двигали больше (копится всё время, пока стрелка на экране; не в ту
+сторону — `MogTimeline.Swipe` его не считает, копится заново; не успел до `hit + MogHitWindow` — промах). Кольца и круги — спрайты `MogShapes`, рисуются в коде.
+Кнопка и стрелка стоят в `playArea` по `x`, `y` чека, целиком внутри области. Кнопка как в osu: круг,
+белая обводка (`MogShapes.Border`), кольцо (`ThinRing`) появляется втрое больше, за первую треть сжатия
+проявляется (`CanvasGroup` кнопки и цвет кольца), в бит смыкается с обводкой; решённая кнопка — вспышка
+`burst` (попал — белая, расходится; мимо — красная). Следующий чек рисуется сразу, как решён предыдущий,
+и ждёт своего времени (кнопка бледная, `WaitAlpha`); «Приготовься» больше нет. `Begin(chart, novaWins, done, startAt)` — конкретная
+раскладка, `BeginTest(chart, done, from)` — проверка (меню, редактор раскладок) без появления Новы,
+`Abort()` — прервать без итога. Для редактора: `ShowStill`/`HideStill`, `FitPanel`, `PlaceAt`,
+`CircleTurnAt`, `BarPosAt`. Анимаций Новы пока нет —
+модель стоит на дэнс полу; когда появятся, их будет включать её аниматор по `MogBattle.Current`.
 Раскладку берёт `MogCharts.LoadAll()` из `StreamingAssets/MogCharts/*.json` (случайную, не ту же,
 что в прошлый раз), музыку грузит `UnityWebRequestMultimedia`. Время чеков — по музыке
 (`timeSamples / frequency − offset`), без музыки — по `Time.deltaTime`. Надпись фазы `phaseLabel` —
@@ -208,11 +278,12 @@ Right`). Считается по **фактическому** повороту �
 `Night.Frozen`, `Wallet.Add`). Данные — `StreamingAssets/Calls` через `CallData`. Деньги — `Wallet`
 (PlayerPrefs `SSDFNC.Money`), счётчик в меню (`MainMenu.moneyLabel`, сборщик меню версии 3).
 
-**Тесты** — `Assets/Tests/EditMode` (asmdef `SSDFNC.Tests.EditMode`), 64 штуки.
+**Тесты** — `Assets/Tests/EditMode` (asmdef `SSDFNC.Tests.EditMode`), 71 штука.
 `FurryTests` (31): бросок кубика, дверь, дэнс пол, звук и ловушка Доли, порча генератора, Дир, Нова
-и мог-батл, рост уровня, детерминизм и порядок сложностей в симуляции. `MogTests` (16): метка
-приходит в центр зоны ровно в `hit`, промахи, сужение зон, запас мога, порядок фаз, и все json-раскладки
-в `StreamingAssets/MogCharts` читаются без ошибок и с музыкой на месте. `CallTests` (17): правила
+и мог-батл, рост уровня, детерминизм и порядок сложностей в симуляции. `MogTests` (23): каждый вид
+чека (стрелка кружка в зоне на бит, окно кнопки, сторона взмаха, отскок и смена скорости полоски),
+плотные чеки, промахи, сужение зон, запас мога, фазы из групп, сохранение в json и обратно (и при
+русской локали), и все json-раскладки в `StreamingAssets/MogCharts` читаются без ошибок и с музыкой на месте. `CallTests` (17): правила
 расписания, подстановка и проверка переменных, для каждого типа вопроса верный вариант правда верный, а
 неверные правда неверные (на 200 случайных расписаниях), план звонков, все json в `StreamingAssets/Calls`. Запуск: Test Runner → EditMode → Run All.
 В batchmode: `Unity.exe -batchmode -projectPath … -runTests -testPlatform EditMode -testResults out.xml`
@@ -362,9 +433,11 @@ Right`). Считается по **фактическому** повороту �
 
 ## MainMenu — главное меню
 
-Две вкладки (`mainTab`, `settingsTab`, кнопки `mainTabButton` / `settingsTabButton`, выбранная
-подсвечена): «Главная» — «Начать ночь», «Выйти»; «Настройка ночи» — `NightSettingsTab` (уровни
-фурри − / +, пресеты, «Только Нова», «По умолчанию») и своя кнопка «Начать ночь».
+Три вкладки (`mainTab`, `settingsTab`, `checksTab`, выбранная подсвечена, `ShowTab(i)`):
+«Главная» — «Начать ночь», «Выйти»; «Настройка ночи» — `NightSettingsTab` (уровни фурри − / +,
+пресеты, «Только Нова», «По умолчанию») и своя кнопка «Начать ночь»; «Скилл-чеки» — `MogTestTab`
+(список раскладок с примерами, клик — пройти её в окне `MogBattle` на канвасе `MogTestHUD` через
+`BeginTest`, меню прячется через `CanvasGroup`, Esc — прервать).
 
 **`NightSettings`** (статический) — уровни ночи из меню; хранятся в PlayerPrefs (ключ
 `SSDFNC.NightLevels`), без сохранения — `Difficulty.Levels(Difficulty.Preset)`. `NightDirector` берёт
@@ -386,7 +459,7 @@ Right`). Считается по **фактическому** повороту �
 1. Предлагает сохранить открытые сцены, если в них есть изменения. Отказ отменяет сборку.
 2. Создаёт пустую сцену, наполняет её (см. «Главное меню» выше) и сохраняет в
    `Assets/Scenes/MainMenu.unity`, перезаписывая старую.
-3. Прописывает Build Settings: `MainMenu`, затем `SampleScene`.
+3. Прописывает Build Settings: `MainMenu`, `SampleScene` (редактор раскладок — отдельная программа).
 
 Кнопки 520×110. Цвет задаёт `ColorTint`: обычный тёмно-фиолетовый, при наведении светлее,
 при нажатии темнее. Для текста используются `NewText`, `NewImage`, `Stretch` из
@@ -511,7 +584,7 @@ Right`). Считается по **фактическому** повороту �
 | Редактор | 6000.6.0f1 |
 | Рендер | URP 17.6, два уровня качества: PC и Mobile (`Assets/Settings`) |
 | Ввод | только **Input System** (`activeInputHandler: 1`) — `UnityEngine.Input` не работает |
-| Сцены в сборке | `MainMenu`, `SampleScene` |
+| Сцены в сборке | `MainMenu`, `SampleScene` (редактор раскладок — своя сборка, `MogEditor`) |
 | Enter Play Mode Options | включены, **без перезагрузки домена и сцены** (`m_EnterPlayModeOptions: 3`) |
 | Имя продукта | `My project (1)`, компания `DefaultCompany` — стоит переименовать |
 | Контроль версий | git (ветка `main`), `.gitignore` для Unity, музыка и модели — Git LFS (`.gitattributes`) |

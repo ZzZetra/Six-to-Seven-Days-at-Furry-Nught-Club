@@ -1,0 +1,20 @@
+{
+    "name": "Все виды скилл-чеков (пример)",
+    "music": "",
+    "offset": 0,
+    "checks": [
+        { "type": "circle", "hit": 3, "pos": 0.3, "zone": 0.2, "speed": 0.5 },
+        { "type": "circle", "hit": 5, "pos": 0.75, "zone": 0.15, "speed": 0.9 },
+        { "type": "circle", "hit": 7, "pos": 0.5, "zone": 0.12, "speed": 1.2 },
+        { "type": "button", "hit": 9, "x": 0.2, "y": 0.7, "approach": 1 },
+        { "type": "button", "hit": 10.5, "x": 0.8, "y": 0.7, "approach": 1 },
+        { "type": "button", "hit": 12, "x": 0.35, "y": 0.3, "approach": 0.8 },
+        { "type": "button", "hit": 13.5, "x": 0.65, "y": 0.3, "approach": 0.6 },
+        { "type": "arrow", "hit": 16, "dir": "right", "approach": 1 },
+        { "type": "arrow", "hit": 17.5, "dir": "up", "approach": 1, "x": 0.3 },
+        { "type": "arrow", "hit": 19, "dir": "left", "approach": 0.8, "x": 0.7 },
+        { "type": "arrow", "hit": 20.5, "dir": "down", "approach": 0.8 },
+        { "type": "bar", "start": 22, "end": 26, "hit": 24, "pos": 0.8, "zone": 0.15, "speed": 0.3, "speedKeys": [{ "at": 23.5, "speed": 0.9 }] },
+        { "type": "bar", "start": 27, "end": 31.5, "hit": 29.5, "pos": 0.35, "zone": 0.15, "speed": 0.8, "speedKeys": [{ "at": 29, "speed": -0.6 }, { "at": 30.5, "speed": 0.6 }] }
+    ]
+}

@@ -2,8 +2,10 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-// Главное меню с двумя вкладками: «Главная» («Начать ночь», «Выйти») и «Настройка ночи»
-// (уровни фурри, см. NightSettingsTab). «Начать ночь» загружает офис, «Выйти» закрывает игру.
+// Главное меню с тремя вкладками: «Главная» («Начать ночь», «Выйти»), «Настройка ночи»
+// (уровни фурри, см. NightSettingsTab) и «Скилл-чеки» (проверка раскладок мог-батла, см. MogTestTab).
+// Сами раскладки делаются в отдельной программе — редакторе раскладок (MogChartEditor).
+// «Начать ночь» загружает офис, «Выйти» закрывает игру.
 // В правом верхнем углу — деньги игрока (Wallet), заработанные на звонках.
 public class MainMenu : MonoBehaviour
 {
@@ -15,8 +17,11 @@ public class MainMenu : MonoBehaviour
     public Button settingsStartButton; // «Начать ночь» на вкладке настройки
     public Button mainTabButton;
     public Button settingsTabButton;
+    public Button checksTabButton;
     public GameObject mainTab;
     public GameObject settingsTab;
+    public GameObject checksTab;
+    public MogTestTab checksTest;
     public Text moneyLabel;
     public string gameScene = "SampleScene";
 
@@ -27,18 +32,23 @@ public class MainMenu : MonoBehaviour
         startButton.onClick.AddListener(StartNight);
         quitButton.onClick.AddListener(Quit);
         settingsStartButton.onClick.AddListener(StartNight);
-        mainTabButton.onClick.AddListener(() => ShowTab(false));
-        settingsTabButton.onClick.AddListener(() => ShowTab(true));
-        ShowTab(false);
+        mainTabButton.onClick.AddListener(() => ShowTab(0));
+        settingsTabButton.onClick.AddListener(() => ShowTab(1));
+        if (checksTabButton != null) checksTabButton.onClick.AddListener(() => ShowTab(2));
+        ShowTab(0);
         if (moneyLabel != null) moneyLabel.text = $"Деньги: {Wallet.Money} $";
     }
 
-    public void ShowTab(bool settings)
+    // 0 — «Главная», 1 — «Настройка ночи», 2 — «Скилл-чеки»
+    public void ShowTab(int index)
     {
-        mainTab.SetActive(!settings);
-        settingsTab.SetActive(settings);
-        mainTabButton.image.color = settings ? TabOff : TabOn;
-        settingsTabButton.image.color = settings ? TabOn : TabOff;
+        mainTab.SetActive(index == 0);
+        settingsTab.SetActive(index == 1);
+        if (checksTab != null) checksTab.SetActive(index == 2);
+        mainTabButton.image.color = index == 0 ? TabOn : TabOff;
+        settingsTabButton.image.color = index == 1 ? TabOn : TabOff;
+        if (checksTabButton != null) checksTabButton.image.color = index == 2 ? TabOn : TabOff;
+        if (index == 2 && checksTest != null) checksTest.Refresh();
     }
 
     public void StartNight()

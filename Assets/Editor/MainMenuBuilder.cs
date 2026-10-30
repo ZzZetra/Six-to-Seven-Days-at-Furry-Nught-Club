@@ -9,9 +9,10 @@ public static class MainMenuBuilder
     const string GameScenePath = "Assets/Scenes/SampleScene.unity";
 
     // Версия сборщика меню, как у TestPlatformBuilder: устарело — Unity предложит пересобрать.
-    // 2 — вкладки «Главная» и «Настройка ночи». 3 — счётчик денег.
-    const int Version = 3;
-    const string VersionNote = "счётчик денег в правом верхнем углу";
+    // 2 — вкладки «Главная» и «Настройка ночи». 3 — счётчик денег. 4 — вкладка «Скилл-чеки».
+    // 5 — кнопка редактора раскладок (убрана в 6: редактор — отдельная программа).
+    const int Version = 6;
+    const string VersionNote = "кнопка в окне скилл-чеков как в osu, проверка без «Приготовься»; редактор раскладок — отдельная программа";
     static string VersionKey => "SSDFNC.MainMenuVersion." + Application.dataPath;
 
     [InitializeOnLoadMethod]
@@ -31,7 +32,7 @@ public static class MainMenuBuilder
         };
     }
 
-    // Собирает сцену главного меню заново и прописывает обе сцены в Build Settings.
+    // Собирает сцену главного меню заново и прописывает сцены игры в Build Settings.
     [MenuItem("SSDFNC/Build Main Menu")]
     public static void Build()
     {
@@ -48,7 +49,8 @@ public static class MainMenuBuilder
             typeof(UnityEngine.EventSystems.EventSystem),
             typeof(UnityEngine.InputSystem.UI.InputSystemUIInputModule));
 
-        var canvasGo = new GameObject("Menu", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+        var canvasGo = new GameObject("Menu", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster),
+            typeof(CanvasGroup)); // CanvasGroup — спрятать меню на время проверки скилл-чеков
         canvasGo.GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
         var scaler = canvasGo.GetComponent<CanvasScaler>();
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
@@ -75,8 +77,9 @@ public static class MainMenuBuilder
         money.sizeDelta = new Vector2(600, 70);
 
         // Вкладки: цвет кнопки вкладки задаёт MainMenu.ShowTab (подсветка выбранной)
-        menu.mainTabButton = TabButton("MainTabButton", root, "Главная", new Vector2(-180, 210));
-        menu.settingsTabButton = TabButton("SettingsTabButton", root, "Настройка ночи", new Vector2(180, 210));
+        menu.mainTabButton = TabButton("MainTabButton", root, "Главная", new Vector2(-360, 210));
+        menu.settingsTabButton = TabButton("SettingsTabButton", root, "Настройка ночи", new Vector2(0, 210));
+        menu.checksTabButton = TabButton("ChecksTabButton", root, "Скилл-чеки", new Vector2(360, 210));
 
         // Вкладка «Главная»
         var mainTab = Container("MainTab", root);
@@ -113,6 +116,42 @@ public static class MainMenuBuilder
         tab.summary = TestPlatformBuilder.NewText("Summary", settings, 34);
         tab.summary.color = new Color(0.8f, 0.7f, 1f);
         Place(tab.summary.rectTransform, new Vector2(0, -430), new Vector2(1200, 60));
+
+        // Вкладка «Скилл-чеки»: список раскладок, итог. Само окно мог-батла — на своём канвасе поверх меню
+        var checks = Container("ChecksTab", root);
+        menu.checksTab = checks.gameObject;
+        var checksTitle = TestPlatformBuilder.NewText("Header", checks, 36);
+        checksTitle.text = "Проверка скилл-чеков: выбери раскладку. Esc — прервать";
+        checksTitle.color = new Color(0.8f, 0.7f, 1f);
+        Place(checksTitle.rectTransform, new Vector2(0, 130), new Vector2(1400, 60));
+        var listGo = new GameObject("List", typeof(RectTransform));
+        listGo.transform.SetParent(checks, false);
+        var list = (RectTransform)listGo.transform;
+        list.anchorMin = list.anchorMax = list.pivot = new Vector2(0.5f, 1f);
+        list.anchoredPosition = new Vector2(0, -470);
+        list.sizeDelta = new Vector2(1100, 540);
+        var template = NewButton("ChartButton", list, "Раскладка", Vector2.zero, new Vector2(1100, 58), 32);
+        var tr = (RectTransform)template.transform;
+        tr.anchorMin = tr.anchorMax = tr.pivot = new Vector2(0.5f, 1f);
+        template.gameObject.SetActive(false);
+        var result = TestPlatformBuilder.NewText("Result", checks, 34);
+        result.color = new Color(1f, 0.85f, 0.35f);
+        Place(result.rectTransform, new Vector2(0, -470), new Vector2(1600, 60));
+
+        var testHud = new GameObject("MogTestHUD", typeof(Canvas), typeof(CanvasScaler), typeof(MogBattle), typeof(AudioSource));
+        var testCanvas = testHud.GetComponent<Canvas>();
+        testCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        testCanvas.sortingOrder = 10;
+        var testScaler = testHud.GetComponent<CanvasScaler>();
+        testScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        testScaler.referenceResolution = new Vector2(1920, 1080);
+        var test = testHud.AddComponent<MogTestTab>();
+        test.battle = MogBattleBuilder.Build(testHud);
+        test.menu = canvasGo.GetComponent<CanvasGroup>();
+        test.list = list;
+        test.template = template;
+        test.result = result;
+        menu.checksTest = test;
 
         EditorSceneManager.SaveScene(scene, MenuScenePath);
 

@@ -127,7 +127,7 @@ public class MogTests
     }
 
     [Test]
-    public void Checks_AreSortedByStart_AndProgressCountsByType()
+    public void Checks_AreSortedByStart_AndPhasesComeFromGroups()
     {
         var chart = Chart(
             new MogCheck { type = "sides", start = 6f, hit = 7f },
@@ -135,13 +135,145 @@ public class MogTests
             new MogCheck { type = "circle", start = 2f, hit = 3f },
             new MogCheck { type = "Bar", start = 4f, hit = 5f });
         var tl = new MogTimeline(chart);
+        Assert.That(tl.PhaseCount, Is.EqualTo(5), "Появление + кружки + полоска + стрелка + конец");
         Assert.That(tl.Current.Type, Is.EqualTo(MogCheckType.Circle));
-        Assert.That(tl.ProgressInType(), Is.EqualTo((1, 2)));
+        Assert.That(tl.Phase, Is.EqualTo(2));
+        Assert.That(tl.ProgressInGroup(), Is.EqualTo((1, 2)));
         tl.Press(1f);
         tl.Press(3f);
         Assert.That(tl.Current.Type, Is.EqualTo(MogCheckType.Bar), "тип без учёта регистра");
-        Assert.That(tl.ProgressInType(), Is.EqualTo((1, 1)));
-        Assert.That(MogTimeline.PhaseNumber(MogCheckType.Sides), Is.EqualTo(4));
+        Assert.That(tl.Phase, Is.EqualTo(3));
+        Assert.That(tl.ProgressInGroup(), Is.EqualTo((1, 1)));
+        tl.Press(5f);
+        Assert.That(tl.Current.Type, Is.EqualTo(MogCheckType.Arrow), "старое sides — стрелка");
+        Assert.That(tl.Phase, Is.EqualTo(4));
+    }
+
+    // ── Виды скилл-чеков ──
+
+    [Test]
+    public void Circle_NeedleReachesZoneOnBeat_PassingTheZoneIsAMiss()
+    {
+        var c = new MogCheck { type = "circle", hit = 3f, pos = 0.5f, zone = 0.2f, speed = 0.5f };
+        Assert.That(c.StartTime, Is.EqualTo(2f).Within(1e-5), "полоборота со скоростью 0.5 об/с — за 1 с до бита");
+        var tl = new MogTimeline(Chart(c));
+        Assert.That(tl.NeedleAngle(3f), Is.EqualTo(0.5f).Within(1e-5));
+        Assert.That(tl.InZone(3.15f), "0.575 — ещё в зоне ±0.1");
+        Assert.That(tl.InZone(2.7f), Is.False, "0.35 — до зоны");
+        tl.Update(3.19f);
+        Assert.That(tl.Misses, Is.EqualTo(0));
+        tl.Update(3.25f); // 0.625 — стрелка прошла зону
+        Assert.That(tl.Misses, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void Button_HitWindowAroundBeat_EarlyClickIsAMiss()
+    {
+        MogTimeline One() => new MogTimeline(Chart(new MogCheck { type = "button", hit = 2f, approach = 1f, x = 0.3f, y = 0.7f }));
+        var tl = One();
+        Assert.That(tl.Active(0.9f), Is.False, "кнопка появляется за approach до бита");
+        Assert.That(tl.RingProgress(1.5f), Is.EqualTo(0.5f).Within(1e-5));
+        tl.Press(2f + Balance.MogHitWindow * 0.9f);
+        Assert.That(tl.Hits, Is.EqualTo(1));
+        tl = One();
+        tl.Press(1.5f);
+        Assert.That(tl.Misses, Is.EqualTo(1), "нажал рано");
+        tl = One();
+        tl.Update(2f + Balance.MogHitWindow + 0.01f);
+        Assert.That(tl.Misses, Is.EqualTo(1), "не успел");
+    }
+
+    [Test]
+    public void DenseChecks_NextRingShrinkingDoesNotKillCurrent()
+    {
+        // Бит каждые 0.5 с, кольцо сжимается 1 с: следующая кнопка «началась» раньше, чем прошёл бит текущей
+        var tl = new MogTimeline(Chart(
+            new MogCheck { type = "button", hit = 3.5f, approach = 1f },
+            new MogCheck { type = "arrow", hit = 4f, approach = 1f, dir = "down" },
+            new MogCheck { type = "circle", hit = 4.5f, pos = 0.5f, zone = 0.2f, speed = 0.6f }));
+        tl.Update(3.1f);
+        Assert.That(tl.Misses, Is.EqualTo(0), "следующая стрелка уже сжимается, но в неё ещё не попасть");
+        tl.Press(3.5f);
+        Assert.That(tl.Hits, Is.EqualTo(1));
+        Assert.That(tl.RingProgress(3.5f), Is.EqualTo(0.5f).Within(1e-5), "кольцо стрелки показывается уже наполовину сжатым");
+        tl.Swipe(4f, MogDir.Down);
+        Assert.That(tl.Hits, Is.EqualTo(2));
+        Assert.That(tl.NeedleAngle(4.2f), Is.GreaterThan(0.3f), "стрелка кружка уже бежит по кругу");
+        tl.Press(4.5f);
+        Assert.That(tl.Hits, Is.EqualTo(3));
+
+        // Длинная полоска (до 5 с) не нажата, а у кнопки на 3 с открылось окно — полоска промах, кнопка играется
+        tl = new MogTimeline(Chart(
+            new MogCheck { type = "bar", start = 0f, end = 5f, pos = 0.5f, zone = 0.2f, speed = 0.5f },
+            new MogCheck { type = "button", hit = 3f, approach = 1f }));
+        tl.Update(2.5f);
+        Assert.That(tl.Misses, Is.EqualTo(0));
+        tl.Update(3f - Balance.MogHitWindow);
+        Assert.That(tl.Misses, Is.EqualTo(1));
+        tl.Press(3f);
+        Assert.That(tl.Hits, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void Arrow_WaitsForRightSwipe_UntilRingCloses()
+    {
+        // Стрелка появляется в 1 с (approach 1) и ждёт взмаха вверх до 2 с (плюс запас окна)
+        MogTimeline One() => new MogTimeline(Chart(new MogCheck { type = "arrow", hit = 2f, dir = "up" }));
+        var tl = One();
+        tl.Press(1.5f);
+        Assert.That(tl.Hits + tl.Misses, Is.EqualTo(0), "ПРОБЕЛ на стрелку не действует");
+        tl.Swipe(1.1f, MogDir.Left);
+        tl.Swipe(1.2f, MogDir.Down);
+        Assert.That(tl.Hits + tl.Misses, Is.EqualTo(0), "не в ту сторону — не считается, ждёт дальше");
+        tl.Swipe(1.3f, MogDir.Up);
+        Assert.That(tl.Hits, Is.EqualTo(1), "махнул в её сторону задолго до конца — попал");
+
+        tl = One();
+        tl.Swipe(0.9f, MogDir.Up);
+        Assert.That(tl.Hits + tl.Misses, Is.EqualTo(0), "до появления взмах не действует");
+
+        tl = One();
+        tl.Update(2f);
+        Assert.That(tl.Misses, Is.EqualTo(0), "кольцо сомкнулось — ещё запас окна");
+        tl.Update(2f + Balance.MogHitWindow + 0.01f);
+        Assert.That(tl.Misses, Is.EqualTo(1), "не успел — промах");
+        tl.Swipe(2.3f, MogDir.Up);
+        Assert.That(tl.Hits, Is.EqualTo(0), "после промаха взмах уже не считается");
+    }
+
+    [Test]
+    public void Bar_BouncesAtEdges_AndChangesSpeed()
+    {
+        var bounce = new MogCheck { type = "bar", start = 0f, end = 4f, speed = 1f };
+        Assert.That(bounce.BarPos(0.5f), Is.EqualTo(0.5f).Within(1e-5));
+        Assert.That(bounce.BarPos(1.5f), Is.EqualTo(0.5f).Within(1e-5), "дошла до края и едет назад");
+        Assert.That(bounce.BarPos(2.25f), Is.EqualTo(0.25f).Within(1e-5), "отскок от левого края");
+
+        var keys = new MogCheck
+        {
+            type = "bar", start = 0f, end = 5f, speed = 0.5f,
+            speedKeys = new[] { new MogSpeedKey { at = 1f, speed = 0.25f }, new MogSpeedKey { at = 2f, speed = -0.5f } },
+        };
+        Assert.That(keys.BarPos(1f), Is.EqualTo(0.5f).Within(1e-5));
+        Assert.That(keys.BarPos(2f), Is.EqualTo(0.75f).Within(1e-5), "медленнее после 1 с");
+        Assert.That(keys.BarPos(2.5f), Is.EqualTo(0.5f).Within(1e-5), "с 2 с — назад");
+
+        var tl = new MogTimeline(Chart(new MogCheck { type = "bar", start = 0f, end = 3f, speed = 1f, pos = 0.5f, zone = 0.2f }));
+        tl.Update(1.5f);
+        Assert.That(tl.Misses, Is.EqualTo(0), "после отскока полоска ещё идёт");
+        tl.Press(1.5f);
+        Assert.That(tl.Hits, Is.EqualTo(1), "на обратном пути метка снова в зоне");
+    }
+
+    [Test]
+    public void Validate_ChecksEveryType()
+    {
+        Assert.That(Chart(new MogCheck { type = "circle", hit = 1f, start = 1f, pos = 0.5f }).Validate(), Does.Contain("speed"));
+        Assert.That(Chart(new MogCheck { type = "button", hit = 1f, approach = 0.1f }).Validate(), Does.Contain("approach"));
+        Assert.That(Chart(new MogCheck { type = "arrow", hit = 1f, dir = "back" }).Validate(), Does.Contain("dir"));
+        Assert.That(Chart(new MogCheck { type = "button", hit = 1f, x = 1.5f }).Validate(), Does.Contain("x"));
+        Assert.That(Chart(new MogCheck { type = "arrow", hit = 1f, dir = "down" },
+                          new MogCheck { type = "circle", hit = 3f, pos = 0.3f, speed = 0.5f }).Validate(), Is.Null);
     }
 
     [Test]
@@ -155,21 +287,21 @@ public class MogTests
     }
 
     [Test]
-    public void Default_IsFiveCirclesFiveBarsFiveSides()
+    public void Default_IsFiveCirclesFiveBarsFiveArrows()
     {
         var chart = MogChart.Default();
         Assert.That(chart.Validate(), Is.Null);
         var tl = new MogTimeline(chart);
         Assert.That(tl.Count, Is.EqualTo(15));
-        int[] perType = new int[3];
-        MogCheckType last = MogCheckType.Circle;
-        foreach (var c in chart.checks)
-        {
-            Assert.That(c.Type, Is.GreaterThanOrEqualTo(last), "фазы идут по порядку: кружок → полоска → в стороны");
-            last = c.Type;
-            perType[(int)c.Type]++;
-        }
-        Assert.That(perType, Is.EqualTo(new[] { 5, 5, 5 }));
+        Assert.That(tl.PhaseCount, Is.EqualTo(5), "Появление → кружки → полоски → стрелки → конец");
+        var order = chart.checks.Select(c => c.Type).Distinct().ToArray();
+        Assert.That(order, Is.EqualTo(new[] { MogCheckType.Circle, MogCheckType.Bar, MogCheckType.Arrow }));
+        Assert.That(chart.checks.Count(c => c.Type == MogCheckType.Circle), Is.EqualTo(5));
+        Assert.That(chart.checks.Count(c => c.Type == MogCheckType.Bar), Is.EqualTo(5));
+        Assert.That(chart.checks.Count(c => c.Type == MogCheckType.Arrow), Is.EqualTo(5));
+        for (int i = 1; i < chart.checks.Length; i++)
+            Assert.That(chart.checks[i].StartTime, Is.GreaterThanOrEqualTo(chart.checks[i - 1].EndTime(Balance.MogHitWindow)),
+                "чеки не накладываются");
     }
 
     // ── Файлы раскладок ──
@@ -195,9 +327,54 @@ public class MogTests
         for (int i = 0; i < code.checks.Length; i++)
         {
             Assert.That(file.checks[i].Type, Is.EqualTo(code.checks[i].Type));
-            Assert.That(file.checks[i].start, Is.EqualTo(code.checks[i].start).Within(1e-4));
+            Assert.That(file.checks[i].StartTime, Is.EqualTo(code.checks[i].StartTime).Within(1e-4));
             Assert.That(file.checks[i].hit, Is.EqualTo(code.checks[i].hit).Within(1e-4));
             Assert.That(file.checks[i].pos, Is.EqualTo(code.checks[i].pos).Within(1e-4));
+            Assert.That(file.checks[i].Speed, Is.EqualTo(code.checks[i].Speed).Within(1e-4));
+            Assert.That(file.checks[i].Direction, Is.EqualTo(code.checks[i].Direction));
+        }
+    }
+
+    // Редактор сохраняет через ToJson: всё читается обратно, числа с точкой даже на русской Windows
+    [Test]
+    public void Json_SaveAndLoadKeepsEveryType()
+    {
+        var culture = System.Threading.Thread.CurrentThread.CurrentCulture;
+        System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("ru-RU");
+        try
+        {
+            var chart = new MogChart
+            {
+                name = "Проверка \"кавычек\"", music = "Music/song.ogg", offset = 0.125f,
+                checks = new[]
+                {
+                    new MogCheck { type = "circle", hit = 2.5f, pos = 0.3f, zone = 0.15f, speed = 0.75f },
+                    new MogCheck { type = "button", hit = 4f, x = 0.2f, y = 0.8f, approach = 0.6f },
+                    new MogCheck { type = "arrow", hit = 5.5f, dir = "down", x = 0.7f, approach = 0.9f },
+                    new MogCheck { type = "bar", start = 7f, end = 10f, hit = 8f, pos = 0.4f, zone = 0.2f, speed = 0.5f,
+                        speedKeys = new[] { new MogSpeedKey { at = 8.5f, speed = -0.25f } } },
+                },
+            };
+            string json = chart.ToJson();
+            Assert.That(json, Does.Contain("0.125").And.Not.Contain("0,125"));
+            var back = JsonUtility.FromJson<MogChart>(json);
+            Assert.That(back.Validate(), Is.Null);
+            Assert.That(back.name, Is.EqualTo(chart.name));
+            Assert.That(back.music, Is.EqualTo(chart.music));
+            for (int i = 0; i < chart.checks.Length; i++)
+            {
+                MogCheck a = chart.checks[i], b = back.checks[i];
+                Assert.That(b.Type, Is.EqualTo(a.Type));
+                Assert.That(b.StartTime, Is.EqualTo(a.StartTime).Within(1e-3), a.type);
+                Assert.That(b.hit, Is.EqualTo(a.hit).Within(1e-3));
+                Assert.That(b.Direction, Is.EqualTo(a.Direction));
+                Assert.That(b.x, Is.EqualTo(a.x).Within(1e-3));
+                Assert.That(b.BarPos(9f), Is.EqualTo(a.BarPos(9f)).Within(1e-3));
+            }
+        }
+        finally
+        {
+            System.Threading.Thread.CurrentThread.CurrentCulture = culture;
         }
     }
 

@@ -77,6 +77,8 @@ public static class Balance
     // Скилл-чеки и музыка — не здесь, а в раскладках Assets/StreamingAssets/MogCharts/*.json
     // (формат: docs/MOG_CHARTS.md). Фазы: Появление → Кружок → Полоска → В стороны → Уход или Смерть.
     public const float MogOutroTime = 2f;            // с, анимация ухода Новы или смерти
+    public const float MogHitWindow = 0.15f;         // с, кнопка: попал, если не дальше этого от бита; стрелка: запас после бита
+    public const float MogSwipeDistance = 0.06f;     // стрелка: провести мышью хотя бы на столько (доля высоты экрана)
     // Запас мога: батл начинается с MogStartLives, попал — +MogLivesPerHit (не выше MogMaxLives),
     // промах — −1. На нуле Нова нападает сразу; дожил до конца хотя бы с 1 — выжил
     public const int MogStartLives = 3;

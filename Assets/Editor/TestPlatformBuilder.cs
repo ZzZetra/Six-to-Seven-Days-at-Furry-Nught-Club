@@ -17,13 +17,18 @@ public static class TestPlatformBuilder
     // 5 — пробел: дэнс пол (если смотришь вперёд) и рычаг двери (если смотришь вправо).
     // 6 — фурри: директор ночи, 8 камер с кормлением Дира, фигуры фурри, экран смерти, мог-батл.
     // 7 — панель сложности F1 во время ночи.
-    const int Version = 11;
-    const string VersionNote = "модель генератора из Blender с анимациями: рывки стартера, дрожь, крышка бака";
+    const int Version = 15;
+    const string VersionNote = "кнопка в окне скилл-чеков как в osu (обводка, кольцо проявляется, вспышка)";
 
     // Модель генератора (выгружает Tools/Blender/export_generator.bat). Нет файла — генератор из примитивов
     const string GeneratorModelFolder = "Assets/Models/Generator/";
     const float GeneratorModelScale = 1.4f; // модель ~0.8 м в длину — чуть крупнее, чтобы читалась
     const float GeneratorModelYaw = 25f;    // доворот от «пульт к игроку», чтобы был виден бок с ручкой стартера
+
+    // Модель Новы (выгружает Tools/Blender/export_nova.bat). Нет файла — Нова-капсула
+    const string NovaModelFolder = "Assets/Models/Nova/";
+    const float NovaModelHeight = 1.8f; // м, с ушами — как капсула
+    const float NovaModelYaw = 180f;    // после импорта Нова смотрит от игрока (+Z) — разворачиваем лицом в офис
     static string VersionKey => "SSDFNC.TestPlatformVersion." + Application.dataPath;
 
     [InitializeOnLoadMethod]
@@ -286,13 +291,13 @@ public static class TestPlatformBuilder
         var normal = Tex("Generator_Normal.png");
         return new Dictionary<string, Material>
         {
-            ["Generator"] = ModelMaterial("Generator", m => Lit(m, baseMap, metallic, normal)),
-            ["GeneratorGlass"] = ModelMaterial("GeneratorGlass", m =>
+            ["Generator"] = ModelMaterial(GeneratorModelFolder, "Generator", m => Lit(m, baseMap, metallic, normal)),
+            ["GeneratorGlass"] = ModelMaterial(GeneratorModelFolder, "GeneratorGlass", m =>
             {
                 Lit(m, glassMap, metallic, normal);
                 Transparent(m);
             }),
-            ["StarterRope"] = ModelMaterial("StarterRope", m =>
+            ["StarterRope"] = ModelMaterial(GeneratorModelFolder, "StarterRope", m =>
             {
                 m.SetColor("_BaseColor", new Color(0.19f, 0.19f, 0.19f));
                 m.SetFloat("_Smoothness", 0.15f);
@@ -300,15 +305,17 @@ public static class TestPlatformBuilder
         };
     }
 
-    static Material ModelMaterial(string name, System.Action<Material> setup)
+    // Материал модели в <папка модели>/Materials: создаётся при первой сборке, потом только обновляется
+    static Material ModelMaterial(string modelFolder, string name, System.Action<Material> setup,
+        string shader = "Universal Render Pipeline/Lit")
     {
-        string folder = GeneratorModelFolder + "Materials";
-        if (!AssetDatabase.IsValidFolder(folder)) AssetDatabase.CreateFolder(GeneratorModelFolder.TrimEnd('/'), "Materials");
+        string folder = modelFolder + "Materials";
+        if (!AssetDatabase.IsValidFolder(folder)) AssetDatabase.CreateFolder(modelFolder.TrimEnd('/'), "Materials");
         string path = $"{folder}/{name}.mat";
         var m = AssetDatabase.LoadAssetAtPath<Material>(path);
         if (m == null)
         {
-            m = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            m = new Material(Shader.Find(shader));
             AssetDatabase.CreateAsset(m, path);
         }
         setup(m);
@@ -491,7 +498,7 @@ public static class TestPlatformBuilder
         // Фигуры-заглушки: капсула с именем, по FurryId (у Дира нет — его видно только на камере)
         director.avatars = new FurryAvatar[5];
         director.avatars[(int)FurryId.Stray] = NewAvatar(go.transform, cam, "Стрей", new Color(0.95f, 0.8f, 0.2f));
-        director.avatars[(int)FurryId.Nova] = NewAvatar(go.transform, cam, "Нова", new Color(0.6f, 0.3f, 0.9f));
+        director.avatars[(int)FurryId.Nova] = NovaAvatar(go.transform, cam, new Color(0.6f, 0.3f, 0.9f));
         director.avatars[(int)FurryId.Dali] = NewAvatar(go.transform, cam, "Дали", new Color(0.2f, 0.8f, 0.85f));
         director.avatars[(int)FurryId.Doli] = NewAvatar(go.transform, cam, "Доли", new Color(1f, 0.45f, 0.7f));
 
@@ -518,42 +525,8 @@ public static class TestPlatformBuilder
         director.deathText = NewText("DeathText", death.transform, 110);
         Stretch(director.deathText.rectTransform);
 
-        var battle = hud.GetComponent<MogBattle>();
-        var panel = NewImage("MogBattlePanel", hud.transform, new Color(0.05f, 0.02f, 0.1f, 0.88f));
-        Place(panel.rectTransform, new Vector2(0, -80), new Vector2(1200, 460));
-        battle.title = NewText("Title", panel.transform, 64);
-        battle.title.text = "МОГ-БАТЛ С НОВОЙ";
-        battle.title.color = new Color(0.8f, 0.6f, 1f);
-        Place(battle.title.rectTransform, new Vector2(0, 160), new Vector2(1100, 90));
-        var hint = NewText("Hint", panel.transform, 40);
-        hint.text = "ПРОБЕЛ — когда метка в зелёной зоне";
-        Place(hint.rectTransform, new Vector2(0, 85), new Vector2(1100, 60));
-        var bar = NewImage("Bar", panel.transform, new Color(0.25f, 0.25f, 0.3f));
-        Place(bar.rectTransform, new Vector2(0, -10), new Vector2(950, 60));
-        var zone = NewImage("Zone", bar.transform, new Color(0.2f, 0.85f, 0.3f));
-        Stretch(zone.rectTransform);
-        var marker = NewImage("Marker", bar.transform, Color.white);
-        marker.rectTransform.sizeDelta = new Vector2(14, 100);
-        battle.score = NewText("Score", panel.transform, 44);
-        Place(battle.score.rectTransform, new Vector2(0, -130), new Vector2(1100, 70));
-        battle.panel = panel.gameObject;
-        battle.zone = zone.rectTransform;
-        battle.marker = marker.rectTransform;
-        panel.gameObject.SetActive(false);
-
-        // Фаза атаки Новы — в правом верхнем углу, под часами смены
-        battle.phaseLabel = NewText("MogPhase", hud.transform, 40);
-        battle.phaseLabel.alignment = TextAnchor.UpperRight;
-        battle.phaseLabel.color = new Color(0.8f, 0.6f, 1f);
-        var pl = battle.phaseLabel.rectTransform;
-        pl.anchorMin = pl.anchorMax = pl.pivot = Vector2.one;
-        pl.anchoredPosition = new Vector2(-40, -110);
-        pl.sizeDelta = new Vector2(900, 60);
-        battle.phaseLabel.text = "";
-
-        battle.music = hud.GetComponent<AudioSource>();
-        battle.music.playOnAwake = false;
-        battle.music.spatialBlend = 0f;
+        // Окно мог-батла: кружок, кнопка, стрелка, полоска, запас мога и фаза (то же окно — в проверке скилл-чеков)
+        var battle = MogBattleBuilder.Build(hud);
         director.battle = battle;
 
         return director;
@@ -770,9 +743,71 @@ public static class TestPlatformBuilder
 
         var avatar = go.GetComponent<FurryAvatar>();
         avatar.label = label.transform;
-        avatar.body = body.transform;
         go.SetActive(false);
         return avatar;
+    }
+
+    // Нова — модель из Blender ростом NovaModelHeight, ноги на полу, лицом к игроку (NovaModelYaw),
+    // табличка с именем над головой. Без модели — капсула
+    static FurryAvatar NovaAvatar(Transform parent, Camera cam, Color color)
+    {
+        var asset = AssetDatabase.LoadAssetAtPath<GameObject>(NovaModelFolder + "Nova.fbx");
+        if (asset == null) return NewAvatar(parent, cam, "Нова", color);
+
+        var go = new GameObject("Furry Нова", typeof(FurryAvatar));
+        go.transform.SetParent(parent, false);
+        var model = (GameObject)PrefabUtility.InstantiatePrefab(asset, go.transform);
+        model.name = "NovaModel";
+        model.transform.localScale *= NovaModelHeight / ModelBounds(model).size.y;
+        model.transform.Rotate(0f, NovaModelYaw, 0f, Space.World);
+        var b = ModelBounds(model);
+        model.transform.position += go.transform.position - new Vector3(b.center.x, b.min.y, b.center.z);
+
+        var materials = NovaMaterials();
+        foreach (var r in model.GetComponentsInChildren<Renderer>())
+        {
+            var list = r.sharedMaterials;
+            for (int i = 0; i < list.Length; i++)
+                if (list[i] != null && materials.TryGetValue(list[i].name, out var m)) list[i] = m;
+            r.sharedMaterials = list;
+        }
+
+        var label = NewCanvasAt("Label", go.transform, cam, new Vector2(300, 80), new Vector3(0f, NovaModelHeight + 0.25f, 0f), scale: 0.002f);
+        var text = NewText("Name", label.transform, 60);
+        text.text = "Нова";
+        text.color = color;
+        Stretch(text.rectTransform);
+
+        var avatar = go.GetComponent<FurryAvatar>();
+        avatar.label = label.transform;
+        go.SetActive(false);
+        return avatar;
+    }
+
+    // Материалы Новы. Тело — текстура Nova_Body.png, если она выгружена (в nova wip.blend её пока нет), иначе
+    // светлый мех как у головы. Детали лица — плоские цвета без света, как в Blender (цвет сразу в выход)
+    static Dictionary<string, Material> NovaMaterials()
+    {
+        var fur = new Color(0.9f, 0.9f, 0.9f); // Blender 0.8 (линейный) ≈ 0.9 на экране
+        var body = AssetDatabase.LoadAssetAtPath<Texture2D>(NovaModelFolder + "Textures/Nova_Body.png");
+        return new Dictionary<string, Material>
+        {
+            ["NovaBody"] = ModelMaterial(NovaModelFolder, "NovaBody", m =>
+            {
+                m.SetTexture("_BaseMap", body);
+                m.SetColor("_BaseColor", body != null ? Color.white : fur);
+                m.SetFloat("_Smoothness", 0.5f);
+            }),
+            ["NovaFur"] = ModelMaterial(NovaModelFolder, "NovaFur", m =>
+            {
+                m.SetColor("_BaseColor", fur);
+                m.SetFloat("_Smoothness", 0f);
+            }),
+            ["NovaBlack"] = ModelMaterial(NovaModelFolder, "NovaBlack", m => m.SetColor("_BaseColor", Color.black),
+                "Universal Render Pipeline/Unlit"),
+            ["NovaRed"] = ModelMaterial(NovaModelFolder, "NovaRed", m => m.SetColor("_BaseColor", new Color(1f, 0.03f, 0f)),
+                "Universal Render Pipeline/Unlit"),
+        };
     }
 
     // Круглая кнопка на столе: тёмное основание и цветная шляпка, которая утапливается (PressControl).
@@ -842,7 +877,7 @@ public static class TestPlatformBuilder
         return fill.rectTransform;
     }
 
-    static void Place(RectTransform r, Vector2 pos, Vector2 size)
+    internal static void Place(RectTransform r, Vector2 pos, Vector2 size)
     {
         r.anchoredPosition = pos;
         r.sizeDelta = size;

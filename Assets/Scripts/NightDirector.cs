@@ -11,7 +11,7 @@ using UnityEngine.UI;
 public class NightDirector : MonoBehaviour, IOffice
 {
     const float DeathScreenTime = 2.5f;
-    const float AvatarSpacing = 0.9f; // м между фурри, если их несколько в одном месте
+    const float AvatarSpacing = 1.2f; // м между фурри, если их несколько в одном месте (Нова с руками ~1.2 м)
 
     public Generator generator;
     public Door door;
@@ -138,9 +138,8 @@ public class NightDirector : MonoBehaviour, IOffice
         look.FaceForward(); // Нова разворачивает игрока к дэнс полу (от генератора — назад в офис)
         generator.Paused = true;
         danceFloor.SetForced(true);
-        PlaceAvatars();     // Нова уже стоит на дэнс полу, когда стартует анимация появления
-        var body = avatars[(int)FurryId.Nova] != null ? avatars[(int)FurryId.Nova].body : null;
-        battle.Begin(nova.Wins, body, won =>
+        PlaceAvatars();     // Нова уже стоит на дэнс полу, когда начинается фаза появления
+        battle.Begin(nova.Wins, won =>
         {
             generator.Paused = false;
             danceFloor.SetForced(false);

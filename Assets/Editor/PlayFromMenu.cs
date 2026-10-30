@@ -2,6 +2,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 
 // Play в редакторе всегда запускает игру с главного меню, какая бы сцена ни была открыта.
+// Исключение — сцена редактора раскладок (MogEditor): это отдельная программа, она запускается сама.
 // Выключить или включить: галочка SSDFNC → Play From Main Menu.
 [InitializeOnLoad]
 public static class PlayFromMenu
@@ -10,8 +11,19 @@ public static class PlayFromMenu
     const string MenuItemPath = "SSDFNC/Play From Main Menu";
     const string PrefKey = "SSDFNC.PlayFromMenu";
 
-    // delayCall: при запуске редактора база ассетов может быть ещё не готова
-    static PlayFromMenu() => EditorApplication.delayCall += Apply;
+    // delayCall: при запуске редактора база ассетов может быть ещё не готова.
+    // Открыли, сохранили или сменили сцену — проверить ещё раз, не редактор ли раскладок это
+    static PlayFromMenu()
+    {
+        EditorApplication.delayCall += Apply;
+        EditorSceneManager.sceneOpened += (s, m) => Apply();
+        EditorSceneManager.sceneSaved += s => Apply();
+        EditorSceneManager.activeSceneChangedInEditMode += (a, b) => Apply();
+        EditorApplication.playModeStateChanged += s =>
+        {
+            if (s == PlayModeStateChange.ExitingEditMode) Apply();
+        };
+    }
 
     static bool Enabled
     {
@@ -35,7 +47,8 @@ public static class PlayFromMenu
 
     static void Apply()
     {
-        EditorSceneManager.playModeStartScene = Enabled
+        bool chartEditor = EditorSceneManager.GetActiveScene().path == MogEditorBuilder.ScenePath;
+        EditorSceneManager.playModeStartScene = Enabled && !chartEditor
             ? AssetDatabase.LoadAssetAtPath<SceneAsset>(MenuScenePath)
             : null;
     }

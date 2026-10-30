@@ -1,115 +1,185 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Networking;
 using UnityEngine.UI;
 
 // Атака Новы (мог-батл) по фазам и по раскладке под музыку (MogChart из StreamingAssets/MogCharts):
-//   1 Появление — Нова повернула игрока к дэнс полу, анимация (заглушка) до первого скилл-чека;
-//   2 Кружок, 3 Полоска, 4 В стороны — группы скилл-чеков из раскладки (пока все работают как «полоска»);
-//   5 Уход Новы или Смерть — анимация (заглушка).
-// Фаза пишется в правом верхнем углу. Время чеков считается по музыке (если она есть), поэтому их
-// подгоняют под бит руками в json. ПРОБЕЛ в зелёной зоне — попал. Запас мога: с 3, попал — +1 (до 4),
-// промах — −1; на нуле Нова нападает сразу, дожил до конца хотя бы с 1 — она уходит.
+//   Появление — Нова повернула игрока к дэнс полу, до первого скилл-чека;
+//   группы скилл-чеков из раскладки — чеки одного вида подряд, каждая группа — своя фаза;
+//   Уход Новы или Смерть — Balance.MogOutroTime.
+// Виды скилл-чеков и управление:
+//   кружок  — стрелка бежит по кругу, ПРОБЕЛ, когда она в зелёной дуге;
+//   кнопка  — как в osu: кольцо сжимается к белой обводке кнопки, клик по кнопке, когда сомкнулось;
+//   стрелка — ждёт взмаха: провести мышью в её сторону, пока кольцо не сомкнулось (кольцо — сколько осталось);
+//             не в ту сторону — не считается; не успел — стрелка краснеет, дальше следующий чек;
+//   полоска — метка ездит (скорость меняется, у краёв отскакивает), ПРОБЕЛ, когда она в зелёной зоне.
+// Чеки идут один за другим: следующий виден сразу, как решён предыдущий, и ждёт своего времени.
+// Фаза пишется в правом верхнем углу. Время чеков считается по музыке (если она есть). Запас мога: с 3,
+// попал — +1 (до 4), промах — −1; на нуле Нова нападает сразу, дожил до конца хотя бы с 1 — она уходит.
+// Этот же компонент проигрывает раскладку в «Проверке скилл-чеков» в главном меню (MogTestTab) и в
+// редакторе раскладок (MogChartEditor), там же он показывает выбранный чек неподвижно (ShowStill).
+// Анимаций Новы пока нет: модель стоит на дэнс полу. Под фазы их будет подключать её аниматор по Current.
 public class MogBattle : MonoBehaviour
 {
     public enum Phase { None, Intro, Checks, Outro }
 
+    const float RingGrow = 2f;       // кольцо появляется втрое больше кнопки, как в osu
+    const float FadeIn = 0.35f;      // за какую долю сжатия кольца кнопка и кольцо проявляются
+    const float WaitAlpha = 0.3f;    // следующая кнопка, пока её время не пришло, бледная
+    const float BurstTime = 0.25f;   // вспышка на месте решённой кнопки, с
+    const float MissBurstTime = 0.45f; // промах держится дольше: видно, что кнопка или стрелка покраснела
+    const float TestLeadIn = 0.5f;   // проверка скилл-чеков: столько секунд до первого чека
+    static readonly Color MissColor = new Color(1f, 0.3f, 0.25f);
+
     public GameObject panel;       // окно скилл-чека
-    public RectTransform zone;     // зелёная зона внутри полоски (anchorMin.x / anchorMax.x)
-    public RectTransform marker;   // метка (anchorMin.x = anchorMax.x = позиция)
-    public Text title;             // «Полоска 2/5» или «Приготовься: Полоска»
+    public Text title;             // «Полоска 2/5»
+    public Text hint;              // что нажимать
     public Text score;             // запас мога: «Мог: 3 / 4»
     public Text phaseLabel;        // правый верхний угол: «Фаза 3/5: Полоска · 2/5»
+    public GameObject phaseBack;   // тёмная плашка под надписью фазы
     public AudioSource music;
+
+    [Header("Полоска")]
+    public GameObject barRoot;
+    public RectTransform zone;     // зелёная зона (anchorMin.x / anchorMax.x)
+    public RectTransform marker;   // метка (anchorMin.x = anchorMax.x = позиция)
+
+    [Header("Кружок")]
+    public GameObject circleRoot;
+    public Image circleRing;       // серое кольцо
+    public Image circleZone;       // зелёная дуга: то же кольцо, залитое на долю оборота
+    public RectTransform needle;   // стрелка, вращается вокруг центра
+
+    [Header("Кнопка и стрелка")]
+    public RectTransform playArea; // в ней стоят кнопки и стрелки: x, y — доли этой области
+    public RectTransform buttonRoot;
+    public Image buttonDisc;
+    public Image buttonBorder;     // белая обводка: к ней смыкается кольцо
+    public Image buttonRing;       // сжимающееся кольцо
+    public RectTransform arrowRoot;
+    public Image arrowDisc;
+    public Image arrowBorder;
+    public Text arrowGlyph;        // «→», поворачивается в сторону стрелки
+    public Image arrowRing;
+    public RectTransform burst;    // вспышка на месте решённой кнопки или стрелки
+    public Image burstDisc;
+    public Image burstBorder;
 
     public Phase Current { get; private set; }
     public bool Running => Current != Phase.None;
     public MogTimeline Timeline { get; private set; }
     public float Clock => clock;
+    public bool Won => won;
 
     List<MogChart> charts;
     MogChart lastChart;
     Action<bool> done;
-    Transform novaBody;
-    Vector3 bodyPos, bodyScale;
-    Quaternion bodyRot;
     float clock, outroTime;
     bool clockRunning, won;
+    Vector2 swipe;          // сколько провели мышью для текущей стрелки, px
+    int swipeIndex = -1;
+    CanvasGroup buttonGroup, arrowGroup, burstGroup;
+    float burstAge = -1f;   // < 0 — вспышки нет
+    bool burstHit;
+    Text burstGlyph;        // стрелка на вспышке — копия arrowGlyph
+    Vector2 panelPos;       // где окно в игре (редактор раскладок ставит его по-своему)
+    MogCheck still;         // редактор: чек, показанный неподвижно
 
-    public void Begin(int novaWins, Transform novaBody, Action<bool> onDone)
+    void Awake()
+    {
+        circleRing.sprite = MogShapes.Ring;
+        circleZone.sprite = MogShapes.Ring;
+        circleZone.type = Image.Type.Filled;
+        circleZone.fillMethod = Image.FillMethod.Radial360;
+        circleZone.fillOrigin = (int)Image.Origin360.Top;
+        circleZone.fillClockwise = true;
+        buttonDisc.sprite = arrowDisc.sprite = burstDisc.sprite = MogShapes.Disc;
+        buttonBorder.sprite = arrowBorder.sprite = burstBorder.sprite = MogShapes.Border;
+        buttonRing.sprite = arrowRing.sprite = MogShapes.ThinRing;
+        buttonGroup = Group(buttonRoot);
+        arrowGroup = Group(arrowRoot);
+        burstGroup = Group(burst);
+        burstGlyph = Instantiate(arrowGlyph, burst, false);
+        burstGlyph.name = "Glyph";
+        burst.gameObject.SetActive(false);
+        panelPos = ((RectTransform)panel.transform).anchoredPosition;
+    }
+
+    static CanvasGroup Group(Component c)
+    {
+        var g = c.GetComponent<CanvasGroup>();
+        return g != null ? g : c.gameObject.AddComponent<CanvasGroup>();
+    }
+
+    // Атака Новы: случайная раскладка, по возможности не та же, что в прошлый раз
+    public void Begin(int novaWins, Action<bool> onDone)
     {
         if (charts == null) charts = MogCharts.LoadAll();
-        var chart = Pick();
+        var pool = charts.Count > 1 ? charts.FindAll(c => c != lastChart) : charts;
+        lastChart = pool[UnityEngine.Random.Range(0, pool.Count)];
+        Begin(lastChart, novaWins, onDone);
+    }
+
+    // Проиграть конкретную раскладку. novaWins — сколько раз Нову уже победили (зоны уже).
+    // startAt — с какой секунды музыки (редактор раскладок: «Проверить отсюда»)
+    public void Begin(MogChart chart, int novaWins, Action<bool> onDone, float startAt = 0f)
+    {
         float zoneScale = Mathf.Max(Balance.MogMinZoneScale, 1f - Balance.MogZoneShrinkPerWin * novaWins);
         Timeline = new MogTimeline(chart, zoneScale);
         Timeline.CheckResolved += (c, hit) =>
             Debug.Log($"[SSDFNC] Мог-батл: {MogTimeline.PhaseName(c.Type)} на {c.hit:0.00} с — " +
                       $"{(hit ? "попал" : "мимо")}, мог {Timeline.Lives}");
+        Timeline.CheckResolved += Burst;
+        still = null;
+        FitPanel(null);
 
         done = onDone;
-        this.novaBody = novaBody;
-        if (novaBody != null)
-        {
-            bodyPos = novaBody.localPosition;
-            bodyScale = novaBody.localScale;
-            bodyRot = novaBody.localRotation;
-        }
-        clock = 0f;
+        clock = startAt;
         clockRunning = false;
         won = false;
+        swipeIndex = -1;
         Current = Phase.Intro;
         panel.SetActive(false);
         score.text = "";
-        Debug.Log($"[SSDFNC] Мог-батл: раскладка «{chart.name}», чеков {Timeline.Count}, музыка: " +
+        Debug.Log($"[SSDFNC] Мог-батл: раскладка «{chart.name}», чеков {Timeline.Count}, фаз {Timeline.PhaseCount}, музыка: " +
                   $"{(string.IsNullOrEmpty(chart.music) ? "нет" : chart.music)}, зоны ×{zoneScale:0.0}");
-        StartCoroutine(StartMusic(chart));
+        StartCoroutine(StartMusic(chart, startAt));
     }
 
-    // Случайная раскладка, по возможности не та же, что в прошлый раз
-    MogChart Pick()
+    // Проверка скилл-чеков (меню, редактор раскладок): без появления Новы — сразу к первому чеку.
+    // from — не раньше этой секунды (редактор: «Проверить отсюда»)
+    public void BeginTest(MogChart chart, Action<bool> onDone, float from = 0f) =>
+        Begin(chart, 0, onDone, Mathf.Max(from, chart.FirstCheckStart - TestLeadIn));
+
+    // Прервать (проверка скилл-чеков, Esc): без итога
+    public void Abort()
     {
-        var pool = charts.Count > 1 ? charts.FindAll(c => c != lastChart) : charts;
-        lastChart = pool[UnityEngine.Random.Range(0, pool.Count)];
-        return lastChart;
+        if (!Running) return;
+        StopAllCoroutines();
+        done = null;
+        Finish();
     }
 
-    // Музыка грузится, пока идёт анимация появления; время раскладки стартует вместе с музыкой
-    IEnumerator StartMusic(MogChart chart)
+    // Музыка грузится, пока идёт появление; время раскладки стартует вместе с музыкой
+    IEnumerator StartMusic(MogChart chart, float startAt)
     {
         string path = MogCharts.MusicPath(chart);
         if (path != null)
-        {
-            using (var req = UnityWebRequestMultimedia.GetAudioClip("file:///" + path.Replace('\\', '/'), AudioTypeOf(path)))
+            yield return MogCharts.LoadClip(path, clip =>
             {
-                yield return req.SendWebRequest();
-                if (req.result == UnityWebRequest.Result.Success)
-                {
-                    music.clip = DownloadHandlerAudioClip.GetContent(req);
-                    music.Play();
-                }
-                else Debug.LogWarning($"[SSDFNC] Музыка {chart.music} не загрузилась: {req.error}. Играем без неё");
-            }
-        }
+                if (clip == null) return;
+                music.clip = clip;
+                music.time = Mathf.Clamp(startAt + chart.offset, 0f, clip.length - 0.05f);
+                music.Play();
+            });
         clockRunning = true;
-    }
-
-    static AudioType AudioTypeOf(string path)
-    {
-        switch (Path.GetExtension(path).ToLowerInvariant())
-        {
-            case ".ogg": return AudioType.OGGVORBIS;
-            case ".wav": return AudioType.WAV;
-            case ".mp3": return AudioType.MPEG;
-            default: return AudioType.UNKNOWN;
-        }
     }
 
     void Update()
     {
+        DrawBurst();
         if (Current == Phase.None) return;
 
         if (clockRunning)
@@ -120,27 +190,71 @@ public class MogBattle : MonoBehaviour
         switch (Current)
         {
             case Phase.Intro:
-                AnimateIntro();
                 if (clockRunning && clock >= Timeline.Chart.FirstCheckStart) EnterChecks();
                 break;
             case Phase.Checks:
-                var kb = Keyboard.current;
-                if (kb != null && kb.spaceKey.wasPressedThisFrame) Timeline.Press(clock);
+                ReadInput();
                 Timeline.Update(clock);
                 if (Timeline.Done) EnterOutro();
                 break;
             case Phase.Outro:
                 outroTime += Time.deltaTime;
-                AnimateOutro(Mathf.Clamp01(outroTime / Balance.MogOutroTime));
                 if (outroTime >= Balance.MogOutroTime) Finish();
                 break;
         }
         DrawUI();
     }
 
+    // Управление зависит от вида чека: ПРОБЕЛ, клик по кнопке или взмах мышью
+    void ReadInput()
+    {
+        if (!Timeline.Active(clock)) return;
+        var c = Timeline.Current;
+        var kb = Keyboard.current;
+        var mouse = Mouse.current;
+        switch (c.Type)
+        {
+            case MogCheckType.Circle:
+            case MogCheckType.Bar:
+                if (kb != null && kb.spaceKey.wasPressedThisFrame) Timeline.Press(clock);
+                break;
+            case MogCheckType.Button:
+                if (mouse != null && mouse.leftButton.wasPressedThisFrame && OverButton(mouse.position.ReadValue()))
+                    Timeline.Press(clock);
+                break;
+            case MogCheckType.Arrow:
+                if (mouse != null) TrackSwipe(mouse.delta.ReadValue());
+                break;
+        }
+    }
+
+    // Клик внутри круга кнопки (с запасом 15%)
+    bool OverButton(Vector2 screen)
+    {
+        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(buttonRoot, screen, null, out var local)) return false;
+        return local.magnitude <= buttonRoot.rect.width / 2f * 1.15f;
+    }
+
+    // Взмах мышью: копим движение, пока стрелка на экране; набралось Balance.MogSwipeDistance от высоты
+    // экрана — взмах в ту сторону, куда двигали больше всего. Не в ту — не считается, копим заново
+    void TrackSwipe(Vector2 delta)
+    {
+        if (swipeIndex != Timeline.Index)
+        {
+            swipeIndex = Timeline.Index;
+            swipe = Vector2.zero;
+        }
+        swipe += delta;
+        if (swipe.magnitude < Balance.MogSwipeDistance * Screen.height) return;
+        var dir = Mathf.Abs(swipe.x) >= Mathf.Abs(swipe.y)
+            ? (swipe.x > 0f ? MogDir.Right : MogDir.Left)
+            : (swipe.y > 0f ? MogDir.Up : MogDir.Down);
+        swipe = Vector2.zero;
+        Timeline.Swipe(clock, dir);
+    }
+
     void EnterChecks()
     {
-        RestoreBody();
         Current = Phase.Checks;
         Debug.Log("[SSDFNC] Мог-батл: скилл-чеки");
     }
@@ -157,7 +271,6 @@ public class MogBattle : MonoBehaviour
 
     void Finish()
     {
-        RestoreBody();
         music.Stop();
         if (music.clip != null) // клип грузится заново каждый батл — старый выгружаем
         {
@@ -166,45 +279,204 @@ public class MogBattle : MonoBehaviour
         }
         panel.SetActive(false);
         phaseLabel.text = "";
+        if (phaseBack != null) phaseBack.SetActive(false);
         Current = Phase.None;
-        done?.Invoke(won);
+        var callback = done;
+        done = null;
+        callback?.Invoke(won);
     }
 
     void DrawUI()
     {
+        if (phaseBack != null) phaseBack.SetActive(Running);
         switch (Current)
         {
             case Phase.Intro:
-                phaseLabel.text = "Фаза 1/5: Появление";
+                phaseLabel.text = $"Фаза 1/{Timeline.PhaseCount}: Появление";
                 break;
             case Phase.Checks:
+                DrawCheck();
+                break;
+            case Phase.Outro:
+                phaseLabel.text = $"Фаза {Timeline.PhaseCount}/{Timeline.PhaseCount}: " + (won ? "Нова уходит" : "Смерть");
+                break;
+        }
+    }
+
+    // Следующий чек показывается сразу, как решён предыдущий, и ждёт своего времени: стрелка кружка
+    // сверху, метка полоски у левого края, кнопка бледная
+    void DrawCheck()
+    {
+        var c = Timeline.Current;
+        var type = c.Type;
+        string name = MogTimeline.PhaseName(type);
+        var (number, total) = Timeline.ProgressInGroup();
+        bool active = Timeline.Active(clock);
+        if (still == null) phaseLabel.text = $"Фаза {Timeline.Phase}/{Timeline.PhaseCount}: {name} · {number}/{total}";
+        panel.SetActive(true);
+        title.text = still == null ? $"{name} {number}/{total}" : name;
+        hint.text = Hint(type);
+
+        barRoot.SetActive(type == MogCheckType.Bar);
+        circleRoot.SetActive(type == MogCheckType.Circle);
+        buttonRoot.gameObject.SetActive(type == MogCheckType.Button);
+        arrowRoot.gameObject.SetActive(type == MogCheckType.Arrow);
+
+        switch (type)
+        {
+            case MogCheckType.Bar:
             {
-                var type = Timeline.Current.Type;
-                string name = MogTimeline.PhaseName(type);
-                var (number, total) = Timeline.ProgressInType();
-                bool active = Timeline.Active(clock);
-                phaseLabel.text = $"Фаза {MogTimeline.PhaseNumber(type)}/5: {name} · {number}/{total}";
-                panel.SetActive(true);
-                zone.gameObject.SetActive(active);
-                marker.gameObject.SetActive(active);
-                // «Приготовься» — только в паузе перед новой фазой, между чеками одной фазы — просто номер
-                title.text = active || number > 1
-                    ? $"{name} {number}/{total}" + (type == MogCheckType.Bar ? "" : "  (пока полоской)")
-                    : $"Приготовься: {name}";
-                if (active)
-                {
-                    float half = Timeline.ZoneWidth / 2f, center = Timeline.Current.pos;
-                    zone.anchorMin = new Vector2(Mathf.Clamp01(center - half), 0f);
-                    zone.anchorMax = new Vector2(Mathf.Clamp01(center + half), 1f);
-                    float p = Mathf.Clamp01(Timeline.MarkerPos(clock));
-                    marker.anchorMin = marker.anchorMax = new Vector2(p, 0.5f);
-                }
-                DrawLives();
+                float half = Timeline.ZoneWidth / 2f;
+                zone.anchorMin = new Vector2(Mathf.Clamp01(c.pos - half), 0f);
+                zone.anchorMax = new Vector2(Mathf.Clamp01(c.pos + half), 1f);
+                marker.anchorMin = marker.anchorMax = new Vector2(Timeline.MarkerPos(clock), 0.5f);
                 break;
             }
-            case Phase.Outro:
-                phaseLabel.text = won ? "Фаза 5/5: Нова уходит" : "Фаза 5/5: Смерть";
+            case MogCheckType.Circle:
+                // Дуга от верха по часовой длиной в зону, повёрнута так, чтобы её середина была на pos
+                circleZone.fillAmount = Timeline.ZoneWidth;
+                circleZone.rectTransform.localEulerAngles = new Vector3(0f, 0f, -(c.pos - Timeline.ZoneWidth / 2f) * 360f);
+                needle.localEulerAngles = new Vector3(0f, 0f, -(active ? Timeline.NeedleAngle(clock) : 0f) * 360f);
                 break;
+            case MogCheckType.Button:
+                Place(buttonRoot, c);
+                DrawApproach(buttonGroup, buttonRing, active);
+                break;
+            case MogCheckType.Arrow:
+                Place(arrowRoot, c);
+                arrowGlyph.rectTransform.localEulerAngles = new Vector3(0f, 0f, 90f * (int)c.Direction);
+                DrawApproach(arrowGroup, arrowRing, active);
+                break;
+        }
+        if (still == null) DrawLives();
+        else score.text = "";
+    }
+
+    // Кнопка и стрелка как в osu: пока время не пришло — бледные; кольцо появляется втрое больше,
+    // за первую треть сжатия проявляется вместе с кнопкой и в бит смыкается ровно с белой обводкой
+    void DrawApproach(CanvasGroup group, Image ring, bool active)
+    {
+        float progress = Timeline.RingProgress(clock);   // 1 — кольцо только появилось, 0 — сомкнулось
+        float shown = active ? Mathf.Clamp01((1f - progress) / FadeIn) : 0f;
+        group.alpha = Mathf.Lerp(WaitAlpha, 1f, shown);
+        ring.enabled = active;
+        ring.color = new Color(1f, 1f, 1f, shown);
+        ring.rectTransform.localScale = Vector3.one * (1f + RingGrow * progress);
+    }
+
+    // Решена кнопка или стрелка: на её месте вспышка. Попал — белая, расходится; мимо — красная, гаснет
+    void Burst(MogCheck c, bool hit)
+    {
+        if (c.Type != MogCheckType.Button && c.Type != MogCheckType.Arrow) return;
+        var source = c.Type == MogCheckType.Button ? buttonRoot : arrowRoot;
+        burst.sizeDelta = source.sizeDelta;
+        Place(burst, c);
+        burstDisc.color = hit ? (c.Type == MogCheckType.Button ? buttonDisc.color : arrowDisc.color) : MissColor;
+        burstBorder.color = hit ? Color.white : MissColor;
+        burstGlyph.gameObject.SetActive(c.Type == MogCheckType.Arrow);
+        burstGlyph.rectTransform.localEulerAngles = new Vector3(0f, 0f, 90f * (int)c.Direction);
+        burstGlyph.color = hit ? arrowGlyph.color : Color.white;
+        burstHit = hit;
+        burstAge = 0f;
+        burst.gameObject.SetActive(true);
+    }
+
+    void DrawBurst()
+    {
+        if (burstAge < 0f) return;
+        burstAge += Time.deltaTime;
+        float k = burstAge / (burstHit ? BurstTime : MissBurstTime);
+        if (k >= 1f || !panel.activeSelf)
+        {
+            burstAge = -1f;
+            burst.gameObject.SetActive(false);
+            return;
+        }
+        burst.localScale = Vector3.one * (burstHit ? 1f + 0.4f * k : 1f - 0.15f * k);
+        burstGroup.alpha = 1f - k;
+    }
+
+    // Кнопка или стрелка на своё место: x, y — доли области playArea (0, 0 — левый нижний угол),
+    // кнопка целиком внутри области
+    void Place(RectTransform target, MogCheck c)
+    {
+        var free = playArea.rect.size - target.rect.size;
+        target.anchoredPosition = new Vector2((c.x - 0.5f) * free.x, (c.y - 0.5f) * free.y);
+    }
+
+    // ── Редактор раскладок ──
+
+    // Показать один чек неподвижно в момент t (без ввода и музыки). Чек тот же объект, что в раскладке:
+    // правки видны сразу
+    public void ShowStill(MogCheck check, float t)
+    {
+        if (Running) return;
+        if (still != check) Timeline = new MogTimeline(new MogChart { checks = new[] { check } });
+        still = check;
+        clock = t;
+        phaseLabel.text = "";
+        if (phaseBack != null) phaseBack.SetActive(false);
+        DrawCheck();
+    }
+
+    public void HideStill()
+    {
+        if (Running || still == null) return;
+        still = null;
+        panel.SetActive(false);
+    }
+
+    // Окно поменьше и на своём месте: прямоугольник в пикселях экрана (y снизу). null — как в игре
+    public void FitPanel(Rect? screen)
+    {
+        var rt = (RectTransform)panel.transform;
+        if (screen == null)
+        {
+            rt.anchoredPosition = panelPos;
+            rt.localScale = Vector3.one;
+            return;
+        }
+        var r = screen.Value;
+        var parent = (RectTransform)rt.parent;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(parent, r.center, null, out var center);
+        float k = parent.lossyScale.x; // пикселей экрана на единицу канваса
+        rt.localScale = Vector3.one * Mathf.Min(r.width / (rt.rect.width * k), r.height / (rt.rect.height * k));
+        rt.anchoredPosition = center;
+    }
+
+    // Куда в окне (x, y от 0 до 1) встанет кнопка или стрелка, если её центр — в этой точке экрана
+    public Vector2 PlaceAt(Vector2 screen, MogCheckType type)
+    {
+        var target = type == MogCheckType.Arrow ? arrowRoot : buttonRoot;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(playArea, screen, null, out var local);
+        var free = playArea.rect.size - target.rect.size;
+        return new Vector2(Mathf.Clamp01(local.x / free.x + 0.5f), Mathf.Clamp01(local.y / free.y + 0.5f));
+    }
+
+    // Кружок: доля оборота от верха по часовой, куда показывает точка экрана
+    public float CircleTurnAt(Vector2 screen)
+    {
+        RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)circleRoot.transform, screen, null, out var local);
+        float turn = Mathf.Atan2(local.x, local.y) / (2f * Mathf.PI);
+        return turn <= 0f ? turn + 1f : turn;
+    }
+
+    // Полоска: доля полоски под точкой экрана
+    public float BarPosAt(Vector2 screen)
+    {
+        var bar = (RectTransform)barRoot.transform;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(bar, screen, null, out var local);
+        return Mathf.Clamp01(local.x / bar.rect.width + 0.5f);
+    }
+
+    static string Hint(MogCheckType type)
+    {
+        switch (type)
+        {
+            case MogCheckType.Circle: return "ПРОБЕЛ — когда стрелка в зелёной дуге";
+            case MogCheckType.Button: return "Клик по кнопке, когда кольцо сомкнётся";
+            case MogCheckType.Arrow: return "Проведи мышью по стрелке, пока кольцо не сомкнулось";
+            default: return "ПРОБЕЛ — когда метка в зелёной зоне";
         }
     }
 
@@ -214,38 +486,5 @@ public class MogBattle : MonoBehaviour
         int lives = Timeline.Lives;
         score.text = $"Мог: <size=70>{new string('■', lives)}{new string('□', Balance.MogMaxLives - lives)}</size>  {lives} / {Balance.MogMaxLives}";
         score.color = lives <= 1 ? new Color(1f, 0.3f, 0.25f) : Color.white;
-    }
-
-    // Заглушки анимаций на капсуле Новы: появление — кружится и пульсирует,
-    // уход — сжимается и уходит в пол, смерть — растёт и поднимается на игрока
-    void AnimateIntro()
-    {
-        if (novaBody == null) return;
-        float k = Timeline.Chart.FirstCheckStart > 0f ? Mathf.Clamp01(clock / Timeline.Chart.FirstCheckStart) : 1f;
-        novaBody.localRotation = bodyRot * Quaternion.Euler(0f, 720f * k, 0f);
-        novaBody.localScale = bodyScale * (1f + 0.15f * Mathf.Sin(Time.time * 8f));
-    }
-
-    void AnimateOutro(float k)
-    {
-        if (novaBody == null) return;
-        if (won)
-        {
-            novaBody.localScale = bodyScale * (1f - k);
-            novaBody.localPosition = bodyPos + Vector3.down * k;
-        }
-        else
-        {
-            novaBody.localScale = bodyScale * (1f + 1.5f * k);
-            novaBody.localPosition = bodyPos + Vector3.up * 0.8f * k;
-        }
-    }
-
-    void RestoreBody()
-    {
-        if (novaBody == null) return;
-        novaBody.localPosition = bodyPos;
-        novaBody.localScale = bodyScale;
-        novaBody.localRotation = bodyRot;
     }
 }

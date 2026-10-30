@@ -3,8 +3,9 @@
 **Six to Seven Days at the Furry Night Club**: Unity 6 (6000.6.0f1, URP 17.6) 3D FNAF-like survival
 game, Roblox-style models. The player sits in the club's reception office during a day shift and
 fends off five furries with four resources: fuel for the generator, the dance floor, the sound
-button and the right door, plus a "mog battle" duel with Nova. Early prototype. **Next goal (user,
-2026-10-23): Nova's real skill checks** (circle and sides; now all play as a bar). Also on the list:
+button and the right door, plus a "mog battle" duel with Nova. Early prototype. **Done 2026-10-30:
+Nova's four skill-check types, the menu «Скилл-чеки» test tab and the chart editor as a separate .exe** — the user still has
+to try them by hand and make charts for real music. Also on the list:
 re-tune the balance (10-min shift, mog lives, calls distract; the sim bot ignores calls) and polish the
 calls (draft dialogues, no penalty yet, frequency, dialogue editor). See README «Что доработать».
 This guide is in English to save tokens; the user, the README, the CHANGELOG and `docs/` are in Russian.
@@ -15,7 +16,7 @@ Concept in one screen (details, numbers and the map are in `docs/GAME_DESIGN.md`
 - Generator powers everything except the sound button. State: fuel (tank 75, 150 per shift, 145 in
   canisters), HP (100, no repair; Dali deals 20 HP / 2 s), running/stalled (needs a restart).
 - Furries: Dir (feed via cameras every ~30 s), Stray (door or dance floor), Nova (mog battle with
-  3 skill-check types), Dali (generator → sound button), Doli (door: close it, never sound; or
+  4 skill-check types), Dali (generator → sound button), Doli (door: close it, never sound; or
   generator: sound button).
 
 ## Read first
@@ -180,10 +181,38 @@ Concept in one screen (details, numbers and the map are in `docs/GAME_DESIGN.md`
   Skill checks are NOT hard-coded: the user will add many music tracks and hand-tune checks per track,
   so they are data — `MogChart` json in `Assets/StreamingAssets/MogCharts` (format `docs/MOG_CHARTS.md`,
   `examples/` is not loaded), run by `MogTimeline` (Core, scene-free, tested in `MogTests`; the clock is
-  music time). Circle and sides still play as a bar ("пока не делай другие скилл чеки"). Next planned
-  by the user: a skill-check tuning app (plan at the end of MOG_CHARTS.md; reuse `MogTimeline`).
-  Builder version 8. Loss rule (user, 2026-10-23): "mog lives" start 3, hit +1 capped at 4, miss −1,
+  music time). Loss rule (user, 2026-10-23): "mog lives" start 3, hit +1 capped at 4, miss −1,
   0 = Nova kills at once, finish with ≥1 = survive (`Balance.MogStartLives/MaxLives/LivesPerHit`).
+- **Skill checks (user's spec 2026-10-30, docs/MOG_CHARTS.md):** four types — circle (DbD needle, Space in
+  the zone), button (osu ring shrinks onto it, LMB on the beat), arrow (right/up/left/down, swipe the mouse on
+  the beat — changed by the user 2026-10-30: the arrow just WAITS for the swipe while its ring closes (ring =
+  time left, deadline `hit + MogHitWindow`), wrong direction is ignored, too late = red miss burst and the next
+  check; `Mouse.delta` summed while the arrow is active, `Balance.MogSwipeDistance` × screen height), bar (Space;
+  speed changes via `speedKeys`, bounces at the ends). Button/arrow window ±`Balance.MogHitWindow`. Phases
+  come from the chart: a run of same-type checks = one phase. One check on screen; the current one is missed
+  when the next is already hittable (`MogCheck.ReadyTime`), not when the next merely starts — dense charts
+  showed the next ring half-shrunk. Old `sides`/speedless bars still load. Window built by
+  `MogBattleBuilder` (office `FurryHUD`, menu `MogTestHUD`, editor `MogPreviewHUD`); rings are `MogShapes`.
+  Menu tab «Скилл-чеки» (`MogTestTab`, sees `examples/`; Nova's attack loads top-level files only) runs
+  `MogBattle.BeginTest` (no Nova intro, starts 0.5 s before the first check).
+  User's follow-up 2026-10-30: checks go one after another with NO «Приготовься» (the next check is drawn as
+  soon as the previous resolves and waits, button faded); the button must look like osu (white border, ring
+  3× fading in and closing exactly on the border, hit/miss burst); and the chart editor must be a
+  **separate .exe program**, with the check edited right in its preview.
+  **Chart editor** = runtime IMGUI scene `MogEditor` (`MogChartEditor`) built as its own player by
+  `MogEditorBuilder.BuildApp` (SSDFNC → Chart Editor → Build App; temporarily swaps productName/windowed
+  1600×900/resizable and restores them; writes the project charts folder into
+  `<app>_Data/StreamingAssets/chart_editor_folder.txt`) → `Builds/ChartEditor/SSDFNC Chart Editor.exe`.
+  In Unity: SSDFNC → Chart Editor → Open in Play Mode (`PlayFromMenu` skips the menu for that scene). Not in
+  the game's Build Settings; no menu button. `MogCharts.Folder` is settable (app folder choice, PlayerPrefs
+  `SSDFNC.ChartEditor.Folder`). Open/import use `NativeFileDialog` (comdlg32 `GetOpenFileNameW` in the player,
+  `EditorUtility.OpenFilePanel` in Unity). The selected check is shown by the real `MogBattle` in a preview
+  rect (`FitPanel`, `ShowStill`), mouse edits via `PlaceAt`/`CircleTurnAt`/`BarPosAt` (LMB place/zone, RMB
+  zone width). Music import into `MogCharts/Music`, waveform from `GetData` peaks, BPM grid/snap, B adds a
+  check, drag on the timeline, per-type inspector, dirty-check with double-click confirm, Ctrl+S. Structure
+  changes in OnGUI go through `Changed` → `GUIUtility.ExitGUI()`; no full-screen IMGUI fill (it would hide
+  the uGUI preview). IMGUI is not drawn in batchmode — to see it, build the app from the project copy with a
+  driver using `ScreenCapture` (done 2026-10-30, all fine). Office builder version 15, menu builder version 6.
 - **Client calls (user's spec 2026-10-23, docs/CALLS.md):** 4–6 calls a night; click the ringing phone →
   client line at the bottom → LMB anywhere → options (mouse or 1–3) → reaction, correct = money 2–10 $
   (`Wallet`, PlayerPrefs `SSDFNC.Money`, counter in the main menu). Answer from the schedule board (new
@@ -198,6 +227,14 @@ Concept in one screen (details, numbers and the map are in `docs/GAME_DESIGN.md`
   for wrong/missed calls yet. F1 panel has «Вызвать звонок» (`CallDirector.RingNow`). Builder version 10,
   menu builder version 3. Autotests must save/restore
   `SSDFNC.Money` (shared PlayerPrefs).
+- **Nova model (2026-10-30, docs/MODELS.md):** `Art/Nova/nova wip.blend` (Blocky Rig + cat head `Cube.006`),
+  exported by `Tools/Blender/export_nova.bat` → `Assets/Models/Nova/Nova.fbx`; `NovaModelImport` (no anims,
+  `importVisibility=false` or the head comes in disabled). Builder `NovaAvatar` replaces Nova's capsule: height
+  1.8 m, yaw 180° (imported model faces +Z, away from the player), URP materials (body texture missing —
+  not packed in the .blend; body uses the fur colour until the user packs/sends `Furrypetfurry2_diff.png`).
+  The user asked to keep the attack phases but remove my placeholder capsule animations — done; Nova has no
+  animations yet. `NightDirector.AvatarSpacing` 1.2 m (Nova is wider). Phase label has a dark backing
+  (`MogBattle.phaseBack`) because the schedule board sits behind it. Builder version 13.
 - **Generator model (2026-10-27, docs/MODELS.md):** sources `Art/Generator/*.blend` (LFS), exported by
   `Tools/Blender/export_generator.bat` (Blender 5.2 from Steam, background mode, bakes constraint-driven
   bones, renames materials, packs textures for URP) into `Assets/Models/Generator`. `GeneratorModelImport`
