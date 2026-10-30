@@ -17,6 +17,9 @@ public static class Balance
     public const float PourRate = 15f;               // ед./с, пока держишь «Залить»
     public const float GeneratorMaxHealth = 100f;
     public const float GeneratorReach = 3f;          // м, ближе — можно пользоваться
+    // с: рывки стартера до запуска — кадр 64 анимации Start при 24 к/с (Art/Generator/generator rig rigged.blend).
+    // Поменял анимацию — поправь и тут: по нему же считает время перезапуска симуляция баланса
+    public const float GeneratorStartTime = 63f / 24f;
 
     // ── Дверь ──
     public const float DoorMaxClosedTime = 20f;      // с, дольше держать закрытой нельзя

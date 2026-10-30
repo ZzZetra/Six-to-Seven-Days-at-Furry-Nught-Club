@@ -22,10 +22,11 @@ TestPlatform
  ├─ CenterPlatform, Left/Forward/Right Path, Forward/Right Prop    (геометрия-заглушка)
  ├─ LeftWall, RightWall              стены с дверным проёмом (Back, Front, Lintel)
  ├─ Generator ── Generator                    (за проёмом слева, x = −6.5)
- │   ├─ GeneratorBody                          оранжевый корпус
  │   ├─ GeneratorSpot                          куда встаёт камера у генератора
- │   ├─ StarterHandle ── GeneratorHandle       ручка стартера
- │   │   ├─ GeneratorCord, GeneratorGrip
+ │   ├─ GeneratorModel ── GeneratorModel       обёртка: место, поворот, масштаб ×1.4
+ │   │   └─ Generator (FBX) ── Animation       модель из Blender; клипы Start, Idle, CapOpen, CapClose
+ │   │       └─ …/starter_handle ── BoxCollider + GeneratorHandle   ручка стартера
+ │   │   (без FBX вместо модели — GeneratorBody и StarterHandle из примитивов)
  │   └─ GeneratorPanel ── GeneratorPanel       табло (World Space Canvas)
  │       ├─ Lamp, State, HP-полоска, Бензин-полоска, Reserve
  │       └─ RefuelButton ── Button + HoldButton   «ЗАЛИТЬ (держать)»
@@ -252,13 +253,28 @@ Right`). Считается по **фактическому** повороту �
 
 ## GeneratorHandle — ручка стартера
 
-`Assets/Scripts/GeneratorHandle.cs`, висит на **StarterHandle**. Это 3D-объект, клик по нему
-ловит `PhysicsRaycaster` на камере. Коллайдеры на детях (`GeneratorGrip`, `GeneratorCord`),
-событие поднимается до родителя.
+`Assets/Scripts/GeneratorHandle.cs`. Клик по ручке ловит `PhysicsRaycaster` на камере. Работает
+только вблизи (`Generator.InReach`).
 
-`OnPointerDown` (левая кнопка) запускает рывок: ручка за 0.12 с выезжает на 0.25 м вдоль своей
-оси Z (к игроку). В крайней точке вызывается `generator.TryStart()`, потом ручка за 0.3 с
-возвращается. Пока идёт рывок, новые клики игнорируются.
+**С моделью** ручка висит на меше `starter_handle` вместе с увеличенным `BoxCollider` и вызывает
+`GeneratorModel.Pull()`:
+- проигрывается клип `Start` (рывки стартера);
+- через `Balance.GeneratorStartTime` (2.6 с, кадр 64) — `generator.TryStart()`;
+- завёлся — клип доигрывает дрожь, дальше `Idle` по кругу;
+- нет — рывки обрываются.
+
+Работающий генератор не дёргается. Пока идут рывки, новые клики не действуют.
+
+**Без модели** (запасной вариант из примитивов) ручка за 0.12 с выезжает на 0.25 м вдоль своей оси Z,
+в крайней точке сразу `TryStart()`, потом за 0.3 с возвращается.
+
+**`GeneratorModel`** (на обёртке модели) — анимации Legacy на трёх слоях:
+- слой 0: `Idle` (дрожь), пока генератор работает;
+- слой 1: `Start` (рывки);
+- слой 2: крышка — `CapOpen` / `CapClose`, пока `GeneratorPanel.Pouring`.
+
+Лишние каналы из клипов убирает `GeneratorModelImport`, поэтому слои не мешают друг другу. Подробно —
+[MODELS.md](MODELS.md).
 
 ## HoldButton и GeneratorPanel — табло
 
@@ -267,7 +283,7 @@ Right`). Считается по **фактическому** повороту �
 даёт подсветку.
 
 `GeneratorPanel` каждый кадр:
-- пока `refuelButton.IsHeld`, вызывает `generator.Pour(Time.deltaTime)`;
+- пока `refuelButton.IsHeld` и игрок рядом (`Pouring`), вызывает `generator.Pour(Time.deltaTime)`;
 - красит лампу и надпись: зелёный «РАБОТАЕТ», жёлтый «ЗАГЛОХ — дёрни ручку», красный «СЛОМАН»;
 - задаёт ширину полосок HP и бензина через `anchorMax.x` у заливки;
 - пишет «В канистрах: N».
@@ -416,7 +432,7 @@ Right`). Считается по **фактическому** повороту �
 7. Удаляет старый `Shift` и создаёт новый: канвас поверх экрана, часы и `ShiftTimer`.
 8. Сохраняет сцену.
 
-**Версия сборщика.** `const int Version` (сейчас 10: кнопка «Вызвать звонок» в панели F1). После успешной
+**Версия сборщика.** `const int Version` (сейчас 11: модель генератора из Blender). После успешной
 сборки номер записывается в `EditorPrefs` (ключ с путём проекта). `[InitializeOnLoadMethod]`
 при загрузке скриптов сравнивает номер и, если офис собран старой версией, показывает окно
 «Пересобрать сцену офиса сейчас?». Окно появляется один раз за запуск Unity, в batchmode не

@@ -49,7 +49,7 @@ moggaty: мага те, мага ты, мага ти, моги ты, магаз�
         "title": "English",
         "model": "vosk-model-small-en-us-0.15",
         "commands": """verity: verity, variety
-lovety: love eddie, love eddy, levity, lovie, love it, lovely
+lovety: love eddie, love eddy, levity, lovie, love it, lovely, love a tea, love tea, love a, love to, love the
 moggaty: margaret, marguerite, margaret he, mog eddy, mog he, mog a tea, mccarty, mccarthy""",
         "fillers": "a the and to of in it is you that i he she we they this what so oh yeah no yes okay",
     },

@@ -24,6 +24,10 @@
 *.exr  filter=lfs diff=lfs merge=lfs -text
 *.hdr  filter=lfs diff=lfs merge=lfs -text
 
+# Текстуры моделей (2K) — тоже в LFS
+Assets/Models/**/*.png filter=lfs diff=lfs merge=lfs -text
+Assets/Models/**/*.jpg filter=lfs diff=lfs merge=lfs -text
+
 # Мелкие бинарные — обычным git
 *.png  binary
 *.jpg  binary

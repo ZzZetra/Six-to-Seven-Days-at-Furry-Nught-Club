@@ -2,24 +2,28 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-// Ручка стартера: клик — рывок на себя, в крайней точке генератор пробует завестись.
-// Работает только вблизи генератора (Generator.InReach).
-// Ручка тянется вдоль своей оси Z. Клики по 3D-объектам ловит PhysicsRaycaster на камере.
+// Ручка стартера: клик — рывок. Работает только вблизи генератора (Generator.InReach).
+// С моделью генератора (GeneratorModel) ручка висит на модели и запускает её анимацию рывков:
+// генератор пробует завестись через Balance.GeneratorStartTime. Без модели (запасной вариант
+// из примитивов) ручка сама выдвигается вдоль своей оси Z и заводит генератор сразу.
+// Клики по 3D-объектам ловит PhysicsRaycaster на камере.
 public class GeneratorHandle : MonoBehaviour, IPointerDownHandler
 {
-    const float PullDistance = 0.25f; // м
+    const float PullDistance = 0.25f; // м, только без модели
     const float PullTime = 0.12f;     // с, рывок
     const float ReturnTime = 0.3f;    // с, возврат
 
     public Generator generator;
+    public GeneratorModel model;
 
     bool pulling;
 
     public void OnPointerDown(PointerEventData e)
     {
-        if (e.button != PointerEventData.InputButton.Left || pulling) return;
+        if (e.button != PointerEventData.InputButton.Left) return;
         if (!generator.InReach(Camera.main.transform.position)) return;
-        StartCoroutine(Pull());
+        if (model != null) model.Pull();
+        else if (!pulling) StartCoroutine(Pull());
     }
 
     IEnumerator Pull()

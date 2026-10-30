@@ -198,6 +198,14 @@ Concept in one screen (details, numbers and the map are in `docs/GAME_DESIGN.md`
   for wrong/missed calls yet. F1 panel has «Вызвать звонок» (`CallDirector.RingNow`). Builder version 10,
   menu builder version 3. Autotests must save/restore
   `SSDFNC.Money` (shared PlayerPrefs).
+- **Generator model (2026-10-27, docs/MODELS.md):** sources `Art/Generator/*.blend` (LFS), exported by
+  `Tools/Blender/export_generator.bat` (Blender 5.2 from Steam, background mode, bakes constraint-driven
+  bones, renames materials, packs textures for URP) into `Assets/Models/Generator`. `GeneratorModelImport`
+  (AssetPostprocessor): Bake Axis Conversion, Legacy anims, strips foreign curves per clip (Unity merges the
+  `generator_rig` node into the FBX root → its path is ""). Builder wraps the FBX in a `GeneratorModel`
+  holder (the clips animate the FBX root), reuses the importer-added `Animation`, creates URP materials,
+  falls back to primitives without the FBX. Starting takes `Balance.GeneratorStartTime` (frame 64 = 2.6 s);
+  the sim uses it too — it made Normal noticeably harder. Builder version 11.
 - Generator roles (user's decision 2026-10-22): Dali stalls or drains (`DaliStallChance`), Doli breaks at
   `BreakPerSecond` until scared by the sound, max `BreakTime` (= fully broken). Sound cues, not spatial on
   purpose: Doli's growl at the door AND the generator (same sound, the player must check), drain glug only

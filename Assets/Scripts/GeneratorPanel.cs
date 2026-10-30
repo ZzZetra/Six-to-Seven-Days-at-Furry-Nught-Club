@@ -17,10 +17,13 @@ public class GeneratorPanel : MonoBehaviour
     public Text reserveLabel;
     public HoldButton refuelButton;
 
+    // Держат «Залить» рядом с генератором — бензин льётся, крышка бака открыта (GeneratorModel)
+    public bool Pouring { get; private set; }
+
     void Update()
     {
-        if (refuelButton.IsHeld && generator.InReach(Camera.main.transform.position))
-            generator.Pour(Time.deltaTime);
+        Pouring = refuelButton.IsHeld && generator.InReach(Camera.main.transform.position);
+        if (Pouring) generator.Pour(Time.deltaTime);
 
         var (text, color) = generator.Current switch
         {

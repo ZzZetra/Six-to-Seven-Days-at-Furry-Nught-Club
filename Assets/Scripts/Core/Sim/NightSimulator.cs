@@ -126,7 +126,7 @@ class SimBot
     const float WalkTime = 1.2f;    // до генератора или обратно
     const float FeedTime = 0.5f + Balance.DirFeedHoldTime; // выбрать камеру 7 и подержать «Покормить»
     const float PressTime = 0.2f;
-    const float RestartTime = 0.5f;
+    const float RestartTime = Balance.GeneratorStartTime; // рывки стартера по анимации модели
     const float FeedBelow = 0.35f;  // кормить, когда корма меньше
     const float RefuelBelow = 20f;  // идти доливать, когда бензина меньше
 

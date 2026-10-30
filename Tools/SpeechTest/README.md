@@ -26,7 +26,7 @@
 | Говоришь (голос Zira) | Английская модель слышит | Команда |
 |---|---|---|
 | verity | **verity** (слово есть в словаре) | **VERITY** |
-| lovety | «love eddie», «love eddy»; luvvity → «levity», «lovie» | **LOVETY** |
+| lovety | «love eddie», «love eddy»; luvvity → «levity», «lovie»; живой голос — «love a tea», «love to» | **LOVETY** |
 | moggaty | «margaret he», «marguerite», в режиме списка «mog eddy», «mog he»; mogaty → «mccarty» | **MOGGATY** |
 
 Проверка, английская модель:

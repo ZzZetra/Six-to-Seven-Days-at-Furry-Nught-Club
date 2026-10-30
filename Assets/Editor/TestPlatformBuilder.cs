@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -15,8 +17,13 @@ public static class TestPlatformBuilder
     // 5 — пробел: дэнс пол (если смотришь вперёд) и рычаг двери (если смотришь вправо).
     // 6 — фурри: директор ночи, 8 камер с кормлением Дира, фигуры фурри, экран смерти, мог-батл.
     // 7 — панель сложности F1 во время ночи.
-    const int Version = 10;
-    const string VersionNote = "в панели F1 кнопка «Вызвать звонок»";
+    const int Version = 11;
+    const string VersionNote = "модель генератора из Blender с анимациями: рывки стартера, дрожь, крышка бака";
+
+    // Модель генератора (выгружает Tools/Blender/export_generator.bat). Нет файла — генератор из примитивов
+    const string GeneratorModelFolder = "Assets/Models/Generator/";
+    const float GeneratorModelScale = 1.4f; // модель ~0.8 м в длину — чуть крупнее, чтобы читалась
+    const float GeneratorModelYaw = 25f;    // доворот от «пульт к игроку», чтобы был виден бок с ручкой стартера
     static string VersionKey => "SSDFNC.TestPlatformVersion." + Application.dataPath;
 
     [InitializeOnLoadMethod]
@@ -184,9 +191,6 @@ public static class TestPlatformBuilder
         go.transform.localPosition = new Vector3(-6.5f, 0f, 0f);
         var generator = go.GetComponent<Generator>();
 
-        Make(PrimitiveType.Cube, "GeneratorBody", go.transform,
-            new Vector3(0f, 0.45f, 0f), new Vector3(0.7f, 0.9f, 1.2f), new Color(0.75f, 0.45f, 0.1f));
-
         // Камера у генератора: в 1.5 м от передней стенки, смотрит на него и на 20° вниз
         var spot = new GameObject("GeneratorSpot").transform;
         spot.SetParent(go.transform, false);
@@ -194,9 +198,160 @@ public static class TestPlatformBuilder
         spot.localRotation = Quaternion.Euler(20f, -90f, 0f);
         if (cam != null) cam.GetComponent<CameraLook>().generatorSpot = spot;
 
+        var asset = AssetDatabase.LoadAssetAtPath<GameObject>(GeneratorModelFolder + "Generator.fbx");
+        var model = asset != null ? BuildGeneratorModel(go.transform, generator, asset) : null;
+        if (model == null) BuildGeneratorPrimitives(go.transform, generator);
+
+        var panel = BuildGeneratorPanel(go.transform, cam, generator, spot.position);
+        if (model != null) model.panel = panel;
+        return generator;
+    }
+
+    // Модель генератора: материалы URP из её текстур, пульт к игроку, анимации Legacy (GeneratorModel),
+    // на ручку стартера — коллайдер побольше и GeneratorHandle.
+    // Модель лежит внутри пустого объекта GeneratorModel: место, поворот и масштаб — у него, потому что
+    // анимации двигают корень самой модели (это риг generator_rig, Unity склеивает его с корнем FBX)
+    static GeneratorModel BuildGeneratorModel(Transform parent, Generator generator, GameObject asset)
+    {
+        var holder = new GameObject("GeneratorModel").transform;
+        holder.SetParent(parent, false);
+        holder.localScale = Vector3.one * GeneratorModelScale;
+        var go = (GameObject)PrefabUtility.InstantiatePrefab(asset, holder);
+
+        var materials = GeneratorMaterials();
+        foreach (var r in go.GetComponentsInChildren<Renderer>())
+        {
+            var list = r.sharedMaterials;
+            for (int i = 0; i < list.Length; i++)
+                if (list[i] != null && materials.TryGetValue(list[i].name, out var m)) list[i] = m;
+            r.sharedMaterials = list;
+        }
+
+        // Пульт (у него стрелка прибора) — к игроку, на +X; потом доворот, чтобы был виден бок с ручкой
+        var dial = go.GetComponentsInChildren<Transform>().First(t => t.name == "portable_generator_dial");
+        var handleMesh = go.GetComponentsInChildren<MeshFilter>().First(m => m.name == "starter_handle");
+        var center = ModelBounds(go).center;
+        var front = dial.position - center;
+        holder.Rotate(0f, Vector3.SignedAngle(new Vector3(front.x, 0f, front.z), Vector3.right, Vector3.up), 0f, Space.World);
+        var side = handleMesh.transform.position - ModelBounds(go).center;
+        holder.Rotate(0f, side.z > 0f ? GeneratorModelYaw : -GeneratorModelYaw, 0f, Space.World);
+
+        // Встать на пол серединой на точку генератора
+        var b = ModelBounds(go);
+        holder.position += parent.position - new Vector3(b.center.x, b.min.y, b.center.z);
+
+        // Legacy-импорт сам кладёт на модель Animation — добавляем в него свои клипы
+        var anim = go.GetComponent<Animation>();
+        if (anim == null) anim = go.AddComponent<Animation>();
+        anim.playAutomatically = false;
+        anim.AddClip(ModelClip("Generator.fbx"), GeneratorModel.StartClip);
+        anim.AddClip(ModelClip("Generator@Idle.fbx"), GeneratorModel.IdleClip);
+        anim.AddClip(ModelClip("Generator@CapOpen.fbx"), GeneratorModel.CapOpenClip);
+        anim.AddClip(ModelClip("Generator@CapClose.fbx"), GeneratorModel.CapCloseClip);
+        var model = holder.gameObject.AddComponent<GeneratorModel>();
+        model.generator = generator;
+        model.anim = anim;
+
+        // Ручка маленькая (7 см) — коллайдер в 2.5 раза больше, чтобы попадать мышкой
+        var bounds = handleMesh.sharedMesh.bounds;
+        var collider = handleMesh.gameObject.AddComponent<BoxCollider>();
+        collider.center = bounds.center;
+        collider.size = Vector3.Max(bounds.size * 2.5f, Vector3.one * 0.08f);
+        var handle = handleMesh.gameObject.AddComponent<GeneratorHandle>();
+        handle.generator = generator;
+        handle.model = model;
+        return model;
+    }
+
+    static Bounds ModelBounds(GameObject go)
+    {
+        var renderers = go.GetComponentsInChildren<Renderer>();
+        var b = renderers[0].bounds;
+        foreach (var r in renderers) b.Encapsulate(r.bounds);
+        return b;
+    }
+
+    static AnimationClip ModelClip(string file) =>
+        AssetDatabase.LoadAllAssetsAtPath(GeneratorModelFolder + file).OfType<AnimationClip>()
+            .First(c => !c.name.StartsWith("__preview__"));
+
+    // Материалы URP Lit из текстур модели: создаются при первой сборке, потом только обновляются.
+    // Ключ — имя материала в FBX (его задаёт export_generator.py)
+    static Dictionary<string, Material> GeneratorMaterials()
+    {
+        Texture2D Tex(string name) => AssetDatabase.LoadAssetAtPath<Texture2D>(GeneratorModelFolder + "Textures/" + name);
+        var baseMap = Tex("Generator_BaseMap.jpg");
+        var glassMap = Tex("Generator_GlassBase.png");
+        var metallic = Tex("Generator_MetallicSmoothness.png");
+        var normal = Tex("Generator_Normal.png");
+        return new Dictionary<string, Material>
+        {
+            ["Generator"] = ModelMaterial("Generator", m => Lit(m, baseMap, metallic, normal)),
+            ["GeneratorGlass"] = ModelMaterial("GeneratorGlass", m =>
+            {
+                Lit(m, glassMap, metallic, normal);
+                Transparent(m);
+            }),
+            ["StarterRope"] = ModelMaterial("StarterRope", m =>
+            {
+                m.SetColor("_BaseColor", new Color(0.19f, 0.19f, 0.19f));
+                m.SetFloat("_Smoothness", 0.15f);
+            }),
+        };
+    }
+
+    static Material ModelMaterial(string name, System.Action<Material> setup)
+    {
+        string folder = GeneratorModelFolder + "Materials";
+        if (!AssetDatabase.IsValidFolder(folder)) AssetDatabase.CreateFolder(GeneratorModelFolder.TrimEnd('/'), "Materials");
+        string path = $"{folder}/{name}.mat";
+        var m = AssetDatabase.LoadAssetAtPath<Material>(path);
+        if (m == null)
+        {
+            m = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            AssetDatabase.CreateAsset(m, path);
+        }
+        setup(m);
+        EditorUtility.SetDirty(m);
+        return m;
+    }
+
+    static void Lit(Material m, Texture2D baseMap, Texture2D metallic, Texture2D normal)
+    {
+        m.SetTexture("_BaseMap", baseMap);
+        m.SetColor("_BaseColor", Color.white);
+        m.SetTexture("_MetallicGlossMap", metallic); // металл в RGB, гладкость в альфе
+        m.EnableKeyword("_METALLICSPECGLOSSMAP");
+        m.SetFloat("_Smoothness", 1f);
+        m.SetFloat("_SmoothnessTextureChannel", 0f);
+        m.SetTexture("_BumpMap", normal);
+        m.EnableKeyword("_NORMALMAP");
+    }
+
+    static void Transparent(Material m)
+    {
+        m.SetFloat("_Surface", 1f); // Transparent, смешивание Alpha
+        m.SetFloat("_Blend", 0f);
+        m.SetFloat("_SrcBlend", (float)UnityEngine.Rendering.BlendMode.SrcAlpha);
+        m.SetFloat("_DstBlend", (float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+        m.SetFloat("_SrcBlendAlpha", (float)UnityEngine.Rendering.BlendMode.One);
+        m.SetFloat("_DstBlendAlpha", (float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+        m.SetFloat("_ZWrite", 0f);
+        m.SetOverrideTag("RenderType", "Transparent");
+        m.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+        m.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+        m.SetShaderPassEnabled("DepthOnly", false);
+    }
+
+    // Запасной генератор из примитивов (если модель не выгружена): оранжевый корпус и ручка-цилиндр
+    static void BuildGeneratorPrimitives(Transform parent, Generator generator)
+    {
+        Make(PrimitiveType.Cube, "GeneratorBody", parent,
+            new Vector3(0f, 0.45f, 0f), new Vector3(0.7f, 0.9f, 1.2f), new Color(0.75f, 0.45f, 0.1f));
+
         // Ручка на передней стенке, справа от игрока. Её ось Z смотрит на игрока — туда она и тянется.
         var handle = new GameObject("StarterHandle", typeof(GeneratorHandle));
-        handle.transform.SetParent(go.transform, false);
+        handle.transform.SetParent(parent, false);
         handle.transform.localPosition = new Vector3(0.35f, 0.7f, 0.4f);
         handle.transform.localRotation = Quaternion.LookRotation(Vector3.right);
         handle.GetComponent<GeneratorHandle>().generator = generator;
@@ -208,13 +363,10 @@ public static class TestPlatformBuilder
         var grip = Make(PrimitiveType.Cylinder, "GeneratorGrip", handle.transform,
             new Vector3(0, 0, 0.17f), new Vector3(0.09f, 0.15f, 0.09f), new Color(0.12f, 0.12f, 0.12f));
         grip.transform.localRotation = Quaternion.Euler(0, 0, 90);
-
-        BuildGeneratorPanel(go.transform, cam, generator, spot.position);
-        return generator;
     }
 
     // Табло 1000×520 px (1.3 × 0.68 м) на корпусе генератора, лицом к глазам игрока у генератора
-    static void BuildGeneratorPanel(Transform parent, Camera cam, Generator generator, Vector3 eye)
+    static GeneratorPanel BuildGeneratorPanel(Transform parent, Camera cam, Generator generator, Vector3 eye)
     {
         var canvas = NewCanvasAt("GeneratorPanel", parent, cam, new Vector2(1000, 520),
             parent.position + new Vector3(-0.1f, 1.3f, 0f), scale: 0.0013f, lookFrom: eye);
@@ -260,6 +412,7 @@ public static class TestPlatformBuilder
         btnText.text = "ЗАЛИТЬ (держать)";
         Stretch(btnText.rectTransform);
         panel.refuelButton = btnGo.GetComponent<HoldButton>();
+        return panel;
     }
 
     // Стол перед игроком (под монитором), на нём кнопки дэнс пола и звука с подписями

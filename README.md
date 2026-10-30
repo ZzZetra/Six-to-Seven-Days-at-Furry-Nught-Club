@@ -88,11 +88,16 @@ Custom) — в [Difficulty.cs](Assets/Scripts/Core/Difficulty.cs); перед н
   подход к генератору через проём.
 - **Стены офиса** слева и справа, в каждой дверной проём 1.2 × 2.2 м. Слева за проёмом
   генератор, справа коридор, где потом будет дверь.
-- **Генератор** (`Generator`, `GeneratorHandle`, `GeneratorPanel`) — за проёмом слева, в 6.5 м.
-  Пользоваться им можно только вблизи (ближе 3 м), то есть подойдя: смотришь влево и жмёшь W. Работает и
-  жжёт бензин (150 за смену). На табло состояние, полоски HP и бензина, остаток в канистрах и
-  кнопка «Залить». Кончился бензин — глохнет, заводится рывком ручки. HP на нуле — сломан до
-  конца смены. Все числа — константы в начале `Generator.cs`.
+- **Генератор** (`Generator`, `GeneratorModel`, `GeneratorHandle`, `GeneratorPanel`) — за проёмом слева,
+  в 6.5 м. Модель из Blender с анимациями:
+  - рывки стартера — генератор заводится через 2.6 с;
+  - работающий трясётся;
+  - пока заливаешь бензин, крышка бака открыта.
+
+  Пользоваться им можно только вблизи (ближе 3 м), то есть подойдя: смотришь влево и жмёшь W.
+  Работает и жжёт бензин (150 за смену). На табло состояние, полоски HP и бензина, остаток в канистрах
+  и кнопка «Залить». Кончился бензин — глохнет, заводится кликом по ручке стартера на боку. HP на нуле —
+  сломан до конца смены. Числа — в `Balance.cs`. Как обновить модель — [docs/MODELS.md](docs/MODELS.md).
 - **Фурри** (`SSDFNC.Core`, `NightDirector`) — пятеро, ИИ как во FNAF: уровень 0–20, бросок кубика
   каждые ~5 с, рост уровня за смену, фиксированные маршруты. Дир в кормушке, Стрей к двери или дэнс
   полу, Нова на дэнс пол (мог-батл), Дали к генератору, Доли к
@@ -198,6 +203,7 @@ Assets/
   Tests/EditMode/            тесты правил фурри, баланса и раскладок мог-батла (Unity Test Runner)
   StreamingAssets/MogCharts/ раскладки мог-батла (json) и музыка к ним; examples/ игра не читает
   StreamingAssets/Calls/     расписание (schedule.json) и диалоги звонков (Dialogues/*.json)
+  Models/Generator/          модель генератора: FBX, текстуры, материалы (выгружается из Art/Generator)
   Editor/
     BalanceReport.cs         меню SSDFNC → Balance Report
     TestPlatformBuilder.cs   меню SSDFNC → Build Test Platform (офис)
@@ -211,6 +217,8 @@ Assets/
   InputSystem_Actions.inputactions   стандартный из шаблона, пока не используется
   TutorialInfo/, Readme.asset        остатки шаблона URP
 Tools/SpeechTest/              тест распознавания речи (Python + Vosk), вне Assets — Unity его не видит
+Tools/Blender/                 export_generator.bat — выгрузить генератор из Blender в Assets/Models
+Art/Generator/                 исходники модели генератора (.blend, Git LFS)
 ```
 
 ## Технологии
@@ -226,6 +234,7 @@ Tools/SpeechTest/              тест распознавания речи (Pyt
 - [docs/BALANCE_REPORT.md](docs/BALANCE_REPORT.md) — таблица выживаемости ботов по сложностям
 - [docs/MOG_CHARTS.md](docs/MOG_CHARTS.md) — раскладки скилл-чеков мог-батла под музыку
 - [docs/CALLS.md](docs/CALLS.md) — звонки клиентов: расписание, диалоги, переменные
+- [docs/MODELS.md](docs/MODELS.md) — модели: генератор из Blender, как выгрузить и обновить
 - [Tools/SpeechTest/README.md](Tools/SpeechTest/README.md) — отдельное приложение: распознавание слов с
   микрофона (Vosk, офлайн, русский), запуск `Tools/SpeechTest/run.bat`
 - [docs/GAME_DESIGN.md](docs/GAME_DESIGN.md) — концепт, карта, фурри, генератор, статус механик, открытые вопросы
