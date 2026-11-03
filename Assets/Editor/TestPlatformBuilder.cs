@@ -17,8 +17,8 @@ public static class TestPlatformBuilder
     // 5 — пробел: дэнс пол (если смотришь вперёд) и рычаг двери (если смотришь вправо).
     // 6 — фурри: директор ночи, 8 камер с кормлением Дира, фигуры фурри, экран смерти, мог-батл.
     // 7 — панель сложности F1 во время ночи.
-    const int Version = 15;
-    const string VersionNote = "кнопка в окне скилл-чеков как в osu (обводка, кольцо проявляется, вспышка)";
+    const int Version = 17;
+    const string VersionNote = "сбой монитора: перезагрузка 3 с, кнопка «Сбой монитора» в F1";
 
     // Модель генератора (выгружает Tools/Blender/export_generator.bat). Нет файла — генератор из примитивов
     const string GeneratorModelFolder = "Assets/Models/Generator/";
@@ -488,6 +488,10 @@ public static class TestPlatformBuilder
         director.shift = shift;
         director.alarm = go.GetComponent<AudioSource>();
         director.alarm.playOnAwake = false;
+        // Звук сбоя монитора: положи файл в Assets/Audio/MonitorReboot.wav (.ogg, .mp3) и пересобери офис
+        director.monitorRebootClip = new[] { "wav", "ogg", "mp3" }
+            .Select(ext => AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/MonitorReboot." + ext))
+            .FirstOrDefault(c => c != null);
 
         // Где фурри видно из офиса. Второй и следующий встают вдоль оси right места
         director.atDoor = NewSpot("FurriesAtDoor", go.transform, new Vector3(4.4f, 0f, 0f), 0f);          // за правым проёмом
@@ -690,7 +694,8 @@ public static class TestPlatformBuilder
         ui.hard = PanelButton(panel.transform, "Hard", "Hard", new Vector2(170, -115), new Vector2(160, 56));
         ui.onlyNova = PanelButton(panel.transform, "OnlyNova", "Только Нова", new Vector2(-130, -185), new Vector2(240, 56));
         ui.novaBattle = PanelButton(panel.transform, "NovaBattle", "Нова → батл", new Vector2(130, -185), new Vector2(240, 56));
-        ui.ringCall = PanelButton(panel.transform, "RingCall", "Вызвать звонок", new Vector2(0, -255), new Vector2(500, 56));
+        ui.ringCall = PanelButton(panel.transform, "RingCall", "Вызвать звонок", new Vector2(-130, -255), new Vector2(240, 56));
+        ui.monitorReboot = PanelButton(panel.transform, "MonitorReboot", "Сбой монитора", new Vector2(130, -255), new Vector2(240, 56));
 
         ui.info = NewText("Info", panel.transform, 26);
         ui.info.color = new Color(0.75f, 0.75f, 0.8f);
@@ -784,8 +789,8 @@ public static class TestPlatformBuilder
         return avatar;
     }
 
-    // Материалы Новы. Тело — текстура Nova_Body.png, если она выгружена (в nova wip.blend её пока нет), иначе
-    // светлый мех как у головы. Детали лица — плоские цвета без света, как в Blender (цвет сразу в выход)
+    // Материалы Новы. Тело — текстура Nova_Body.png (выгружает export_nova.bat), без неё — светлый мех
+    // как у головы. Детали лица — плоские цвета без света, как в Blender (цвет сразу в выход)
     static Dictionary<string, Material> NovaMaterials()
     {
         var fur = new Color(0.9f, 0.9f, 0.9f); // Blender 0.8 (линейный) ≈ 0.9 на экране

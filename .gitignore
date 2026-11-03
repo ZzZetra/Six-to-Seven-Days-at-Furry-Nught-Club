@@ -10,6 +10,8 @@
 /[Rr]ecordings/
 /[Aa]ssets/_Recovery/
 /[Aa]ssets/_Recovery.meta
+/[Aa]ssets/Unity.VisualScripting.Generated/
+/[Aa]ssets/Unity.VisualScripting.Generated.meta
 
 # Файлы IDE (Unity пересоздаёт .sln и .csproj сам)
 .vs/

@@ -242,6 +242,26 @@ public class MogTests
     }
 
     [Test]
+    public void Bar_CanStartFromRight()
+    {
+        var right = new MogCheck { type = "bar", start = 0f, end = 4f, speed = 1f, pos = 0.3f, zone = 0.2f, side = "right" };
+        Assert.That(right.BarPos(0f), Is.EqualTo(1f).Within(1e-5), "до старта метка у правого края");
+        Assert.That(right.BarPos(0.25f), Is.EqualTo(0.75f).Within(1e-5), "едет влево");
+        Assert.That(right.BarPos(1.5f), Is.EqualTo(0.5f).Within(1e-5), "отскок от левого края — едет обратно");
+        var tl = new MogTimeline(Chart(right));
+        Assert.That(tl.InZone(0.7f), "зона на 0.3 от левого края — метка там через 0.7 с");
+        Assert.That(tl.InZone(0.3f), Is.False);
+
+        var old = new MogCheck { type = "bar", start = 0f, hit = 1f, pos = 0.25f, side = "right" };
+        Assert.That(old.BarPos(1f), Is.EqualTo(0.25f).Within(1e-5), "без speed: от правого края до зоны ровно к hit");
+
+        var chart = Chart(right);
+        var back = UnityEngine.JsonUtility.FromJson<MogChart>(chart.ToJson());
+        Assert.That(back.checks[0].FromRight, "side переживает сохранение");
+        Assert.That(Chart(new MogCheck { type = "bar", start = 0f, end = 2f, speed = 1f, side = "up" }).Validate(), Does.Contain("side"));
+    }
+
+    [Test]
     public void Bar_BouncesAtEdges_AndChangesSpeed()
     {
         var bounce = new MogCheck { type = "bar", start = 0f, end = 4f, speed = 1f };

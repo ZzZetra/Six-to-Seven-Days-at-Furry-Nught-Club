@@ -21,7 +21,8 @@ public class MogSpeedKey
 //   кнопка  (button) — hit, x, y, approach: кольцо сжимается approach секунд и в hit смыкается с кнопкой;
 //   стрелка (arrow)  — hit, x, y, approach, dir: появляется за approach секунд до hit и ждёт взмаха в сторону dir,
 //                      кольцо показывает, сколько осталось; в hit оно смыкается — не успел, промах;
-//   полоска (bar)    — start, end, pos, zone, speed, speedKeys: метка едет, у краёв отскакивает назад.
+//   полоска (bar)    — start, end, pos, zone, speed, speedKeys, side: метка стартует у левого края (side = right —
+//                      у правого) и едет к другому, у краёв отскакивает назад.
 // Старые раскладки (start + hit без speed, тип sides) читаются как раньше.
 [Serializable]
 public class MogCheck
@@ -31,13 +32,14 @@ public class MogCheck
     public float zone = 0.22f;      // ширина зоны: доля полоски, у кружка — доля оборота
     public float pos = 0.6f;        // центр зоны: у полоски 0..1 слева направо, у кружка — доля оборота от верха
     public float speed;             // кружок — оборотов в секунду, полоска — полосок в секунду; 0 — посчитать из start и hit
-    public float start;             // полоска: когда появляется (метка у левого края)
+    public float start;             // полоска: когда появляется (метка у своего края, см. side)
     public float end;               // полоска: когда пропадает; 0 — когда метка первый раз дойдёт до края
     public MogSpeedKey[] speedKeys = new MogSpeedKey[0]; // полоска: смены скорости по ходу
     public float approach = 1f;     // кнопка: секунд, за которые кольцо сжимается до кнопки; стрелка: время на взмах
     public float x = 0.5f;          // кнопка и стрелка: место в окне скилл-чека, 0 — левый край, 1 — правый
     public float y = 0.5f;          //                                            0 — низ, 1 — верх
     public string dir = "";         // стрелка: right | up | left | down ("" у старых sides — по pos)
+    public string side = "";        // полоска: с какого края стартует метка — left ("" тоже) или right
 
     public MogCheckType Type
     {
@@ -69,8 +71,11 @@ public class MogCheck
         }
     }
 
+    // Полоска: метка стартует у правого края и едет влево (всё зеркально; pos по-прежнему от левого края)
+    public bool FromRight => (side ?? "").Trim().ToLowerInvariant() == "right";
+
     // Скорость: у кружка — оборотов, у полоски — полосок в секунду (в начале). Старый формат — из start и hit
-    public float Speed => speed != 0f ? speed : hit > start ? pos / (hit - start) : 0f;
+    public float Speed => speed != 0f ? speed : hit > start ? (FromRight ? 1f - pos : pos) / (hit - start) : 0f;
 
     // Когда чек появляется
     public float StartTime
@@ -112,10 +117,11 @@ public class MogCheck
         }
     }
 
-    // Полоска: где метка в момент t, 0..1. Скорость меняется по speedKeys, у краёв метка отскакивает
+    // Полоска: где метка в момент t, 0 — левый край, 1 — правый. Скорость меняется по speedKeys, у краёв метка
+    // отскакивает. Со стартом справа (FromRight) — зеркально: плюс — едет влево
     public float BarPos(float t)
     {
-        if (t <= start) return 0f;
+        if (t <= start) return FromRight ? 1f : 0f;
         float s = 0f, v = Speed, from = start;
         foreach (var k in (speedKeys ?? new MogSpeedKey[0]).OrderBy(k => k.at))
         {
@@ -129,7 +135,8 @@ public class MogCheck
         }
         s += v * (t - from);
         s = Math.Abs(s) % 2f; // путь «туда-обратно» сворачивается в отскоки от краёв
-        return s <= 1f ? s : 2f - s;
+        float p = s <= 1f ? s : 2f - s;
+        return FromRight ? 1f - p : p;
     }
 }
 
@@ -161,6 +168,8 @@ public class MogChart
                     if (c.pos <= 0f || c.pos > 1f) return $"{at}: «pos» должна быть от 0 до 1";
                     if (c.Speed == 0f) return $"{at}: нужна «speed» (полосок в секунду) или «hit» позже «start»";
                     if (c.BarEnd <= c.start + 0.05f) return $"{at}: «end» должен быть позже «start»";
+                    string side = (c.side ?? "").Trim().ToLowerInvariant();
+                    if (side != "" && side != "left" && side != "right") return $"{at}: «side» — left или right";
                     break;
                 default:
                     if (c.approach < 0.2f) return $"{at}: «approach» должен быть не меньше 0.2 с";
@@ -219,6 +228,7 @@ public class MogChart
                 Add("type", Str("bar"));
                 Add("start", Num(c.start)); Add("end", Num(c.BarEnd)); Add("hit", Num(c.hit));
                 Add("pos", Num(c.pos)); Add("zone", Num(c.zone)); Add("speed", Num(c.Speed));
+                if (c.FromRight) Add("side", Str("right"));
                 if (c.speedKeys != null && c.speedKeys.Length > 0)
                     Add("speedKeys", "[" + string.Join(", ", c.speedKeys.OrderBy(k => k.at)
                         .Select(k => $"{{ \"at\": {Num(k.at)}, \"speed\": {Num(k.speed)} }}")) + "]");

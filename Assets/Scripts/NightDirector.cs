@@ -8,6 +8,7 @@ using UnityEngine.UI;
 // Нападение — экран смерти и смена заново. Нова на дэнс полу — мог-батл по фазам (MogBattle): она поворачивает
 // игрока к дэнс полу, управление отключено, остальные фурри, голод Дира и бензин стоят (Night.Frozen).
 // Звуки: Доли у двери и у генератора рычит одинаково (не понять, где он); слив бензина булькает.
+// Сбой монитора (Night.MonitorRebootStarted): звук monitorRebootClip, если он есть, перезагрузку рисует CameraMonitor.
 public class NightDirector : MonoBehaviour, IOffice
 {
     const float DeathScreenTime = 2.5f;
@@ -29,6 +30,7 @@ public class NightDirector : MonoBehaviour, IOffice
     public GameObject deathPanel;
     public Text deathText;
     public AudioSource alarm;
+    public AudioClip monitorRebootClip; // звук сбоя монитора; сборщик берёт Assets/Audio/MonitorReboot.*, пока его нет
 
     public Night Night { get; private set; }
 
@@ -49,6 +51,7 @@ public class NightDirector : MonoBehaviour, IOffice
         doliLoop = NewLoop(Tones.Growl("DoliGrowl"));
         drainLoop = NewLoop(Tones.Glug("FuelDrain"));
         Night.GeneratorSabotaged += r => Debug.Log($"[SSDFNC] {r.Name} у генератора: {r.SabotageName}");
+        Night.MonitorRebootStarted += OnMonitorReboot;
         Debug.Log($"[SSDFNC] Ночь: сложность {NightSettings.Describe()}, уровни Дир/Стрей/Нова/Дали/Доли");
         deathPanel.SetActive(false);
     }
@@ -73,12 +76,15 @@ public class NightDirector : MonoBehaviour, IOffice
     // ── IOffice: что видят и делают фурри ──
     public bool DoorClosed => door.IsClosed;
     public bool DanceFloorOn => danceFloor.IsActive;
+    public bool MonitorPowered => generator.IsPowered;
     public void StallGenerator() => generator.Stall();
     public void DamageGenerator(float hp) => generator.Damage(hp);
     public void DrainFuel(float amount) => generator.Drain(amount);
 
     // ── Камеры и кормление ──
     public string Describe(Room room) => Night.Describe(room);
+    public bool MonitorRebooting => Night != null && Night.MonitorRebooting; // монитор включается раньше ночи
+    public float MonitorRebootLeft => Night != null ? Night.MonitorRebootLeft : 0f;
     public bool DirActive => Night.Dir.Active;
     public float FeedProgress => feedHeld / Balance.DirFeedHoldTime;
 
@@ -130,6 +136,12 @@ public class NightDirector : MonoBehaviour, IOffice
     }
 
     static Vector3 Spot(Transform anchor, int index) => anchor.position + anchor.right * (index * AvatarSpacing);
+
+    void OnMonitorReboot()
+    {
+        Debug.Log($"[SSDFNC] Сбой монитора: перезагрузка {Balance.MonitorRebootTime:0} с (корм Дира {Night.Dir.Food * 100f:0}%)");
+        if (monitorRebootClip != null) alarm.PlayOneShot(monitorRebootClip);
+    }
 
     void OnMogBattle(NovaAI nova)
     {

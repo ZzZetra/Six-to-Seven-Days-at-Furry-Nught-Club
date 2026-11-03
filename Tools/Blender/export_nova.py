@@ -9,8 +9,8 @@
 #     анимировать;
 #   - материалы переименовывает: NovaBody (тело, текстура Furrypetfurry2_diff), NovaFur (мех головы),
 #     NovaBlack и NovaRed (детали лица) — по этим именам Unity подставляет свои материалы;
-#   - с --textures сохраняет текстуру тела как Nova_Body.png, если она вшита в .blend или лежит рядом
-#     (File → External Data → Pack Resources в Blender, чтобы вшить).
+#   - с --textures сохраняет текстуру тела как Nova_Body.png: вшитую в .blend (File → External Data →
+#     Pack Resources) или лежащую рядом с .blend — Art/Nova/Furrypetfurry2_diff.png или .jpg.
 import argparse
 import os
 import sys
@@ -58,15 +58,24 @@ bpy.ops.export_scene.fbx(
 print(f"EXPORT {args.fbx} objects {sorted(o.name for o in export)}")
 
 if args.textures:
+    # Текстура тела: вшитая в .blend, по пути из .blend или рядом с .blend (Furrypetfurry2_diff.png / .jpg)
     body = bpy.data.images.get("Furrypetfurry2_diff.png")
-    if body is not None and (body.packed_file or os.path.exists(bpy.path.abspath(body.filepath))):
+    here = os.path.dirname(bpy.data.filepath)
+    files = [bpy.path.abspath(body.filepath)] if body is not None else []
+    files += [os.path.join(here, "Furrypetfurry2_diff" + ext) for ext in (".png", ".jpg")]
+    source = next((f for f in files if os.path.exists(f)), None)
+    path = os.path.join(args.textures, "Nova_Body.png")
+    if body is not None and body.packed_file:
         os.makedirs(args.textures, exist_ok=True)
-        path = os.path.join(args.textures, "Nova_Body.png")
-        if body.packed_file:
-            with open(path, "wb") as f:
-                f.write(body.packed_file.data)
-        else:
-            body.save_render(path)
-        print("TEXTURE Nova_Body.png")
+        with open(path, "wb") as f:
+            f.write(body.packed_file.data)
+        print("TEXTURE Nova_Body.png (вшитая)")
+    elif source is not None:
+        os.makedirs(args.textures, exist_ok=True)
+        image = bpy.data.images.load(source)
+        image.pixels[0]                # Blender грузит картинку лениво — прочитать до сохранения
+        image.file_format = "PNG"
+        image.save(filepath=path)      # save(), не save_render(): без цветокоррекции сцены
+        print(f"TEXTURE Nova_Body.png ← {source}")
     else:
-        print("NO_TEXTURE Furrypetfurry2_diff.png не вшита в .blend и не найдена — тело будет одним цветом")
+        print("NO_TEXTURE Furrypetfurry2_diff не вшита в .blend и не лежит рядом — тело будет одним цветом")

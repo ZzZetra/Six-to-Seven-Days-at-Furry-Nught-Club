@@ -188,7 +188,8 @@ Concept in one screen (details, numbers and the map are in `docs/GAME_DESIGN.md`
   the beat — changed by the user 2026-10-30: the arrow just WAITS for the swipe while its ring closes (ring =
   time left, deadline `hit + MogHitWindow`), wrong direction is ignored, too late = red miss burst and the next
   check; `Mouse.delta` summed while the arrow is active, `Balance.MogSwipeDistance` × screen height), bar (Space;
-  speed changes via `speedKeys`, bounces at the ends). Button/arrow window ±`Balance.MogHitWindow`. Phases
+  speed changes via `speedKeys`, bounces at the ends; `side: "right"` (user, 2026-11-02) starts the marker at the
+  right edge — `BarPos` mirrored, `pos` still from the left). Button/arrow window ±`Balance.MogHitWindow`. Phases
   come from the chart: a run of same-type checks = one phase. One check on screen; the current one is missed
   when the next is already hittable (`MogCheck.ReadyTime`), not when the next merely starts — dense charts
   showed the next ring half-shrunk. Old `sides`/speedless bars still load. Window built by
@@ -230,11 +231,19 @@ Concept in one screen (details, numbers and the map are in `docs/GAME_DESIGN.md`
 - **Nova model (2026-10-30, docs/MODELS.md):** `Art/Nova/nova wip.blend` (Blocky Rig + cat head `Cube.006`),
   exported by `Tools/Blender/export_nova.bat` → `Assets/Models/Nova/Nova.fbx`; `NovaModelImport` (no anims,
   `importVisibility=false` or the head comes in disabled). Builder `NovaAvatar` replaces Nova's capsule: height
-  1.8 m, yaw 180° (imported model faces +Z, away from the player), URP materials (body texture missing —
-  not packed in the .blend; body uses the fur colour until the user packs/sends `Furrypetfurry2_diff.png`).
+  1.8 m, yaw 180° (imported model faces +Z, away from the player), URP materials. Body texture (not packed
+  in the .blend) was sent via Telegram 2026-10-30 as a JPEG: `Art/Nova/Furrypetfurry2_diff.jpg` → export_nova.py
+  also looks next to the .blend (.png first) → `Assets/Models/Nova/Textures/Nova_Body.png` → NovaBody _BaseMap
+  (UV0 = «Faceless», the render UV). Office builder version 16.
   The user asked to keep the attack phases but remove my placeholder capsule animations — done; Nova has no
   animations yet. `NightDirector.AvatarSpacing` 1.2 m (Nova is wider). Phase label has a dark backing
   (`MogBattle.phaseBack`) because the schedule board sits behind it. Builder version 13.
+- **Monitor glitch (user, 2026-11-02):** 10%/min chance (rolled once a second with its own `Random`, see
+  `Night.UpdateMonitor`) the monitor reboots for 3 s: sound slot (`NightDirector.monitorRebootClip`, builder
+  loads `Assets/Audio/MonitorReboot.*` — the user will add the sound later), screen goes dark then a boot
+  screen (`CameraMonitor.DrawReboot`); cameras and feeding are off. Only if Dir's food ≥ 40% and the monitor
+  is powered (`IOffice.MonitorPowered`); not during the mog battle. F1 «Сбой монитора». Sim bot can't feed
+  while rebooting. Numbers `Balance.MonitorReboot*`. Office builder version 17.
 - **Generator model (2026-10-27, docs/MODELS.md):** sources `Art/Generator/*.blend` (LFS), exported by
   `Tools/Blender/export_generator.bat` (Blender 5.2 from Steam, background mode, bakes constraint-driven
   bones, renames materials, packs textures for URP) into `Assets/Models/Generator`. `GeneratorModelImport`

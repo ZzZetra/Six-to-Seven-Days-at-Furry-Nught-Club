@@ -58,6 +58,12 @@ public static class Balance
     public const float DirGraceTime = 3f;            // с от сигнала «корм кончился» до нападения
     public const float DirFeedHoldTime = 1.5f;       // с держать «Покормить» на камере 7
 
+    // ── Монитор сам уходит в перезагрузку ──
+    // Камеры и кормление Дира на это время не работают. Только если Дир сыт: иначе сбой убивал бы
+    public const float MonitorRebootChancePerMinute = 0.1f; // шанс за минуту смены (бросок раз в секунду)
+    public const float MonitorRebootTime = 3f;              // с, столько идёт перезагрузка
+    public const float MonitorRebootMinDirFood = 0.4f;      // корма у Дира не меньше этой доли — иначе не сбоит
+
     // ── Нова ──
     public const float NovaRestAfterBattle = 180f;   // с после проигранного ею мог-батла сидит дома
 

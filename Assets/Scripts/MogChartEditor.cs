@@ -977,6 +977,11 @@ public class MogChartEditor : MonoBehaviour
                 c.end = Number("end", c.BarEnd, 90);
                 if (GUILayout.Button("сюда", GUILayout.Width(80))) c.end = Snapped(head);
                 GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Метка стартует", GUILayout.Width(230));
+                int from = GUILayout.Toolbar(c.FromRight ? 1 : 0, new[] { "слева", "справа" }, GUILayout.Width(240));
+                c.side = from == 1 ? "right" : "";
+                GUILayout.EndHorizontal();
                 c.pos = Slider("Центр зоны (0–1)", "pos", c.pos, 0.02f, 1f);
                 c.zone = Slider("Ширина зоны", "zone", c.zone, 0.03f, 0.5f);
                 c.speed = Slider("Скорость (минус — назад)", "speed", c.Speed, -3f, 3f);

@@ -20,6 +20,7 @@ public class SimOffice : IOffice
     public float Health = Balance.GeneratorMaxHealth;
     public bool Stalled, Broken, Paused;
     public bool Powered => !Stalled && !Broken;
+    public bool MonitorPowered => Powered;
 
     public int Stalls, DoorAutoOpens;
 
@@ -243,9 +244,14 @@ class SimBot
             GoTo(Spot.Right, PressTime, office.CloseDoor);
             return;
         }
-        if (Noticed("dir", dirHungry) && office.Powered)
+        if (Noticed("dir", dirHungry) && office.Powered && !night.MonitorRebooting)
         {
-            GoTo(Spot.Forward, FeedTime, () => { night.FeedDir(); Feeds++; });
+            GoTo(Spot.Forward, FeedTime, () =>
+            {
+                if (night.MonitorRebooting) return; // монитор ушёл в перезагрузку, пока кормил — заново
+                night.FeedDir();
+                Feeds++;
+            });
             return;
         }
         // Звук на тех, кто идёт к генератору. Если Доли у открытой двери, звук его спровоцирует:

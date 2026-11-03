@@ -196,6 +196,10 @@ Right`). Считается по **фактическому** повороту �
   `Balance.DirFeedHoldTime` (1.5 с) Дир накормлен. На кнопке прогресс «КОРМИМ… 60%».
 - **Без питания** экран и кнопки почти чёрные, `Select` ничего не делает. Когда питание
   возвращается, монитор включается без выбранной камеры.
+- **Сбой** (`director.MonitorRebooting`, логика — `Night`): кнопки и кормление выключены, `Select` ничего не
+  делает. `DrawReboot` первые 0.4 с держит экран чёрным, потом тёмно-синий экран «ПЕРЕЗАГРУЗКА…» с полоской
+  из символов `█░`, процентами и строками загрузки (номера камер появляются по одному). Сбой начался или
+  кончился — камера сбрасывается, как после отключения питания.
 
 ## Фурри: SSDFNC.Core и NightDirector
 
@@ -208,7 +212,11 @@ Right`). Считается по **фактическому** повороту �
   его не держат; продержали — домой. У генератора портит (`StartSabotage` / `SabotageUpdate`).
 - `StrayAI`, `NovaAI`, `DaliAI`, `DoliAI`, `DirAI` — пятеро по концепту.
 - `Night` — ночь: пятеро, рост уровня по четвертям, `SoundFired`, `FeedDir`, мог-батл
-  (`Frozen`, `FinishMogBattle`), смерть (`PlayerKilled`), `Describe(room)` для камер.
+  (`Frozen`, `FinishMogBattle`), смерть (`PlayerKilled`), `Describe(room)` для камер. Сбой монитора: раз в
+  секунду бросок своим `Random` (не сдвигает броски фурри) с шансом, который за минуту даёт
+  `Balance.MonitorRebootChancePerMinute`; только если `MonitorCanReboot` — `IOffice.MonitorPowered` и у Дира корма
+  не меньше `MonitorRebootMinDirFood`. Тогда `MonitorRebootLeft` = `MonitorRebootTime` и событие
+  `MonitorRebootStarted`. Во время мог-батла не идёт. `ForceMonitorReboot()` — для панели F1.
 - `MogChart` / `MogCheck` — раскладка мог-батла (музыка и скилл-чеки по времени, читается из json
   через `JsonUtility`), `Validate()`, `Default()`, `ToJson()`. У чека вид (`Type`: кружок, кнопка, стрелка,
   полоска) и время: `StartTime` (появился), `ReadyTime` (уже можно попасть), `EndTime` (не попал —

@@ -61,6 +61,7 @@ public interface IOffice
 {
     bool DoorClosed { get; }
     bool DanceFloorOn { get; }
+    bool MonitorPowered { get; }    // монитор камер работает (есть питание от генератора)
     void StallGenerator();
     void DamageGenerator(float hp);
     void DrainFuel(float amount);

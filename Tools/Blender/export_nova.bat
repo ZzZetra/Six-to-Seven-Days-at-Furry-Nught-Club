@@ -1,6 +1,6 @@
 @echo off
 chcp 65001 >nul
-rem Выгрузить Нову из Art\Nova\nova wip.blend в Assets\Models\Nova (FBX и текстура тела, если она вшита).
+rem Выгрузить Нову из Art\Nova\nova wip.blend в Assets\Models\Nova (FBX и текстура тела — вшитая или Art\Nova\Furrypetfurry2_diff.png/.jpg).
 rem Путь к Blender можно поменять в BLENDER ниже.
 setlocal
 set "BLENDER=C:\Program Files (x86)\Steam\steamapps\common\Blender\blender.exe"

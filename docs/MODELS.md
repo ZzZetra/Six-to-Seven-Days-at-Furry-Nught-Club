@@ -8,18 +8,19 @@
 ### Как обновить
 
 1. Положи новый `nova wip.blend` в `Art/Nova`.
-2. Запусти `Tools/Blender/export_nova.bat` — он выгрузит `Assets/Models/Nova/Nova.fbx`.
+2. Запусти `Tools/Blender/export_nova.bat` — он выгрузит `Assets/Models/Nova/Nova.fbx` и текстуру тела.
 3. Переключись в Unity и пересобери офис: SSDFNC → Build Test Platform или «Пересобрать» в окне.
 
 ### Текстура тела
 
-Тело в Blender покрашено текстурой `Furrypetfurry2_diff.png`. В файл она не вшита, а лежит у автора в
-папке «BLENDER RIGS», поэтому пока тело того же светлого цвета, что голова. Чтобы появилась:
-- в Blender: File → External Data → Pack Resources, сохрани и пришли `.blend`;
-- или пришли саму картинку — положи её рядом с `.blend`.
+Тело в Blender покрашено текстурой `Furrypetfurry2_diff.png` (1024×512, прямо в цвет материала,
+шероховатость 0.5, развёртка «Faceless» — она у тела первая, её и берёт Unity). В `.blend` она не вшита,
+поэтому лежит рядом: `Art/Nova/Furrypetfurry2_diff.jpg` — автор прислал её в Telegram 2026-10-30, это
+сжатая копия. Если пришлёт оригинал `.png`, положи его туда же: `.png` выгрузка берёт первым.
 
-`export_nova.bat` сам сохранит её как `Assets/Models/Nova/Textures/Nova_Body.png`. После пересборки
-офиса она встанет в материал `NovaBody`.
+`export_nova.bat` берёт текстуру вшитую в `.blend` (File → External Data → Pack Resources) или лежащую
+рядом и сохраняет как `Assets/Models/Nova/Textures/Nova_Body.png`. После пересборки офиса она встаёт в
+материал `NovaBody`; без неё тело того же светлого цвета, что голова.
 
 ### Что делает выгрузка (`Tools/Blender/export_nova.py`)
 

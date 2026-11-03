@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-// Одна ночь (смена): пять фурри, рост сложности по четвертям смены, мог-батл и итог.
+// Одна ночь (смена): пять фурри, рост сложности по четвертям смены, мог-батл, сбои монитора и итог.
 // Без Unity-сцены: в игре её тикает NightDirector, в тестах и симуляции — свой цикл.
 public class Night
 {
@@ -26,11 +26,29 @@ public class Night
     public event Action<Furry, Room, Room> FurryMoved;
     public event Action<DirAI> DirStarving;
     public event Action<Roamer> GeneratorSabotaged; // Дали или Доли начали портить генератор
+    public event Action MonitorRebootStarted;        // монитор ушёл в перезагрузку
+
+    // Шанс сбоя за один бросок (раз в секунду), чтобы за минуту выходило Balance.MonitorRebootChancePerMinute
+    static readonly double MonitorRebootChancePerRoll =
+        1.0 - Math.Pow(1.0 - Balance.MonitorRebootChancePerMinute, 1.0 / 60.0);
+
+    readonly IOffice office;
+    readonly Random monitorRng; // свой поток: сбои не сдвигают броски фурри
+    float monitorClock;
+
+    public float MonitorRebootLeft { get; private set; } // с до конца перезагрузки, 0 — работает
+    public bool MonitorRebooting => MonitorRebootLeft > 0f;
+
+    // Может ли монитор сейчас сбоить: он работает и у Дира корма не меньше MonitorRebootMinDirFood
+    public bool MonitorCanReboot =>
+        office.MonitorPowered && !Dir.Starving && Dir.Food >= Balance.MonitorRebootMinDirFood;
 
     // levels — уровни ИИ в порядке FurryId: Дир, Стрей, Нова, Дали, Доли
     public Night(IOffice office, int[] levels, float duration, int seed)
     {
         var rng = new Random(seed);
+        monitorRng = new Random(unchecked(seed * 31 + 17));
+        this.office = office;
         Duration = duration;
         Dir = new DirAI(levels[0], office, rng);
         Stray = new StrayAI(levels[1], office, rng);
@@ -62,11 +80,46 @@ public class Night
         foreach (var f in All)
             if (f.Active) f.SetLevel(f.BaseLevel + Quarter * Difficulty.RampPerQuarter);
         if (Frozen) return;
+        UpdateMonitor(dt);
         foreach (var f in All)
         {
             f.Tick(dt);
             if (Over || Frozen) return;
         }
+    }
+
+    // Сбой монитора: идёт перезагрузка — досчитать; иначе раз в секунду бросок, если монитор может сбоить
+    void UpdateMonitor(float dt)
+    {
+        if (MonitorRebootLeft > 0f)
+        {
+            MonitorRebootLeft = Math.Max(0f, MonitorRebootLeft - dt);
+            return;
+        }
+        monitorClock += dt;
+        while (monitorClock >= 1f)
+        {
+            monitorClock -= 1f;
+            if (MonitorCanReboot && monitorRng.NextDouble() < MonitorRebootChancePerRoll)
+            {
+                StartMonitorReboot();
+                return;
+            }
+        }
+    }
+
+    // Для проверки (панель F1): сбой сразу, без броска и без условия про Дира
+    public void ForceMonitorReboot()
+    {
+        if (Over || Frozen || MonitorRebooting) return;
+        StartMonitorReboot();
+    }
+
+    void StartMonitorReboot()
+    {
+        MonitorRebootLeft = Balance.MonitorRebootTime;
+        monitorClock = 0f;
+        MonitorRebootStarted?.Invoke();
     }
 
     public void SoundFired()

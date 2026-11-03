@@ -9,6 +9,7 @@ public class FurryTests
     {
         public bool DoorClosed { get; set; }
         public bool DanceFloorOn { get; set; }
+        public bool MonitorPowered { get; set; } = true;
         public int Stalls;
         public float Damage, Drained;
         public void StallGenerator() => Stalls++;
@@ -452,6 +453,54 @@ public class FurryTests
         var skilled = NightSimulator.RunMany(levels, BotProfile.Skilled, 600f, 150);
         var novice = NightSimulator.RunMany(levels, BotProfile.Novice, 600f, 150);
         Assert.That(skilled.SurvivalRate, Is.GreaterThan(novice.SurvivalRate + 0.3f));
+    }
+
+    // ── Сбой монитора ──
+
+    static int CountReboots(Night night, float seconds)
+    {
+        int reboots = 0;
+        night.MonitorRebootStarted += () => reboots++;
+        for (float t = 0f; t < seconds; t += 0.25f) night.Tick(0.25f);
+        return reboots;
+    }
+
+    [Test]
+    public void MonitorReboot_AboutTenPercentPerMinute()
+    {
+        const int minutes = 3000;
+        var night = new Night(new FakeOffice(), new[] { 0, 0, 0, 0, 0 }, 1e7f, 7);
+        float perMinute = CountReboots(night, minutes * 60f) / (float)minutes;
+        Assert.That(perMinute, Is.InRange(Balance.MonitorRebootChancePerMinute * 0.85f, Balance.MonitorRebootChancePerMinute * 1.15f),
+            $"сбоев в минуту: {perMinute:0.000}");
+    }
+
+    [Test]
+    public void MonitorReboot_LastsRebootTime()
+    {
+        var night = new Night(new FakeOffice(), new[] { 0, 0, 0, 0, 0 }, 600f, 1);
+        night.ForceMonitorReboot();
+        Assert.That(night.MonitorRebooting);
+        for (float t = 0f; t < Balance.MonitorRebootTime - 0.2f; t += 0.05f) night.Tick(0.05f);
+        Assert.That(night.MonitorRebooting, "ещё перезагружается");
+        for (int i = 0; i < 8; i++) night.Tick(0.05f);
+        Assert.That(night.MonitorRebooting, Is.False, "через MonitorRebootTime снова работает");
+    }
+
+    [Test]
+    public void MonitorReboot_OnlyIfPoweredAndDirFed()
+    {
+        var unpowered = new Night(new FakeOffice { MonitorPowered = false }, new[] { 0, 0, 0, 0, 0 }, 1e7f, 1);
+        Assert.That(CountReboots(unpowered, 3600f), Is.EqualTo(0), "монитор без питания не сбоит");
+
+        var night = new Night(new FakeOffice(), new[] { 1, 0, 0, 0, 0 }, 1e7f, 1);
+        Assert.That(night.MonitorCanReboot, "Дир сыт — может сбоить");
+        float hungry = (1f - Balance.MonitorRebootMinDirFood + 0.02f) * night.Dir.FoodTime;
+        for (float t = 0f; t < hungry; t += 0.05f) night.Tick(0.05f);
+        Assert.That(night.Dir.Food, Is.LessThan(Balance.MonitorRebootMinDirFood));
+        Assert.That(night.MonitorCanReboot, Is.False, "корма меньше 40% — не сбоит");
+        night.FeedDir();
+        Assert.That(night.MonitorCanReboot, "покормили — снова может");
     }
 
     // Таблица баланса в лог теста (её же пишет меню SSDFNC → Balance Report)
