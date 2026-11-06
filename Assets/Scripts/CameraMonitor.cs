@@ -42,6 +42,8 @@ public class CameraMonitor : MonoBehaviour
 
     void Awake()
     {
+        // Всё на экране — по его краям: ползущая полоса помех и дёрганье кадра при сбое выходили за монитор
+        if (!TryGetComponent<RectMask2D>(out _)) gameObject.AddComponent<RectMask2D>();
         for (int i = 0; i < buttons.Length; i++)
         {
             int index = i;

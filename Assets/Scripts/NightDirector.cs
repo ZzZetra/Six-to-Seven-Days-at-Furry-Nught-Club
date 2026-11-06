@@ -248,8 +248,11 @@ public class NightDirector : MonoBehaviour, IOffice
         generator.Paused = true;
         danceFloor.SetForced(true);
         PlaceAvatars();     // Нова уже стоит на дэнс полу, когда начинается фаза появления
+        battle.KeyHints = NightProgress.Current == 1; // в 1-ю ночь на чеках написано, что нажимать
+        look.Sway = true; // голова чуть ходит за мышью, пока идёт батл
         battle.Begin(nova.Wins, won =>
         {
+            look.Sway = false;
             generator.Paused = false;
             danceFloor.SetForced(false);
             if (won) SetControls(true); // проиграл — дальше экран смерти, управление не нужно

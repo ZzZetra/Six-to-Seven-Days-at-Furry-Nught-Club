@@ -35,11 +35,17 @@ public class CameraLook : MonoBehaviour
     const float IntroFov = 22f;       // градусов: на столько шире угол обзора в начале
     const float IntroJerk = 2.2f;   // сила рывка через край в конце (0 — плавно, без рывка)
 
+    // Мог-батл: голова чуть ходит за мышью — на стрелках и кнопках «виляем головой» (пользователь, 2026-11-06)
+    const float SwayYaw = 6f;       // градусов, когда мышь у левого / правого края экрана
+    const float SwayPitch = 4f;     // градусов, когда у верхнего / нижнего
+    const float SwaySharpness = 7f; // больше — быстрее догоняет мышь
+
     public enum Side { Left, Forward, Right } // номера совпадают с index
     static readonly float[] Yaws = { -90f, 0f, 90f };
 
     public Transform generatorSpot; // где стоит камера у генератора; не задан — подойти нельзя
     public bool InputLocked;        // ввод  отключён (атака Новы): камеру поворачивают за игрока
+    public bool Sway;               // мог-батл: голова чуть следует за мышью (ставит NightDirector)
 
     int index = 1;
     Vector3 officePosition;
@@ -48,6 +54,7 @@ public class CameraLook : MonoBehaviour
     Vector3 velocity;
     Quaternion baseRotation; // поворот без появления
     Camera cam;
+    Vector2 sway;            // -1…1 по осям: куда сейчас качнулась голова
     float introTime = -1f;   // с начала появления; меньше нуля — ждём, пока уйдёт загрузочный экран
     bool introDone;
 
@@ -142,6 +149,16 @@ public class CameraLook : MonoBehaviour
         // Отъезд «вперёд» — с той же скоростью, что и поворот, поэтому не задерживает следующую команду
         lean = Vector3.Lerp(lean, TargetLean, 1f - Mathf.Exp(-TurnSharpness * Time.deltaTime));
 
+        // Мог-батл: голова за мышью (от центра экрана), после батла — плавно назад
+        var swayTo = Vector2.zero;
+        var mouse = Mouse.current;
+        if (Sway && mouse != null && Screen.width > 0 && Screen.height > 0)
+        {
+            var p = mouse.position.ReadValue();
+            swayTo = new Vector2(Mathf.Clamp(p.x / Screen.width * 2f - 1f, -1f, 1f), Mathf.Clamp(p.y / Screen.height * 2f - 1f, -1f, 1f));
+        }
+        sway = Vector2.Lerp(sway, swayTo, 1f - Mathf.Exp(-SwaySharpness * Time.deltaTime));
+
         if (!introDone)
         {
             if (introTime < 0f && !SceneLoader.Covering) introTime = 0f; // экран загрузки начал уходить
@@ -159,7 +176,7 @@ public class CameraLook : MonoBehaviour
         float fovK = introDone ? 0f : Mathf.Pow(1f - t, 3f);     // угол обзора — плавно
         var yaw = Quaternion.Euler(0f, baseRotation.eulerAngles.y, 0f);
         transform.position = basePosition + lean + yaw * new Vector3(0f, IntroRise, IntroForward) * k;
-        transform.rotation = baseRotation * Quaternion.Euler(IntroPitch * k, 0f, 0f);
+        transform.rotation = baseRotation * Quaternion.Euler(IntroPitch * k - sway.y * SwayPitch, sway.x * SwayYaw, 0f);
         if (cam != null) cam.fieldOfView = FieldOfView + IntroFov * fovK;
     }
 

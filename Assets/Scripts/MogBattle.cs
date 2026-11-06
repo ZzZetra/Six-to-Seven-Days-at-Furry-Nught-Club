@@ -18,7 +18,9 @@ using UnityEngine.UI;
 // Чеки идут один за другим: следующий виден сразу, как решён предыдущий, и ждёт своего времени.
 // Время чеков считается по музыке (если она есть). Запас мога (на экране его нет): с 3,
 // попал — +1 (до 4), промах — −1; на нуле Нова нападает сразу, дожил до конца хотя бы с 1 — она уходит.
-// Надписей фазы и запаса мога нет (пользователь, 2026-11-06) — только название чека и подсказка.
+// Над чеками текста нет — ни фазы, ни запаса мога, ни названия чека с подсказкой (пользователь, 2026-11-06). Только в
+// 1-й ночи (KeyHints) на самом чеке написано, что делать: кружок и полоска — «ПРОБЕЛ», кнопка — «КЛИК», стрелка —
+// «ПОВОРАЧИВАЙ». В редакторе раскладок (ShowStill) название и подсказка остаются.
 // Этот же компонент проигрывает раскладку в «Проверке скилл-чеков» в главном меню (MogTestTab) и в
 // редакторе раскладок (MogChartEditor), там же он показывает выбранный чек неподвижно (ShowStill).
 // Анимаций Новы пока нет: модель стоит на дэнс полу. Под фазы их будет подключать её аниматор по Current.
@@ -84,10 +86,30 @@ public class MogBattle : MonoBehaviour
     Text burstGlyph;        // стрелка на вспышке — копия arrowGlyph
     Vector2 panelPos;       // где окно в игре (редактор раскладок ставит его по-своему)
     MogCheck still;         // редактор: чек, показанный неподвижно
+    Text keyHint;           // 1-я ночь: подпись на самом чеке
+
+    // 1-я ночь — на чеке пишется, что нажимать (ставит NightDirector перед батлом)
+    [NonSerialized] public bool KeyHints;
+    const int KeyHintSize = 34;
+    const float KeyHintBarUp = 60f, KeyHintArrowDown = 95f; // px: над полоской и под стрелкой, чтобы не закрывать их
 
     void Awake()
     {
         GameSounds.VolumeChanged += ApplyMusicVolume; // громкость «Музыка мог-батла» в настройках
+        keyHint = new GameObject("KeyHint", typeof(RectTransform), typeof(Text)).GetComponent<Text>();
+        keyHint.transform.SetParent(panel.transform, false); // последним — поверх чека
+        keyHint.font = title.font;
+        keyHint.fontSize = KeyHintSize;
+        keyHint.alignment = TextAnchor.MiddleCenter;
+        keyHint.horizontalOverflow = HorizontalWrapMode.Overflow;
+        keyHint.verticalOverflow = VerticalWrapMode.Overflow;
+        keyHint.color = Color.white;
+        keyHint.raycastTarget = false;
+        keyHint.rectTransform.sizeDelta = new Vector2(400f, 60f);
+        var outline = keyHint.gameObject.AddComponent<Outline>();
+        outline.effectColor = new Color(0f, 0f, 0f, 0.9f);
+        outline.effectDistance = new Vector2(2f, -2f);
+        keyHint.enabled = false;
         circleRing.sprite = MogShapes.Ring;
         circleZone.sprite = MogShapes.Ring;
         circleZone.type = Image.Type.Filled;
@@ -305,8 +327,8 @@ public class MogBattle : MonoBehaviour
         var (number, total) = Timeline.ProgressInGroup();
         bool active = Timeline.Active(clock);
         panel.SetActive(true);
-        title.text = still == null ? $"{name} {number}/{total}" : name;
-        hint.text = Hint(type);
+        title.text = still == null ? "" : name;     // в игре текста над чеком нет, в редакторе — название
+        hint.text = still == null ? "" : Hint(type);
 
         barRoot.SetActive(type == MogCheckType.Bar);
         circleRoot.SetActive(type == MogCheckType.Circle);
@@ -339,6 +361,25 @@ public class MogBattle : MonoBehaviour
                 DrawApproach(arrowGroup, arrowRing, active);
                 break;
         }
+        DrawKeyHint(type);
+    }
+
+    // 1-я ночь: подпись прямо на чеке (над полоской, под стрелкой — чтобы не закрывать их)
+    void DrawKeyHint(MogCheckType type)
+    {
+        keyHint.enabled = KeyHints && still == null;
+        if (!keyHint.enabled) return;
+        Transform at;
+        float shift = 0f;
+        switch (type)
+        {
+            case MogCheckType.Circle: keyHint.text = "ПРОБЕЛ"; at = circleRoot.transform; break;
+            case MogCheckType.Button: keyHint.text = "КЛИК"; at = buttonRoot; break;
+            case MogCheckType.Arrow: keyHint.text = "ПОВОРАЧИВАЙ"; at = arrowRoot; shift = -KeyHintArrowDown; break;
+            default: keyHint.text = "ПРОБЕЛ"; at = barRoot.transform; shift = KeyHintBarUp; break;
+        }
+        keyHint.rectTransform.position = at.position;
+        keyHint.rectTransform.localPosition += Vector3.up * shift;
     }
 
     // Кнопка и стрелка как в osu: пока время не пришло — бледные; кольцо появляется втрое больше,
