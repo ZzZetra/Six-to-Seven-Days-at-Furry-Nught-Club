@@ -1,0 +1,5383 @@
+{
+ "materials": [
+  {
+   "name": "Map_Mat_3",
+   "source": "Mat.3",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.8185352832078934,
+   "emission": [
+    0.8673469424247742,
+    0.71932452917099,
+    0.7168156504631042
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Mat_11",
+   "source": "Mat.11",
+   "color": [
+    0.019387755542993546,
+    0.3877550959587097,
+    0.0,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.7071067690849304,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Mat_12",
+   "source": "Mat.12",
+   "color": [
+    0.4253443479537964,
+    0.5714285969734192,
+    0.023612750694155693,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.7071067690849304,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Mat_9",
+   "source": "Mat.9",
+   "color": [
+    0.9666666388511658,
+    1.0,
+    0.0,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.7071067690849304,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Material_003",
+   "source": "Material.003",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_Material_003_Base.jpg",
+   "normalMap": "Map_Material_003_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_Material_003_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    15.0,
+    15.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_water",
+   "source": "water",
+   "color": [
+    0.8412885665893555,
+    0.8654635548591614,
+    0.8775510191917419,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.7071067690849304,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Mat_4",
+   "source": "Mat.4",
+   "color": [
+    0.7653061151504517,
+    0.7125990986824036,
+    0.6071850061416626,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.7071067690849304,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Mat_5",
+   "source": "Mat.5",
+   "color": [
+    0.40816327929496765,
+    0.0,
+    0.18367347121238708,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.7483314871788025,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Mat_14",
+   "source": "Mat.14",
+   "color": [
+    0.9506943225860596,
+    0.9693877696990967,
+    0.40858492255210876,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.7071067690849304,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Mat_8",
+   "source": "Mat.8",
+   "color": [
+    1.0,
+    1.0,
+    0.5206611752510071,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.7071067690849304,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Mat_10",
+   "source": "Mat.10",
+   "color": [
+    1.0,
+    0.9903581142425537,
+    0.9586777091026306,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.7071067690849304,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_adjustable_wrench",
+   "source": "adjustable_wrench",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_adjustable_wrench_Base.jpg",
+   "normalMap": "Map_adjustable_wrench_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_adjustable_wrench_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_all_purpose_cleaner",
+   "source": "all_purpose_cleaner",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_all_purpose_cleaner_Base.jpg",
+   "normalMap": "Map_all_purpose_cleaner_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_all_purpose_cleaner_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.6181818246841431,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_baseball_bat",
+   "source": "baseball_bat",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_baseball_bat_Base.jpg",
+   "normalMap": "Map_baseball_bat_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_baseball_bat_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_bleach_bottle",
+   "source": "bleach_bottle",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_bleach_bottle_Base.jpg",
+   "normalMap": "Map_bleach_bottle_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_bleach_bottle_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_border",
+   "source": "border",
+   "color": [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.699999988079071,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_BottlePlastic",
+   "source": "BottlePlastic",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.7205882370471954,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_BottlePlastic_002",
+   "source": "BottlePlastic.002",
+   "color": [
+    1.0,
+    0.6991357207298279,
+    0.2511064112186432,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.7205882370471954,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_BottlePlastic_004",
+   "source": "BottlePlastic.004",
+   "color": [
+    0.87451171875,
+    0.55029296875,
+    0.260986328125,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.7999999970197678,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_cardboard_box_01",
+   "source": "cardboard_box_01",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_cardboard_box_01_Base.jpg",
+   "normalMap": "Map_cardboard_box_01_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_cardboard_box_01_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_carved_wooden_elephant",
+   "source": "carved_wooden_elephant",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_carved_wooden_elephant_Base.jpg",
+   "normalMap": "Map_carved_wooden_elephant_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_carved_wooden_elephant_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_ceramic_vase_03",
+   "source": "ceramic_vase_03",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_ceramic_vase_03_Base.jpg",
+   "normalMap": "Map_ceramic_vase_03_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_ceramic_vase_03_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5999999940395355,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Steel",
+   "source": "Steel",
+   "color": [
+    0.800000011920929,
+    0.800000011920929,
+    0.800000011920929,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "Map_Steel_Normal.png",
+   "normalScale": 1.0,
+   "msMap": "Map_Steel_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    2.0,
+    2.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": true
+  },
+  {
+   "name": "Map_Blood_Glass",
+   "source": "Blood Glass",
+   "color": [
+    0.5394796133041382,
+    0.013702080585062504,
+    0.0,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Smuged_Glass",
+   "source": "Smuged Glass",
+   "color": [
+    0.800000011920929,
+    0.800000011920929,
+    0.800000011920929,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Smuged_Glass_001",
+   "source": "Smuged Glass.001",
+   "color": [
+    0.800000011920929,
+    0.800000011920929,
+    0.800000011920929,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Blood_Glass_001",
+   "source": "Blood Glass.001",
+   "color": [
+    0.5394796133041382,
+    0.013702080585062504,
+    0.0,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Steel_001",
+   "source": "Steel.001",
+   "color": [
+    0.800000011920929,
+    0.800000011920929,
+    0.800000011920929,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "Map_Steel_Normal.png",
+   "normalScale": 1.0,
+   "msMap": "Map_Steel_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    2.0,
+    2.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": true
+  },
+  {
+   "name": "Map_Steel_003",
+   "source": "Steel.003",
+   "color": [
+    0.800000011920929,
+    0.800000011920929,
+    0.800000011920929,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "Map_Steel_Normal.png",
+   "normalScale": 1.0,
+   "msMap": "Map_Steel_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    2.0,
+    2.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": true
+  },
+  {
+   "name": "Map_Smuged_Glass_003",
+   "source": "Smuged Glass.003",
+   "color": [
+    0.800000011920929,
+    0.800000011920929,
+    0.800000011920929,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Smuged_Glass_004",
+   "source": "Smuged Glass.004",
+   "color": [
+    0.800000011920929,
+    0.800000011920929,
+    0.800000011920929,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Steel_004",
+   "source": "Steel.004",
+   "color": [
+    0.800000011920929,
+    0.800000011920929,
+    0.800000011920929,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "Map_Steel_Normal.png",
+   "normalScale": 1.0,
+   "msMap": "Map_Steel_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    2.0,
+    2.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": true
+  },
+  {
+   "name": "Map_clipboard",
+   "source": "clipboard",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_clipboard_Base.jpg",
+   "normalMap": "Map_clipboard_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_clipboard_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5999999940395355,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_clipboard_001",
+   "source": "clipboard.001",
+   "color": [
+    0.800000011920929,
+    0.800000011920929,
+    0.800000011920929,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_combination_wrench",
+   "source": "combination_wrench",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_combination_wrench_Base.jpg",
+   "normalMap": "Map_combination_wrench_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_combination_wrench_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_painted_plaster_wall_005",
+   "source": "painted_plaster_wall.005",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_painted_plaster_wall_005_Base.jpg",
+   "normalMap": "Map_painted_plaster_wall_005_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_painted_plaster_wall_005_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_cross_pein_hammer",
+   "source": "cross_pein_hammer",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_cross_pein_hammer_Base.jpg",
+   "normalMap": "Map_cross_pein_hammer_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_cross_pein_hammer_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Material_026",
+   "source": "Material.026",
+   "color": [
+    0.6399999856948853,
+    0.6399999856948853,
+    0.6399999856948853,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.30996525287628174,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Material_027",
+   "source": "Material.027",
+   "color": [
+    0.47604817152023315,
+    0.015483077615499496,
+    0.015483077615499496,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Material_028",
+   "source": "Material.028",
+   "color": [
+    0.6399999856948853,
+    0.6399999856948853,
+    0.6399999856948853,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.30996525287628174,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Material_029",
+   "source": "Material.029",
+   "color": [
+    0.9476860165596008,
+    0.0,
+    0.5125792026519775,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_painted_plaster_wall_001",
+   "source": "painted_plaster_wall.001",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_painted_plaster_wall_005_Base.jpg",
+   "normalMap": "Map_painted_plaster_wall_005_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_painted_plaster_wall_005_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_painted_plaster_wall_019",
+   "source": "painted_plaster_wall.019",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_painted_plaster_wall_005_Base.jpg",
+   "normalMap": "Map_painted_plaster_wall_005_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_painted_plaster_wall_005_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Material_033",
+   "source": "Material.033",
+   "color": [
+    0.800000011920929,
+    0.800000011920929,
+    0.800000011920929,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.699999988079071,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Door_Handle_001",
+   "source": "Door Handle.001",
+   "color": [
+    0.800000011920929,
+    0.800000011920929,
+    0.800000011920929,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 1.0,
+   "smoothness": 0.724137932062149,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Material_034",
+   "source": "Material.034",
+   "color": [
+    0.2721893787384033,
+    0.21142934262752533,
+    0.13038447499275208,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_light_off",
+   "source": "light off",
+   "color": [
+    0.5486801266670227,
+    0.5486801266670227,
+    0.5486801266670227,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.699999988079071,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_drain_cleaner",
+   "source": "drain_cleaner",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_drain_cleaner_Base.jpg",
+   "normalMap": "Map_drain_cleaner_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_drain_cleaner_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_dustpan",
+   "source": "dustpan",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_dustpan_Base.jpg",
+   "normalMap": "Map_dustpan_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_dustpan_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_painted_plaster_wall_002",
+   "source": "painted_plaster_wall.002",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_painted_plaster_wall_005_Base.jpg",
+   "normalMap": "Map_painted_plaster_wall_005_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_painted_plaster_wall_005_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_fire_alarm",
+   "source": "fire_alarm",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_fire_alarm_Base.jpg",
+   "normalMap": "Map_fire_alarm_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_fire_alarm_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_fire_alarm_001",
+   "source": "fire_alarm.001",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_fire_alarm_Base.jpg",
+   "normalMap": "Map_fire_alarm_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_fire_alarm_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Door_White",
+   "source": "Door_White",
+   "color": [
+    0.8500000238418579,
+    0.8500000238418579,
+    0.8299999833106995,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.6500000059604645,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_DoorHandle_Silver",
+   "source": "DoorHandle_Silver",
+   "color": [
+    0.8500000238418579,
+    0.8500000238418579,
+    0.8700000047683716,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 1.0,
+   "smoothness": 0.7999999970197678,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_DoorFrame_White",
+   "source": "DoorFrame_White",
+   "color": [
+    0.18220727145671844,
+    0.18220727145671844,
+    0.17788395285606384,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.5999999940395355,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_painted_plaster_wall_003",
+   "source": "painted_plaster_wall.003",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_painted_plaster_wall_005_Base.jpg",
+   "normalMap": "Map_painted_plaster_wall_005_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_painted_plaster_wall_005_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_painted_plaster_wall_007",
+   "source": "painted_plaster_wall.007",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_painted_plaster_wall_005_Base.jpg",
+   "normalMap": "Map_painted_plaster_wall_005_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_painted_plaster_wall_005_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_painted_plaster_wall_008",
+   "source": "painted_plaster_wall.008",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_painted_plaster_wall_005_Base.jpg",
+   "normalMap": "Map_painted_plaster_wall_005_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_painted_plaster_wall_005_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_painted_plaster_wall_009",
+   "source": "painted_plaster_wall.009",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_painted_plaster_wall_005_Base.jpg",
+   "normalMap": "Map_painted_plaster_wall_005_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_painted_plaster_wall_005_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_painted_plaster_wall_013",
+   "source": "painted_plaster_wall.013",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_painted_plaster_wall_005_Base.jpg",
+   "normalMap": "Map_painted_plaster_wall_005_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_painted_plaster_wall_005_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_painted_plaster_wall_014",
+   "source": "painted_plaster_wall.014",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_painted_plaster_wall_005_Base.jpg",
+   "normalMap": "Map_painted_plaster_wall_005_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_painted_plaster_wall_005_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_painted_plaster_wall_015",
+   "source": "painted_plaster_wall.015",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_painted_plaster_wall_005_Base.jpg",
+   "normalMap": "Map_painted_plaster_wall_005_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_painted_plaster_wall_005_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_painted_plaster_wall_004",
+   "source": "painted_plaster_wall.004",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_painted_plaster_wall_005_Base.jpg",
+   "normalMap": "Map_painted_plaster_wall_005_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_painted_plaster_wall_005_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_painted_plaster_wall_006",
+   "source": "painted_plaster_wall.006",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_painted_plaster_wall_005_Base.jpg",
+   "normalMap": "Map_painted_plaster_wall_005_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_painted_plaster_wall_005_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_painted_plaster_wall_020",
+   "source": "painted_plaster_wall.020",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_painted_plaster_wall_005_Base.jpg",
+   "normalMap": "Map_painted_plaster_wall_005_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_painted_plaster_wall_005_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_desk_lamp_arm_01",
+   "source": "desk_lamp_arm_01",
+   "color": [
+    0.025984162464737892,
+    0.025984162464737892,
+    0.025984162464737892,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "Map_desk_lamp_arm_01_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_desk_lamp_arm_01_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_desk_lamp_arm_01_light",
+   "source": "desk_lamp_arm_01_light",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_desk_lamp_arm_01_light_Base.jpg",
+   "normalMap": "Map_desk_lamp_arm_01_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_desk_lamp_arm_01_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    1.0,
+    0.9837890267372131,
+    0.649111270904541
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_hatchet",
+   "source": "hatchet",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_hatchet_Base.jpg",
+   "normalMap": "Map_hatchet_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_hatchet_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Material_006",
+   "source": "Material.006",
+   "color": [
+    0.02365051582455635,
+    0.02365051582455635,
+    0.02365051582455635,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.19999998807907104,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Material_007",
+   "source": "Material.007",
+   "color": [
+    0.014669411815702915,
+    0.014669411815702915,
+    0.014669411815702915,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Material_014",
+   "source": "Material.014",
+   "color": [
+    0.05614183843135834,
+    0.05614183843135834,
+    0.05614183843135834,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.5999999940395355,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Material_012",
+   "source": "Material.012",
+   "color": [
+    0.018155349418520927,
+    0.03580250218510628,
+    0.05496867746114731,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.7953367829322815,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Material_008",
+   "source": "Material.008",
+   "color": [
+    0.800000011920929,
+    0.012764262966811657,
+    0.0,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Material_009",
+   "source": "Material.009",
+   "color": [
+    0.8000000715255737,
+    0.7394230961799622,
+    0.17378486692905426,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Material_010",
+   "source": "Material.010",
+   "color": [
+    0.8000000715255737,
+    0.7602800726890564,
+    0.057456985116004944,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Material_011",
+   "source": "Material.011",
+   "color": [
+    0.19112172722816467,
+    0.800000011920929,
+    0.19551491737365723,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Material_013",
+   "source": "Material.013",
+   "color": [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Material_015",
+   "source": "Material.015",
+   "color": [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Material_016",
+   "source": "Material.016",
+   "color": [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Material_017",
+   "source": "Material.017",
+   "color": [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Material_018",
+   "source": "Material.018",
+   "color": [
+    0.03967937454581261,
+    0.03967937454581261,
+    0.03967937454581261,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.303108811378479,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_aiStandardSurface3",
+   "source": "aiStandardSurface3",
+   "color": [
+    0.8309999704360962,
+    0.4262999892234802,
+    0.0,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.7999999970197678,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_aiStandardSurface3_002",
+   "source": "aiStandardSurface3.002",
+   "color": [
+    0.8309999704360962,
+    0.4262999892234802,
+    0.0,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.7999999970197678,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_aiStandardSurface3_003",
+   "source": "aiStandardSurface3.003",
+   "color": [
+    0.8309999704360962,
+    0.4262999892234802,
+    0.0,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.7999999970197678,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Mat_2",
+   "source": "Mat.2",
+   "color": [
+    0.2142857164144516,
+    0.2125147581100464,
+    0.2125147581100464,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.754983440041542,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_body",
+   "source": "body",
+   "color": [
+    0.009999999776482582,
+    0.009999999776482582,
+    0.009999999776482582,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.7999999970197678,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_body_001",
+   "source": "body.001",
+   "color": [
+    0.009999999776482582,
+    0.009999999776482582,
+    0.009999999776482582,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.7999999970197678,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_keys",
+   "source": "keys",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_keys_Base.png",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.699999988079071,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_keys_001",
+   "source": "keys.001",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_keys_Base.png",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.699999988079071,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Bottle2LabelArnold",
+   "source": "Bottle2LabelArnold",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_Bottle2LabelArnold_Base.png",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.7999999970197678,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": true
+  },
+  {
+   "name": "Map_Bottle2LabelArnold_002",
+   "source": "Bottle2LabelArnold.002",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_Bottle2LabelArnold_Base.png",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.7999999970197678,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": true
+  },
+  {
+   "name": "Map_Bottle2LabelArnold_003",
+   "source": "Bottle2LabelArnold.003",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_Bottle2LabelArnold_Base.png",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.7999999970197678,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": true
+  },
+  {
+   "name": "Map_leather_cleaner_can",
+   "source": "leather_cleaner_can",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_leather_cleaner_can_Base.jpg",
+   "normalMap": "Map_leather_cleaner_can_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_leather_cleaner_can_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Material_024",
+   "source": "Material.024",
+   "color": [
+    0.03183411806821823,
+    0.03183411806821823,
+    0.03183411806821823,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.20000000298023224,
+   "smoothness": 0.19999998807907104,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Material_023",
+   "source": "Material.023",
+   "color": [
+    0.29372653365135193,
+    0.01929096318781376,
+    0.014754344709217548,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.19999998807907104,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Material_025",
+   "source": "Material.025",
+   "color": [
+    0.4498816132545471,
+    0.4498816132545471,
+    0.4498816132545471,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 1.0,
+   "smoothness": 0.5999999940395355,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_machete",
+   "source": "machete",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_machete_Base.jpg",
+   "normalMap": "Map_machete_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_machete_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Bottle2CapArnold",
+   "source": "Bottle2CapArnold",
+   "color": [
+    1.0,
+    0.017999999225139618,
+    0.0,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.9416058398783207,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Bottle2CapArnold_002",
+   "source": "Bottle2CapArnold.002",
+   "color": [
+    1.0,
+    0.017999999225139618,
+    0.0,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.9416058398783207,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Bottle2CapArnold_003",
+   "source": "Bottle2CapArnold.003",
+   "color": [
+    1.0,
+    0.017999999225139618,
+    0.0,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.9416058398783207,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_metal_jerrycan",
+   "source": "metal_jerrycan",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_metal_jerrycan_Base.jpg",
+   "normalMap": "Map_metal_jerrycan_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_metal_jerrycan_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_metal_jerrycan_green",
+   "source": "metal_jerrycan_green",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_metal_jerrycan_green_Base.jpg",
+   "normalMap": "Map_metal_jerrycan_green_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_metal_jerrycan_green_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_metal_jerrycan_green_001",
+   "source": "metal_jerrycan_green.001",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_metal_jerrycan_green_Base.jpg",
+   "normalMap": "Map_metal_jerrycan_green_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_metal_jerrycan_green_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_metal_stool_02_003",
+   "source": "metal_stool_02.003",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_metal_stool_02_003_Base.jpg",
+   "normalMap": "Map_metal_stool_02_003_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_metal_stool_02_003_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_metal_stool_02_004",
+   "source": "metal_stool_02.004",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_metal_stool_02_003_Base.jpg",
+   "normalMap": "Map_metal_stool_02_003_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_metal_stool_02_003_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_metal_stool_02_005",
+   "source": "metal_stool_02.005",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_metal_stool_02_003_Base.jpg",
+   "normalMap": "Map_metal_stool_02_003_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_metal_stool_02_003_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_metal_stool_02_006",
+   "source": "metal_stool_02.006",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_metal_stool_02_003_Base.jpg",
+   "normalMap": "Map_metal_stool_02_003_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_metal_stool_02_003_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_metal_stool_02_008",
+   "source": "metal_stool_02.008",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_metal_stool_02_003_Base.jpg",
+   "normalMap": "Map_metal_stool_02_003_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_metal_stool_02_003_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_metal_stool_02_009",
+   "source": "metal_stool_02.009",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_metal_stool_02_003_Base.jpg",
+   "normalMap": "Map_metal_stool_02_003_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_metal_stool_02_003_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_metal_tool_chest",
+   "source": "metal_tool_chest",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_metal_tool_chest_Base.jpg",
+   "normalMap": "Map_metal_tool_chest_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_metal_tool_chest_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5999999940395355,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_mid_century_lounge_chair",
+   "source": "mid_century_lounge_chair",
+   "color": [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "Map_mid_century_lounge_chair_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.30000001192092896,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_modular_airduct_rectangular_01_parts02",
+   "source": "modular_airduct_rectangular_01_parts02",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_modular_airduct_rectangular_01_parts02_Base.jpg",
+   "normalMap": "Map_modular_airduct_rectangular_01_parts02_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_modular_airduct_rectangular_01_parts02_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_modular_airduct_rectangular_01_parts01",
+   "source": "modular_airduct_rectangular_01_parts01",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_modular_airduct_rectangular_01_parts01_Base.jpg",
+   "normalMap": "Map_modular_airduct_rectangular_01_parts01_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_modular_airduct_rectangular_01_parts01_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_modular_industrial_pipes_01_group01_002",
+   "source": "modular_industrial_pipes_01_group01.002",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_modular_industrial_pipes_01_group01_002_Base.jpg",
+   "normalMap": "Map_modular_industrial_pipes_01_group01_002_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_modular_industrial_pipes_01_group01_002_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_modular_industrial_pipes_01_group01",
+   "source": "modular_industrial_pipes_01_group01",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_modular_industrial_pipes_01_group01_002_Base.jpg",
+   "normalMap": "Map_modular_industrial_pipes_01_group01_002_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_modular_industrial_pipes_01_group01_002_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_modular_industrial_pipes_01_group01_001",
+   "source": "modular_industrial_pipes_01_group01.001",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_modular_industrial_pipes_01_group01_002_Base.jpg",
+   "normalMap": "Map_modular_industrial_pipes_01_group01_002_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_modular_industrial_pipes_01_group01_002_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_polySurface53SG",
+   "source": "polySurface53SG",
+   "color": [
+    0.06865828484296799,
+    0.06865828484296799,
+    0.06865828484296799,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.0,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Material_005",
+   "source": "Material.005",
+   "color": [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.5,
+   "smoothness": 0.7999999970197678,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_polySurface53SG_001",
+   "source": "polySurface53SG.001",
+   "color": [
+    0.06865828484296799,
+    0.06865828484296799,
+    0.06865828484296799,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.0,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Material_019",
+   "source": "Material.019",
+   "color": [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.5,
+   "smoothness": 0.7999999970197678,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_re_bar_end_L",
+   "source": "re_bar_end_L",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_re_bar_end_L_Base.jpeg",
+   "normalMap": "Map_re_bar_end_L_Normal.png",
+   "normalScale": 1.0,
+   "msMap": "Map_re_bar_end_L_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.19999998807907104,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_re_bar_center",
+   "source": "re_bar_center",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_re_bar_center_Base.jpeg",
+   "normalMap": "Map_re_bar_center_Normal.png",
+   "normalScale": 1.0,
+   "msMap": "Map_re_bar_center_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.19999998807907104,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_re_bar_side",
+   "source": "re_bar_side",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_re_bar_side_Base.jpeg",
+   "normalMap": "Map_re_bar_side_Normal.png",
+   "normalScale": 1.0,
+   "msMap": "Map_re_bar_side_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.19999998807907104,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_re_ho_02",
+   "source": "re_ho_02",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_re_ho_02_Base.jpeg",
+   "normalMap": "Map_re_ho_02_Normal.png",
+   "normalScale": 1.0,
+   "msMap": "Map_re_ho_02_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_re_ho_01",
+   "source": "re_ho_01",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_re_ho_01_Base.jpeg",
+   "normalMap": "Map_re_ho_01_Normal.png",
+   "normalScale": 1.0,
+   "msMap": "Map_re_ho_01_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_tire_r13_01",
+   "source": "tire_r13_01",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_tire_r13_01_Base.jpg",
+   "normalMap": "Map_tire_r13_01_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_tire_r13_01_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_initialShadingGroup",
+   "source": "initialShadingGroup",
+   "color": [
+    0.6000000238418579,
+    0.6000000238418579,
+    0.6000000238418579,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.4472135901451111,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_initialShadingGroup_003",
+   "source": "initialShadingGroup.003",
+   "color": [
+    0.6000000238418579,
+    0.6000000238418579,
+    0.6000000238418579,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.4472135901451111,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_plastic_bottle_gallon",
+   "source": "plastic_bottle_gallon",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_plastic_bottle_gallon_Base.jpg",
+   "normalMap": "Map_plastic_bottle_gallon_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_plastic_bottle_gallon_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_plastic_bottle_gallon_001",
+   "source": "plastic_bottle_gallon.001",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_plastic_bottle_gallon_Base.jpg",
+   "normalMap": "Map_plastic_bottle_gallon_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_plastic_bottle_gallon_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_plastic_broom",
+   "source": "plastic_broom",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_plastic_broom_Base.jpg",
+   "normalMap": "Map_plastic_broom_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_plastic_broom_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_plastic_broom_bristles",
+   "source": "plastic_broom_bristles",
+   "color": [
+    0.800000011920929,
+    0.800000011920929,
+    0.800000011920929,
+    1.0
+   ],
+   "baseMap": "Map_plastic_broom_bristles_BaseAlpha.png",
+   "normalMap": "Map_plastic_broom_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_plastic_broom_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": true
+  },
+  {
+   "name": "Map_plastic_container",
+   "source": "plastic_container",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_plastic_container_Base.jpg",
+   "normalMap": "Map_plastic_container_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_plastic_container_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_plastic_crate_02",
+   "source": "plastic_crate_02",
+   "color": [
+    0.4245694577693939,
+    0.2884209156036377,
+    0.09245149046182632,
+    1.0
+   ],
+   "baseMap": "Map_plastic_crate_02_BaseAlpha.png",
+   "normalMap": "Map_plastic_crate_02_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_plastic_crate_02_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.6873111724853516,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": true
+  },
+  {
+   "name": "Map_plastic_jerrycan",
+   "source": "plastic_jerrycan",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_plastic_jerrycan_Base.jpg",
+   "normalMap": "Map_plastic_jerrycan_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_plastic_jerrycan_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_pliers",
+   "source": "pliers",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_pliers_Base.jpg",
+   "normalMap": "Map_pliers_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_pliers_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_plunger",
+   "source": "plunger",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_plunger_Base.jpg",
+   "normalMap": "Map_plunger_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_plunger_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_wood_table_worn",
+   "source": "wood_table_worn",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_wood_table_worn_Base.jpg",
+   "normalMap": "Map_wood_table_worn_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.0,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_rollershutter_window_02",
+   "source": "rollershutter_window_02",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_rollershutter_window_02_Base.jpg",
+   "normalMap": "Map_rollershutter_window_02_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_rollershutter_window_02_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_screwdriver",
+   "source": "screwdriver",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_screwdriver_Base.jpg",
+   "normalMap": "Map_screwdriver_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_screwdriver_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_security_camera_02",
+   "source": "security_camera_02",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_security_camera_02_Base.jpg",
+   "normalMap": "Map_security_camera_02_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_security_camera_02_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_security_camera_02_glass",
+   "source": "security_camera_02_glass",
+   "color": [
+    0.800000011920929,
+    0.800000011920929,
+    0.800000011920929,
+    1.0
+   ],
+   "baseMap": "Map_security_camera_02_glass_BaseAlpha.png",
+   "normalMap": "Map_security_camera_02_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_security_camera_02_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": true
+  },
+  {
+   "name": "Map_standing_picture_frame_02_artwork",
+   "source": "standing_picture_frame_02_artwork",
+   "color": [
+    0.800000011920929,
+    0.800000011920929,
+    0.800000011920929,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "Map_standing_picture_frame_02_artwork_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_standing_picture_frame_02",
+   "source": "standing_picture_frame_02",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_standing_picture_frame_02_Base.jpg",
+   "normalMap": "Map_standing_picture_frame_02_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_standing_picture_frame_02_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_standing_picture_frame_02_glass",
+   "source": "standing_picture_frame_02_glass",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_standing_picture_frame_02_Base.jpg",
+   "normalMap": "Map_standing_picture_frame_02_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_standing_picture_frame_02_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_stationery_supplies",
+   "source": "stationery_supplies",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_stationery_supplies_Base.jpg",
+   "normalMap": "Map_stationery_supplies_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_stationery_supplies_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_steel_frame_shelves_03_002",
+   "source": "steel_frame_shelves_03.002",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_steel_frame_shelves_03_002_Base.jpg",
+   "normalMap": "Map_steel_frame_shelves_03_002_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_steel_frame_shelves_03_002_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.19999998807907104,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_steel_frame_shelves_03_drawers_002",
+   "source": "steel_frame_shelves_03_drawers.002",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_steel_frame_shelves_03_drawers_002_Base.jpg",
+   "normalMap": "Map_steel_frame_shelves_03_drawers_002_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_steel_frame_shelves_03_drawers_002_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_utility_box_01",
+   "source": "utility_box_01",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_utility_box_01_Base.jpg",
+   "normalMap": "Map_utility_box_01_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_utility_box_01_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_painted_plaster_wall_010",
+   "source": "painted_plaster_wall.010",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_painted_plaster_wall_005_Base.jpg",
+   "normalMap": "Map_painted_plaster_wall_005_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_painted_plaster_wall_005_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_painted_plaster_wall_011",
+   "source": "painted_plaster_wall.011",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_painted_plaster_wall_005_Base.jpg",
+   "normalMap": "Map_painted_plaster_wall_005_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_painted_plaster_wall_005_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_painted_plaster_wall_012",
+   "source": "painted_plaster_wall.012",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_painted_plaster_wall_005_Base.jpg",
+   "normalMap": "Map_painted_plaster_wall_005_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_painted_plaster_wall_005_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_wall_clock",
+   "source": "wall_clock",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_wall_clock_Base.jpg",
+   "normalMap": "Map_wall_clock_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_wall_clock_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_wall_clock_glass",
+   "source": "wall_clock_glass",
+   "color": [
+    0.800000011920929,
+    0.800000011920929,
+    0.800000011920929,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "Map_wall_clock_glass_MS.png",
+   "metallic": 0.0,
+   "smoothness": 1.0,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": true
+  },
+  {
+   "name": "Map_light_on",
+   "source": "light on",
+   "color": [
+    0.13291920721530914,
+    0.814378023147583,
+    0.2032862901687622,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.5316768288612366,
+    3.257512092590332,
+    0.8131451606750488
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_wooden_hammer_01",
+   "source": "wooden_hammer_01",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_wooden_hammer_01_Base.jpg",
+   "normalMap": "Map_wooden_hammer_01_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_wooden_hammer_01_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_wooden_ladder",
+   "source": "wooden_ladder",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_wooden_ladder_Base.jpg",
+   "normalMap": "Map_wooden_ladder_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_wooden_ladder_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_worn_metal_rack",
+   "source": "worn_metal_rack",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_worn_metal_rack_Base.jpg",
+   "normalMap": "Map_worn_metal_rack_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_worn_metal_rack_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_worn_metal_rack_001",
+   "source": "worn_metal_rack.001",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_worn_metal_rack_Base.jpg",
+   "normalMap": "Map_worn_metal_rack_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_worn_metal_rack_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_worn_metal_rack_002",
+   "source": "worn_metal_rack.002",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_worn_metal_rack_Base.jpg",
+   "normalMap": "Map_worn_metal_rack_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_worn_metal_rack_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_worn_metal_rack_003",
+   "source": "worn_metal_rack.003",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_worn_metal_rack_Base.jpg",
+   "normalMap": "Map_worn_metal_rack_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_worn_metal_rack_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_worn_metal_rack_004",
+   "source": "worn_metal_rack.004",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_worn_metal_rack_Base.jpg",
+   "normalMap": "Map_worn_metal_rack_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_worn_metal_rack_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_worn_metal_rack_005",
+   "source": "worn_metal_rack.005",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_worn_metal_rack_Base.jpg",
+   "normalMap": "Map_worn_metal_rack_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_worn_metal_rack_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_worn_metal_rack_006",
+   "source": "worn_metal_rack.006",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_worn_metal_rack_Base.jpg",
+   "normalMap": "Map_worn_metal_rack_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_worn_metal_rack_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_worn_metal_rack_007",
+   "source": "worn_metal_rack.007",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_worn_metal_rack_Base.jpg",
+   "normalMap": "Map_worn_metal_rack_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_worn_metal_rack_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_worn_metal_rack_008",
+   "source": "worn_metal_rack.008",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_worn_metal_rack_Base.jpg",
+   "normalMap": "Map_worn_metal_rack_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_worn_metal_rack_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_worn_metal_rack_009",
+   "source": "worn_metal_rack.009",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "Map_worn_metal_rack_Base.jpg",
+   "normalMap": "Map_worn_metal_rack_Normal.jpg",
+   "normalScale": 1.0,
+   "msMap": "Map_worn_metal_rack_MS.png",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Mat_6",
+   "source": "Mat.6",
+   "color": [
+    0.95425945520401,
+    0.9693877696990967,
+    0.7530781030654907,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.7071067690849304,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_Mat_",
+   "source": "этикетка",
+   "color": [
+    0.800000011920929,
+    0.800000011920929,
+    0.800000011920929,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": true
+  },
+  {
+   "name": "Map_Mat_001",
+   "source": "этикетка.001",
+   "color": [
+    0.800000011920929,
+    0.800000011920929,
+    0.800000011920929,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": true
+  },
+  {
+   "name": "Map_DiscoTile",
+   "source": "DiscoTile",
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.5,
+   "emission": [
+    4.0,
+    4.0,
+    4.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  },
+  {
+   "name": "Map_DiscoBase",
+   "source": "DiscoBase",
+   "color": [
+    0.009999999776482582,
+    0.009999999776482582,
+    0.012000000104308128,
+    1.0
+   ],
+   "baseMap": "",
+   "normalMap": "",
+   "normalScale": 1.0,
+   "msMap": "",
+   "metallic": 0.0,
+   "smoothness": 0.699999988079071,
+   "emission": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tiling": [
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0
+   ],
+   "coords": "UV",
+   "transparent": false
+  }
+ ],
+ "missing": [
+  "GWCBasicSteel_BaseColor.png",
+  "GWCBasicSteel_Metalness-GWCBasicSteel_Roughness@channels=B.png",
+  "TELEPHONE_initialShadingGroup_BaseColor.png",
+  "TELEPHONE_initialShadingGroup_Metallic.png",
+  "TELEPHONE_initialShadingGroup_Normal.png",
+  "TELEPHONE_initialShadingGroup_Roughness.png",
+  "buttonTexture.png",
+  "images (12).jpg",
+  "этикетка.png"
+ ],
+ "monitorScreen": {
+  "center": [
+   0.7406591176986694,
+   -0.09101526439189911,
+   0.7098060846328735
+  ],
+  "normal": [
+   0.7050880193710327,
+   0.7091197967529297,
+   7.549790126404332e-08
+  ],
+  "up": [
+   -5.323266449863695e-08,
+   -5.35370574539229e-08,
+   1.0
+  ],
+  "width": 0.6050723039079458,
+  "height": 0.33816957473755416
+ },
+ "generator": {
+  "center": [
+   5.489144802093506,
+   0.4411010146141052,
+   0.2885196805000305
+  ],
+  "front": [
+   -0.4497919976711273,
+   -0.8931333422660828,
+   0.0
+  ],
+  "size": [
+   0.944575309753418,
+   0.9614232778549194,
+   0.5769232511520386
+  ]
+ }
+}

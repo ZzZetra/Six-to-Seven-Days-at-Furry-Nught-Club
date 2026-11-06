@@ -16,6 +16,8 @@
   phrase — «Фразой»: модель знает все тройки целиком (плюс одиночные слова и служебные, чтобы не
            выдумывать тройку из обрывка). Точнее на одном дыхании.
   free   — «Свободная речь + поиск»: распознаёт всё подряд, тройку ищет в тексте.
+  own    — «Своя модель»: не Vosk, а наша модель, обученная на эти три слова (Tools/SpeechTrain). Порог — ползунок
+           «Мин. уверенность» (сам ставится на 0.8). Синонимы ей не нужны.
 """
 import argparse
 import itertools
@@ -62,7 +64,29 @@ def model_dir(lang):
 
 DEFAULT_LANG = "en"  # английский: на тестах точнее (см. README)
 
-VARIANTS = {"words": "По словам", "phrase": "Фразой", "free": "Свободная речь + поиск"}
+VARIANTS = {"words": "По словам", "phrase": "Фразой", "free": "Свободная речь + поиск", "own": "Своя модель"}
+TRAIN = os.path.join(HERE, "..", "SpeechTrain")  # своя модель: обучение и распознавание (detect.py)
+
+
+def own_detector(threshold):
+    """Своя модель из Tools/SpeechTrain (нужны только numpy и onnxruntime — их ставит setup.bat)"""
+    if TRAIN not in sys.path:
+        sys.path.insert(0, TRAIN)
+    import detect
+    return detect.WordDetector(threshold=threshold)
+
+
+def recognize_file_own(path, window, threshold):
+    if TRAIN not in sys.path:
+        sys.path.insert(0, TRAIN)
+    import detect
+    tracker = ComboTracker(window)
+    combos = []
+    for word, t, p in detect.detect_file(path, threshold=threshold):
+        found = tracker.feed([(word, t)])
+        combos += found
+        print(f"  {t:6.2f} с [{p:.2f}] {word}" + (f"   ТРОЙКА: {' · '.join(found[-1])}" if found else ""))
+    return combos
 
 SetLogLevel(-1)
 
@@ -200,7 +224,7 @@ def run_gui(selftest=False):
     import sounddevice as sd
 
     root = tk.Tk()
-    root.title("SSDFNC — тест распознавания речи (Vosk)")
+    root.title("SSDFNC — тест распознавания речи (Vosk / своя модель)")
     root.geometry("1100x760")
 
     state = {"models": {}, "model_dir": model_dir(DEFAULT_LANG), "lang": DEFAULT_LANG, "stream": None, "running": False,
@@ -240,8 +264,18 @@ def run_gui(selftest=False):
     opts.pack(fill="x")
     ttk.Label(opts, text="Вариант:").pack(side="left")
     variant_var = tk.StringVar(value="words")
+    was_own = [False]
+
+    def variant_changed():
+        own = variant_var.get() == "own"
+        if own != was_own[0]:  # у своей модели свой порог (вероятность слова), у Vosk — уверенность слова
+            conf_var.set(0.8 if own else 0.5)
+            conf_lbl.config(text=f"{conf_var.get():.2f}")
+            was_own[0] = own
+
     for key, title in VARIANTS.items():
-        ttk.Radiobutton(opts, text=title, variable=variant_var, value=key).pack(side="left", padx=4)
+        ttk.Radiobutton(opts, text=title, variable=variant_var, value=key,
+                        command=lambda: variant_changed()).pack(side="left", padx=4)
     ttk.Label(opts, text="   Окно, с:").pack(side="left")
     window_var = tk.DoubleVar(value=4.0)
     ttk.Spinbox(opts, from_=1.0, to=10.0, increment=0.5, width=5, textvariable=window_var).pack(side="left")
@@ -422,12 +456,47 @@ def run_gui(selftest=False):
             else:
                 state["ui"].put(("partial", rec.PartialResult(), 0.0))
 
+    def worker_own(det):
+        import numpy as np
+        while state["running"]:
+            try:
+                data = state["audio"].get(timeout=0.2)
+            except queue.Empty:
+                continue
+            t0 = time.perf_counter()
+            found = det.feed(np.frombuffer(data, np.int16))
+            dt = time.perf_counter() - t0
+            for word, t, p in found:
+                state["ui"].put(("own", (word, t, p), dt))
+            state["ui"].put(("probs", det.probs.copy(), dt))
+
     def start():
         if state["running"]:
             stop()
             return
-        model = load_model()
         state["commands"] = parse_commands(cmd_txt.get("1.0", "end"))
+        if variant_var.get() == "own":
+            status.config(text="Загружаю свою модель…")
+            root.update_idletasks()
+            try:
+                det = own_detector(float(conf_var.get()))
+            except Exception as e:  # нет модели или пакетов
+                status.config(text=f"Своя модель не загрузилась: {e}")
+                return
+            state["tracker"] = ComboTracker(float(window_var.get()))
+            new_target()
+            device = inputs[mic.current()][0] if inputs else None
+            state["audio"] = queue.Queue()
+            state["running"] = True
+            state["stream"] = sd.RawInputStream(samplerate=RATE, blocksize=BLOCK, device=device,
+                                                dtype="int16", channels=1, callback=audio_cb)
+            state["stream"].start()
+            threading.Thread(target=worker_own, args=(det,), daemon=True).start()
+            start_btn.config(text="■ Стоп")
+            status.config(text=f"Слушаю: {mic.get()} · своя модель, порог {float(conf_var.get()):.2f} · "
+                               f"окно {float(window_var.get()):.1f} с")
+            return
+        model = load_model()
         fillers = fill_txt.get("1.0", "end").split() if fillers_var.get() else []
         phrases = grammar_for(variant_var.get(), state["commands"], fillers, distinct_var.get())
         rec = make_recognizer(model, phrases)
@@ -473,6 +542,19 @@ def run_gui(selftest=False):
             state["flash_until"] = 0.0
         while not state["ui"].empty():
             kind, payload, dt = state["ui"].get()
+            if kind == "probs":  # своя модель: вероятности слов сейчас
+                partial.config(text="   ".join(f"{n} {payload[i + 1]:.2f}" for i, n in enumerate(("VERITY", "LOVETY", "MOGGATY"))))
+                continue
+            if kind == "own":
+                word, t, p = payload
+                log.insert("end", f"{time.strftime('%H:%M:%S')}  [{p:.2f}]  ")
+                log.insert("end", word, "hit")
+                log.insert("end", f"   ({dt * 1000:.0f} мс)\n", "dim")
+                for combo in state["tracker"].feed([(word, t)]):
+                    on_combo(combo)
+                draw_progress()
+                log.see("end")
+                continue
             if kind == "partial":
                 partial.config(text=json.loads(payload).get("partial", "") or "…")
                 continue
@@ -525,8 +607,11 @@ if __name__ == "__main__":
         preset = PRESETS[args.lang]
         commands = parse_commands(open(args.words, encoding="utf-8").read() if args.words else preset["commands"])
         fillers = [] if args.no_fillers else preset["fillers"].split()
-        combos = recognize_file(args.wav, args.variant, commands, fillers, args.distinct, args.window, args.min_conf,
-                                model_dir(args.lang))
+        if args.variant == "own":
+            combos = recognize_file_own(args.wav, args.window, args.min_conf if args.min_conf != 0.5 else 0.8)
+        else:
+            combos = recognize_file(args.wav, args.variant, commands, fillers, args.distinct, args.window, args.min_conf,
+                                    model_dir(args.lang))
         print("ТРОЙКИ:", " | ".join(" · ".join(c) for c in combos) or "нет")
     else:
         run_gui(selftest=args.selftest)

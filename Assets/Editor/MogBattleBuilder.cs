@@ -8,6 +8,8 @@ public static class MogBattleBuilder
     static readonly Color Purple = new Color(0.8f, 0.6f, 1f);
     static readonly Color Green = new Color(0.2f, 0.85f, 0.3f);
     static readonly Color Track = new Color(0.25f, 0.25f, 0.3f);
+    // Где окно скилл-чеков (канвас 1920×1080, от центра) и его размер: ниже середины, чтобы было видно Нову
+    static readonly Vector2 PanelPos = new Vector2(0, -250), PanelSize = new Vector2(1200, 480);
 
     public static MogBattle Build(GameObject hud)
     {
@@ -19,18 +21,20 @@ public static class MogBattleBuilder
         music.spatialBlend = 0f;
         battle.music = music;
 
-        var panel = TestPlatformBuilder.NewImage("MogBattlePanel", hud.transform, new Color(0.05f, 0.02f, 0.1f, 0.88f));
-        TestPlatformBuilder.Place(panel.rectTransform, new Vector2(0, -60), new Vector2(1200, 560));
+        // Окно без фона — скилл-чеки прямо в воздухе (пользователь, 2026-11-06: «рамку убери»), и пониже экрана,
+        // чтобы было видно Нову. Картинка окна выключена: оно только держит место и включается целиком
+        var panel = TestPlatformBuilder.NewImage("MogBattlePanel", hud.transform, new Color(0f, 0f, 0f, 0f));
+        TestPlatformBuilder.Place(panel.rectTransform, PanelPos, PanelSize);
+        panel.enabled = false;
         battle.panel = panel.gameObject;
-        battle.title = Text("Title", panel.transform, 60, new Vector2(0, 230), new Vector2(1100, 80), Purple);
+        battle.title = Text("Title", panel.transform, 56, new Vector2(0, 195), new Vector2(1100, 76), Purple);
         battle.title.text = "МОГ-БАТЛ С НОВОЙ";
-        battle.hint = Text("Hint", panel.transform, 34, new Vector2(0, 175), new Vector2(1100, 50), new Color(0.85f, 0.85f, 0.9f));
-        battle.score = Text("Score", panel.transform, 44, new Vector2(0, -225), new Vector2(1100, 60), Color.white);
+        battle.hint = Text("Hint", panel.transform, 32, new Vector2(0, 148), new Vector2(1100, 48), new Color(0.85f, 0.85f, 0.9f));
 
         // Область, где стоят кнопки и стрелки (x, y скилл-чека — доли этой области)
         var area = new GameObject("PlayArea", typeof(RectTransform)).GetComponent<RectTransform>();
         area.SetParent(panel.transform, false);
-        TestPlatformBuilder.Place(area, new Vector2(0, -15), new Vector2(1100, 300));
+        TestPlatformBuilder.Place(area, new Vector2(0, -25), new Vector2(1100, 300));
         battle.playArea = area;
 
         // Полоска
@@ -85,24 +89,6 @@ public static class MogBattleBuilder
 
         foreach (var g in panel.GetComponentsInChildren<Graphic>(true)) g.raycastTarget = false;
         panel.gameObject.SetActive(false);
-
-        // Фаза — в правом верхнем углу, под часами смены, на тёмной плашке (в офисе там табличка расписания)
-        var phaseBack = TestPlatformBuilder.NewImage("MogPhaseBack", hud.transform, new Color(0.05f, 0.03f, 0.08f, 0.85f));
-        phaseBack.raycastTarget = false;
-        var pb = phaseBack.rectTransform;
-        pb.anchorMin = pb.anchorMax = pb.pivot = Vector2.one;
-        pb.anchoredPosition = new Vector2(-24, -102);
-        pb.sizeDelta = new Vector2(640, 64);
-        phaseBack.gameObject.SetActive(false);
-        battle.phaseBack = phaseBack.gameObject;
-        battle.phaseLabel = TestPlatformBuilder.NewText("MogPhase", hud.transform, 40);
-        battle.phaseLabel.alignment = TextAnchor.UpperRight;
-        battle.phaseLabel.color = Purple;
-        var pl = battle.phaseLabel.rectTransform;
-        pl.anchorMin = pl.anchorMax = pl.pivot = Vector2.one;
-        pl.anchoredPosition = new Vector2(-40, -110);
-        pl.sizeDelta = new Vector2(900, 60);
-        battle.phaseLabel.text = "";
         return battle;
     }
 
@@ -111,6 +97,9 @@ public static class MogBattleBuilder
         var t = TestPlatformBuilder.NewText(name, parent, size);
         t.color = color;
         TestPlatformBuilder.Place(t.rectTransform, pos, box);
+        var outline = t.gameObject.AddComponent<Outline>(); // фона нет — тёмная обводка, чтобы читалось поверх сцены
+        outline.effectColor = new Color(0f, 0f, 0f, 0.85f);
+        outline.effectDistance = new Vector2(2f, -2f);
         return t;
     }
 

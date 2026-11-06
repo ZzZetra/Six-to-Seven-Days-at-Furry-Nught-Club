@@ -1,0 +1,6 @@
+# Окружение, голоса Piper (~390 МБ) и сгенерированные примеры — ставятся и делаются заново (setup.bat, generate.py)
+.venv/
+voices/
+data/
+__pycache__/
+# features/*.onnx (признаки openWakeWord) и models/ssdfnc_words.onnx — в гите: их берёт игра

@@ -1,8 +1,10 @@
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Video;
 
-// Монитор камер: 8 кнопок — комнаты 2–8 и проход Г (Rooms.Cameras). На экране название комнаты
-// и кто там из фурри. На камере 7 (кормушка) — кнопка «ПОКОРМИТЬ»: держать DirFeedHoldTime секунд.
+// Монитор камер: 7 кнопок — камера 1 (не работает: «НЕТ СИГНАЛА», сильные помехи) и комнаты 2–7 (Rooms.Cameras). На экране название комнаты и кадр камеры
+// (CameraFeeds: картинка или видео по кругу для «в комнате ровно эти фурри»); кадра нет — текстом, кто там из фурри. На камере 7 (кормушка) — кнопка «ПОКОРМИТЬ»: держать DirFeedHoldTime секунд.
 // Без питания от генератора экран чёрный и ничего не работает.
 // Сбой (Night.MonitorRebooting): экран гаснет и идёт перезагрузка Balance.MonitorRebootTime секунд — полоска
 // загрузки, камеры и кормление не работают; потом снова «Выбери камеру».
@@ -20,6 +22,10 @@ public class CameraMonitor : MonoBehaviour
     public Button[] buttons;      // по порядку Rooms.Cameras
     public HoldButton feedButton;
     public Text feedLabel;
+    public RawImage feed;         // кадр камеры (под названием и кнопками)
+    public VideoPlayer video;     // для видео-кадров (mp4)
+    public MonitorStatic noise;   // помехи поверх кадра
+    public Text clock;            // время смены в правом нижнем углу (пишет ShiftTimer)
     public Generator generator;   // не задан — питание есть всегда
     public NightDirector director;
     public Color idleScreen = new Color(0.04f, 0.1f, 0.06f);
@@ -27,6 +33,8 @@ public class CameraMonitor : MonoBehaviour
 
     int selected = -1;
     bool wasRebooting;
+    CameraFeeds.Feed shown;
+    RenderTexture videoTexture;
 
     bool Powered => generator == null || generator.IsPowered;
     bool Rebooting => director != null && director.MonitorRebooting;
@@ -39,6 +47,12 @@ public class CameraMonitor : MonoBehaviour
             int index = i;
             buttons[i].onClick.AddListener(() => Select(index));
         }
+        if (video != null) video.prepareCompleted += OnVideoReady;
+    }
+
+    void OnDestroy()
+    {
+        if (videoTexture != null) videoTexture.Release();
     }
 
     void OnEnable()
@@ -56,6 +70,7 @@ public class CameraMonitor : MonoBehaviour
     public void Select(int index)
     {
         if (!Powered || Rebooting) return;
+        if (index != selected && noise != null) noise.Burst();
         selected = index;
         Redraw();
     }
@@ -82,7 +97,16 @@ public class CameraMonitor : MonoBehaviour
             return;
         }
         if (!Powered || selected < 0 || director == null) return;
-        body.text = director.Describe(Rooms.Cameras[selected]);
+        var room = Rooms.Cameras[selected];
+        if (noise != null) noise.SetNoSignal(room == Room.Camera1);
+        if (room == Room.Camera1)
+        {
+            body.text = "НЕТ СИГНАЛА";
+            return;
+        }
+        var now = director.Night != null ? CameraFeeds.Find(room, director.Night.In(room).Select(f => f.Id)) : null;
+        if (now != shown) ShowFeed(now);
+        body.text = now != null ? "" : director.Describe(room);
 
         if (!OnFeeding) return;
         if (feedButton.IsHeld) director.HoldFeed(Time.deltaTime);
@@ -119,11 +143,47 @@ public class CameraMonitor : MonoBehaviour
         return string.Join(" ", labels);
     }
 
+    // Кадр камеры: картинка — сразу, видео — когда VideoPlayer подготовит файл; null — кадра нет (текст)
+    void ShowFeed(CameraFeeds.Feed f)
+    {
+        shown = f;
+        if (feed == null) return;
+        if (video != null) video.Stop();
+        feed.enabled = false;
+        if (f == null) return;
+        if (!f.video)
+        {
+            feed.texture = CameraFeeds.Texture(f);
+            feed.enabled = true;
+            return;
+        }
+        if (video == null) return;
+        if (videoTexture == null) videoTexture = new RenderTexture(960, 540, 0) { name = "CameraFeedVideo" };
+        video.targetTexture = videoTexture;
+        video.url = f.path;
+        video.Prepare();
+    }
+
+    void OnVideoReady(VideoPlayer source)
+    {
+        if (shown == null || !shown.video || source.url != shown.path) return;
+        source.Play();
+        feed.texture = videoTexture;
+        feed.enabled = true;
+    }
+
     void Redraw()
     {
+        ShowFeed(null); // кадр подберёт Update по тому, кто сейчас в комнате
         bool on = Powered && !Rebooting;
+        if (noise != null)
+        {
+            noise.SetOn(on);
+            noise.SetNoSignal(false);
+        }
         bool none = selected < 0;
         screen.color = on ? idleScreen : OffColor;
+        if (clock != null) clock.enabled = on;
         title.text = !on ? "" : none ? "Выбери камеру" : $"КАМ {Rooms.CameraLabel(Rooms.Cameras[selected])} · {Rooms.Name(Rooms.Cameras[selected])}";
         body.text = "";
         feedButton.gameObject.SetActive(on && OnFeeding && director != null && director.DirActive);

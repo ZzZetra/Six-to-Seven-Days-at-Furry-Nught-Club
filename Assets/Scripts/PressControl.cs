@@ -5,10 +5,10 @@ using UnityEngine.EventSystems;
 // Клики по 3D-объектам ловит PhysicsRaycaster на камере, коллайдер может быть на детях.
 public class PressControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
-    const float PressDepth = 0.008f; // м, насколько утапливается шляпка кнопки
-
     public Deterrent target;
-    public Transform cap; // что утапливать при нажатии; не задано — ничего
+    public Transform cap;                          // что утапливать при нажатии; не задано — ничего
+    public Vector3 pressDirection = Vector3.down;  // куда утапливать (в осях родителя шляпки): у кнопок карты — в стол
+    public float pressDepth = 0.008f;              // м, насколько утапливается шляпка
 
     bool pressed;
 
@@ -16,7 +16,7 @@ public class PressControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
     {
         if (e.button != PointerEventData.InputButton.Left || pressed) return;
         pressed = true;
-        if (cap != null) cap.localPosition += Vector3.down * PressDepth;
+        if (cap != null) cap.localPosition += pressDirection * pressDepth;
         target.Press();
     }
 
@@ -24,7 +24,7 @@ public class PressControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
     {
         if (!pressed) return;
         pressed = false;
-        if (cap != null) cap.localPosition += Vector3.up * PressDepth;
+        if (cap != null) cap.localPosition -= pressDirection * pressDepth;
         target.Release();
     }
 }

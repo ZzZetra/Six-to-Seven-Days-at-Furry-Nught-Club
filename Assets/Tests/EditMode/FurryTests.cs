@@ -146,18 +146,46 @@ public class FurryTests
 
     // ── Генератор ──
 
+    // Дали у генератора, которая выбрала нужное: глушить или сливать (выбор случайный — перебираем зёрна)
+    DaliAI DaliAtGenerator(FakeOffice office, bool drain)
+    {
+        for (int seed = 1; seed <= 200; seed++)
+        {
+            var dali = new DaliAI(20, office, Rng(seed));
+            Assert.That(RunUntil(dali, () => dali.Room == Room.Generator, 60f) >= 0f);
+            if (dali.Draining == drain) return dali;
+        }
+        Assert.Fail(drain ? "ни разу не стала сливать" : "ни разу не стала глушить");
+        return null;
+    }
+
     [Test]
-    public void Dali_AtGenerator_SabotagesEvenWithSound_AndGoesHome()
+    public void Dali_Stall_SoundDoesNotHelp_AndGoesHome()
     {
         var office = new FakeOffice();
-        var dali = new DaliAI(20, office, Rng(3));
-        Assert.That(RunUntil(dali, () => dali.Room == Room.Generator, 60f) >= 0f);
-        dali.HearSound(); // у генератора звук уже не помогает
+        var dali = DaliAtGenerator(office, drain: false);
+        dali.HearSound(); // глушение звук уже не остановит
         Assert.AreEqual(Room.Generator, dali.Room);
-        float back = RunUntil(dali, () => dali.Room != Room.Generator, 10f);
-        Assert.That(back, Is.GreaterThan(0f));
-        Assert.That(office.Stalls > 0 || office.Damage > 0f || office.Drained > 0f, "ничего не испортила");
+        Assert.That(RunUntil(dali, () => dali.Room != Room.Generator, 10f), Is.GreaterThan(0f));
+        Assert.That(office.Stalls, Is.GreaterThan(0));
         Assert.AreEqual(Room.Server, dali.Room);
+    }
+
+    // Слив — пока не нажмут звук (пользователь, 2026-11-06)
+    [Test]
+    public void Dali_DrainsUntilSound()
+    {
+        var office = new FakeOffice();
+        var dali = DaliAtGenerator(office, drain: true);
+        float before = office.Drained;
+        Run(dali, 20f);
+        Assert.AreEqual(Room.Generator, dali.Room, "без звука не уходит");
+        Assert.That(office.Drained - before, Is.EqualTo(20f * Balance.DrainPerSecond).Within(Balance.DrainPerSecond));
+        dali.HearSound();
+        Assert.AreEqual(Room.Server, dali.Room, "звук прогоняет её от генератора");
+        float drained = office.Drained;
+        Run(dali, 1f);
+        Assert.AreEqual(drained, office.Drained, "после звука не сливает");
     }
 
     [Test]
@@ -168,6 +196,7 @@ public class FurryTests
         {
             var dali = new DaliAI(20, office, Rng(seed));
             RunUntil(dali, () => dali.Room == Room.Generator, 60f);
+            if (dali.Draining) { Run(dali, 1f); dali.HearSound(); } // слив — до звука
             RunUntil(dali, () => dali.Room != Room.Generator, 10f);
         }
         Assert.That(office.Stalls, Is.GreaterThan(0), "ни разу не заглушила");
@@ -472,6 +501,17 @@ public class FurryTests
         var night = new Night(new FakeOffice(), new[] { 0, 0, 0, 0, 0 }, 1e7f, 7);
         float perMinute = CountReboots(night, minutes * 60f) / (float)minutes;
         Assert.That(perMinute, Is.InRange(Balance.MonitorRebootChancePerMinute * 0.85f, Balance.MonitorRebootChancePerMinute * 1.15f),
+            $"сбоев в минуту: {perMinute:0.000}");
+    }
+
+    // У ночи прохождения свой шанс сбоя (с 3-й ночи — 18% в минуту)
+    [Test]
+    public void MonitorReboot_NightOwnChance()
+    {
+        const int minutes = 3000;
+        var night = new Night(new FakeOffice(), new[] { 0, 0, 0, 0, 0 }, 1e7f, 7, Balance.MonitorRebootChanceHard);
+        float perMinute = CountReboots(night, minutes * 60f) / (float)minutes;
+        Assert.That(perMinute, Is.InRange(Balance.MonitorRebootChanceHard * 0.85f, Balance.MonitorRebootChanceHard * 1.15f),
             $"сбоев в минуту: {perMinute:0.000}");
     }
 

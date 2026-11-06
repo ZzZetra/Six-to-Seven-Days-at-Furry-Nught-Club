@@ -41,7 +41,7 @@ public class Generator : MonoBehaviour
             Drain(BurnRate * Time.deltaTime);
 
         var kb = Keyboard.current;
-        if (Debug.isDebugBuild && kb != null)
+        if (Debug.isDebugBuild && kb != null && !GameFlow.InputBlocked)
         {
             if (kb.f6Key.wasPressedThisFrame) Stall();
             if (kb.f7Key.wasPressedThisFrame) Damage(20f);

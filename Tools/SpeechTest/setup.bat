@@ -1,9 +1,9 @@
 @echo off
 chcp 65001 >nul
-rem Установка с нуля (если папки .venv или models нет): окружение Python 3.14, пакеты, русская и английская модели Vosk
+rem Установка с нуля (если папки .venv или models нет): окружение Python 3.14, пакеты (numpy и onnxruntime — для «Своей модели» из Tools/SpeechTrain), русская и английская модели Vosk
 cd /d "%~dp0"
 if not exist ".venv\Scripts\python.exe" py -3.14 -m venv .venv
-".venv\Scripts\python.exe" -m pip install vosk sounddevice
+".venv\Scripts\python.exe" -m pip install vosk sounddevice numpy onnxruntime
 if not exist "models\vosk-model-small-ru-0.22" (
     if not exist models mkdir models
     curl -L --fail -o models\model.zip https://alphacephei.com/vosk/models/vosk-model-small-ru-0.22.zip

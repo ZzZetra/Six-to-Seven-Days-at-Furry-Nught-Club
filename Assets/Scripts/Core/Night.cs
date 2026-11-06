@@ -28,9 +28,9 @@ public class Night
     public event Action<Roamer> GeneratorSabotaged; // Дали или Доли начали портить генератор
     public event Action MonitorRebootStarted;        // монитор ушёл в перезагрузку
 
-    // Шанс сбоя за один бросок (раз в секунду), чтобы за минуту выходило Balance.MonitorRebootChancePerMinute
-    static readonly double MonitorRebootChancePerRoll =
-        1.0 - Math.Pow(1.0 - Balance.MonitorRebootChancePerMinute, 1.0 / 60.0);
+    // Шанс сбоя за один бросок (раз в секунду), чтобы за минуту выходило MonitorRebootChancePerMinute
+    readonly double monitorRebootChancePerRoll;
+    public float MonitorRebootChancePerMinute { get; }
 
     readonly IOffice office;
     readonly Random monitorRng; // свой поток: сбои не сдвигают броски фурри
@@ -43,9 +43,12 @@ public class Night
     public bool MonitorCanReboot =>
         office.MonitorPowered && !Dir.Starving && Dir.Food >= Balance.MonitorRebootMinDirFood;
 
-    // levels — уровни ИИ в порядке FurryId: Дир, Стрей, Нова, Дали, Доли
-    public Night(IOffice office, int[] levels, float duration, int seed)
+    // levels — уровни ИИ в порядке FurryId: Дир, Стрей, Нова, Дали, Доли.
+    // monitorRebootPerMinute — шанс сбоя монитора за минуту (у ночей прохождения свой, Nights.cs); < 0 — из Balance
+    public Night(IOffice office, int[] levels, float duration, int seed, float monitorRebootPerMinute = -1f)
     {
+        MonitorRebootChancePerMinute = monitorRebootPerMinute >= 0f ? monitorRebootPerMinute : Balance.MonitorRebootChancePerMinute;
+        monitorRebootChancePerRoll = 1.0 - Math.Pow(1.0 - MonitorRebootChancePerMinute, 1.0 / 60.0);
         var rng = new Random(seed);
         monitorRng = new Random(unchecked(seed * 31 + 17));
         this.office = office;
@@ -100,7 +103,7 @@ public class Night
         while (monitorClock >= 1f)
         {
             monitorClock -= 1f;
-            if (MonitorCanReboot && monitorRng.NextDouble() < MonitorRebootChancePerRoll)
+            if (MonitorCanReboot && monitorRng.NextDouble() < monitorRebootChancePerRoll)
             {
                 StartMonitorReboot();
                 return;

@@ -4,11 +4,14 @@ using System.Runtime.CompilerServices;
 
 // Все числа игры в одном месте. Меняются здесь, в коде.
 // Другие скрипты берут их отсюда (например Door.MaxClosedTime = Balance.DoorMaxClosedTime).
-// Сложность (уровни ИИ фурри) — в Difficulty.cs.
+// Сложность (уровни ИИ фурри) — в Difficulty.cs, ночи 1–7 (кто участвует, уровни, сбои, звонки) — в Nights.cs.
 public static class Balance
 {
     // ── Смена ──
-    public const float ShiftDuration = 600f;         // с, 10 минут (как по дизайну)
+    public const float ShiftDuration = 360f;         // с, 6 минут (пользователь, 2026-11-05; было 10)
+
+    // ── Ночи ──
+    public const int Night7Money = 50;               // $ на счету, чтобы открылась 7-я ночь (деньги не тратятся)
 
     // ── Генератор ──
     public const float TankSize = 75f;               // бак, ед.
@@ -45,8 +48,9 @@ public static class Balance
     // ── Дали у генератора: глушит или сливает бензин ──
     public const float DaliStallChance = 0.5f;       // доля визитов, когда глушит; остальное — сливает
     public const float StallTime = 3f;               // с глушения, потом генератор глохнет (звук уже не спасёт)
-    public const float DrainTime = 2f;               // с слива
-    public const float DrainPerSecond = 5f;          // 10 бензина за 2 с, как в концепте
+    // Слив — пока не нажмут кнопку звука (пользователь, 2026-11-06: «должна сливать, пока не будет нажата кнопка»;
+    // раньше было 2 с — уходила почти сразу)
+    public const float DrainPerSecond = 3f;          // бензина в секунду
 
     // ── Доли у генератора: ломает, пока не спугнут звуком ──
     public const float BreakPerSecond = 10f;         // 20 HP за 2 с, как в концепте
@@ -60,7 +64,8 @@ public static class Balance
 
     // ── Монитор сам уходит в перезагрузку ──
     // Камеры и кормление Дира на это время не работают. Только если Дир сыт: иначе сбой убивал бы
-    public const float MonitorRebootChancePerMinute = 0.1f; // шанс за минуту смены (бросок раз в секунду)
+    public const float MonitorRebootChancePerMinute = 0.1f; // шанс за минуту смены (бросок раз в секунду): ночи 1–2, своя ночь
+    public const float MonitorRebootChanceHard = 0.18f;     // ... с 3-й ночи (Nights.cs)
     public const float MonitorRebootTime = 3f;              // с, столько идёт перезагрузка
     public const float MonitorRebootMinDirFood = 0.4f;      // корма у Дира не меньше этой доли — иначе не сбоит
 
@@ -69,6 +74,7 @@ public static class Balance
 
     // ── Звонки клиентов ──
     // Диалоги и расписание — не здесь, а в Assets/StreamingAssets/Calls (формат: docs/CALLS.md)
+    // Сколько звонков клиентов за ночь — в Nights.cs (до 9); это — для «Своей ночи»
     public const int CallsPerNightMin = 4;
     public const int CallsPerNightMax = 6;
     public const float CallFirstDelay = 40f;         // с от начала смены до первого звонка (не раньше)
@@ -78,6 +84,15 @@ public static class Balance
     public const float CallReactionTime = 3f;        // с, реплика клиента после ответа, потом гудки
     public const int CallRewardMin = 2;              // $ за верный ответ, если в диалоге не задано своё «reward»
     public const int CallRewardMax = 10;
+
+    // ── Звонки начальства (туториал) и звонки по условию ──
+    // Тексты — Assets/StreamingAssets/Calls/Boss/night_N.json и Calls/Triggered/<условие>.json (docs/CALLS.md).
+    // Можно не брать трубку — ничего не будет
+    public const float BossCallStartFrom = 4f;       // с от начала смены: звонок «в начале ночи» — в этом окне
+    public const float BossCallStartTo = 15f;
+    public const float BossCallMiddleFrom = 0.35f;   // доля смены: звонок «в середине ночи» — в случайный момент окна
+    public const float BossCallMiddleTo = 0.65f;
+    public const float CallTriggerDelay = 2f;        // с от условия (CallDirector.Request) до звонка
 
     // ── Мог-батл с Новой ──
     // Скилл-чеки и музыка — не здесь, а в раскладках Assets/StreamingAssets/MogCharts/*.json

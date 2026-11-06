@@ -16,8 +16,9 @@ public class SpaceAction : MonoBehaviour
     void Update()
     {
         var kb = Keyboard.current;
-        bool held = kb != null && kb.spaceKey.isPressed;
-        bool pressed = kb != null && kb.spaceKey.wasPressedThisFrame;
+        bool free = kb != null && !GameFlow.InputBlocked; // пауза — как будто пробел отпущен
+        bool held = free && kb.spaceKey.isPressed;
+        bool pressed = free && kb.spaceKey.wasPressedThisFrame;
 
         bool dance = held && look.IsLooking(CameraLook.Side.Forward);
         if (dance != holdingDance)

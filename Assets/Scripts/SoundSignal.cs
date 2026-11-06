@@ -2,7 +2,8 @@ using System.Collections;
 using UnityEngine;
 
 // Кнопка звукового сигнала на столе: нажал — один гудок (Pulse). Работает и без генератора.
-// Отпугивает тех, кто идёт к генератору (когда появятся фурри). Звук создаётся в коде, файла нет.
+// Отпугивает тех, кто идёт к генератору. Звук — GameSounds «Красная кнопка» (по умолчанию «звук кнопки»),
+// «встроенный» — гудок, созданный здесь в коде.
 public class SoundSignal : Deterrent
 {
     public const ActivationMode Activation = ActivationMode.Pulse;
@@ -24,13 +25,14 @@ public class SoundSignal : Deterrent
     void Awake()
     {
         beep = MakeBeep();
+        GameSounds.SetBuiltin(SoundSlot.SoundButton, beep);
         block = new MaterialPropertyBlock();
     }
 
     protected override void OnFired()
     {
         Debug.Log("[SSDFNC] Звуковой сигнал");
-        if (source != null) source.PlayOneShot(beep);
+        GameSounds.Play(SoundSlot.SoundButton, source);
         StopAllCoroutines();
         StartCoroutine(Flash());
     }

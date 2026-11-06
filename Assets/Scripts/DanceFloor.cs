@@ -1,8 +1,8 @@
 using UnityEngine;
 
 // Дэнс пол в коридоре перед офисом: работает, пока держишь кнопку на столе (Hold), как фонарик во FNAF 2.
-// Плитки переливаются цветами, над ними горит свет. Отпугивает стеснительных фурри (когда появятся).
-// Нужен генератор.
+// Плитки переливаются цветами, над ними горит свет, играет музыка (звук «Дэнс пол» в паузе → «Звуки»; когда пол
+// включила Нова на мог-батл — нет, там своя музыка). Отпугивает стеснительных фурри. Нужен генератор.
 public class DanceFloor : Deterrent
 {
     public const ActivationMode Activation = ActivationMode.Hold;
@@ -15,6 +15,7 @@ public class DanceFloor : Deterrent
     public Light glow;
 
     MaterialPropertyBlock block;
+    SoundBinding music;
     bool forced; // Нова сама включила пол на время мог-батла
 
     public void SetForced(bool on)
@@ -30,11 +31,15 @@ public class DanceFloor : Deterrent
     {
         block = new MaterialPropertyBlock();
         Paint(false);
+        var source = gameObject.AddComponent<AudioSource>();
+        source.spatialBlend = 0f;
+        music = GameSounds.Bind(source, SoundSlot.DanceFloorMusic);
     }
 
     void Update()
     {
         if (IsActive || forced) Paint(true);
+        music.SetPlaying(IsActive && !forced);
     }
 
     protected override void OnActiveChanged(bool on)

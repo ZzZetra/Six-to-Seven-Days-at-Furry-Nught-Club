@@ -5,25 +5,48 @@
 ## Сцены и переходы
 
 ```
-MainMenu.unity ──«Начать ночь»──▶ SampleScene.unity (офис, смена 10 мин)
-      ▲                                   │
-      └──────── время смены вышло ────────┘
-«Выйти» — закрыть игру (в редакторе — остановить Play)
+Boot.unity ──▶ MainMenu.unity ──«Ночь N» / «Продолжить»──▶ SampleScene.unity (офис, смена 6 мин)
+                    ▲                                  │
+                    └── «Ночь N пройдена» → «В меню», ─┘
+                        пауза → «В главное меню»
+«Следующая ночь», «Заново» и смерть — офис грузится заново. «Выйти» — закрыть игру (в редакторе — остановить Play)
+Какая ночь идёт — статический NightProgress.Current (1–7, 0 — «Своя ночь»), его ставит меню или «Следующая ночь».
+Все переходы — через загрузочный экран (SceneLoader)
 
 MogEditor.unity — редактор раскладок, отдельная программа (в игру не входит)
 ```
 
-В Build Settings игры: `0 — MainMenu`, `1 — SampleScene`. Сцены грузятся по имени через
-`SceneManager.LoadScene`. Имена лежат в полях `MainMenu.gameScene` и `ShiftTimer.menuScene`.
+В Build Settings игры: `0 — Boot`, `1 — MainMenu`, `2 — SampleScene`. Сцены грузятся по имени через
+`SceneLoader.Load(сцена, подпись)`. Имена лежат в полях `Boot.menuScene`, `MainMenu.gameScene`,
+`ShiftTimer.menuScene`, `PauseMenu.menuScene`, `NightEndScreen.menuScene`.
+
+**`SceneLoader`** — загрузочный экран. Строит свой оверлей сам (canvas с `sortingOrder` 1000, фон, название,
+подпись, полоска, проценты, крутилка из `MogShapes.Ring`, совет) и живёт всю игру (`DontDestroyOnLoad`).
+`Load` снимает паузу (`GameFlow.Reset`), проявляет экран за 0.3 с, грузит сцену `LoadSceneAsync` с
+`allowSceneActivation = false`, держит экран хотя бы 1.4 с (при запуске — 2 с, `Boot`), потом убирает.
+Пока `IsLoading`, клики в сцену не проходят и ввод игры выключен.
+
+**`GameFlow`** — общее состояние: `Paused` (пауза), `NightOver` (экран конца ночи), `InputBlocked` (одно из них
+или загрузка). На паузе и после конца ночи `Time.timeScale = 0` и `AudioListener.pause = true` — смена, ночь,
+генератор, звонки и мог-батл (часы по музыке тоже стоят) замирают сами. Клавиатуру и мышь проверяют
+`CameraLook`, `SpaceAction`, `CallDirector`, `MogBattle`, `DifficultyPanel` (F1), `ShiftTimer` (F9), `Generator`
+(F6–F8). Кнопки и рычаги в сцене закрыты панелью паузы на весь экран.
+
+**`PauseMenu`** (оверлей `PauseHUD` в офисе) — Esc открывает и закрывает; не открывается во время загрузки,
+после смерти и на экране конца ночи. **`NightEndScreen`** (там же) — `ShiftTimer` в конце смены зовёт `Show()`:
+`GameFlow.EndNight()`, итоги (`NightDirector.Feeds`, `Night.Nova.Wins`, счёт звонков `CallDirector`, `Wallet.Money`),
+«Заново» и «В меню».
 
 ## Офис (SampleScene)
 
 ```
 Main Camera ── CameraLook, PhysicsRaycaster   (A/D — поворот; клики по 3D-объектам)
 TestPlatform
- ├─ CenterPlatform, Left/Forward/Right Path, Forward/Right Prop    (геометрия-заглушка)
- ├─ LeftWall, RightWall              стены с дверным проёмом (Back, Front, Lintel)
- ├─ Generator ── Generator                    (за проёмом слева, x = −6.5)
+ ├─ Map                                        карта клуба (MapBuilder): разворот 180°, кресло под игроком
+ │   ├─ MapModel                               копия Map.fbx: стены, мебель, DanceTile_000…119, маркеры
+ │   └─ MapLamps                               точечные лампы внутри
+ │  (без карты вместо Map — полигон: CenterPlatform, дорожки, LeftWall, RightWall с проёмами)
+ ├─ Generator ── Generator                    (на месте генератора карты; без карты — x = −6.5)
  │   ├─ GeneratorSpot                          куда встаёт камера у генератора
  │   ├─ GeneratorModel ── GeneratorModel       обёртка: место, поворот, масштаб ×1.4
  │   │   └─ Generator (FBX) ── Animation       модель из Blender; клипы Start, Idle, CapOpen, CapClose
@@ -34,7 +57,6 @@ TestPlatform
  │       └─ RefuelButton ── Button + HoldButton   «ЗАЛИТЬ (держать)»
  ├─ Desk                                       стол перед игроком
  ├─ DanceButton, SoundButton ── PressControl   кнопки на столе (Base + Cap)
- ├─ DeskLabels                                 подписи кнопок (World Space Canvas)
  ├─ DanceFloor ── DanceFloor                   DanceTile1..9 + DanceLight
  ├─ SoundSignal ── SoundSignal, AudioSource
  ├─ Door ── Door                               дверь в правом проёме
@@ -46,8 +68,7 @@ TestPlatform
  │   └─ CameraNumber  (Text)
  └─ CameraButtons                   (World Space Canvas)
      └─ CamButton1..6 (Button + Image) └─ Number (Text)
-Shift ── ShiftTimer                  (Screen Space Overlay Canvas)
- └─ Clock (Text)                       часы в правом верхнем углу
+Shift ── ShiftTimer                  время смены; часы — MonitorPanel/Clock (правый нижний угол монитора)
 EventSystem ── InputSystemUIInputModule   (клики по кнопкам)
 Directional Light, Global Volume          (из шаблона URP)
 ```
@@ -169,8 +190,11 @@ MogPreviewHUD ── Canvas, MogBattle, AudioSource   окно мог-батла
 `InputLocked` — клавиши не работают, но камера доворачивается (атака Новы). `FaceForward()` —
 повернуть вперёд, к дэнс полу; от генератора сначала вернуться в офис.
 
-Когда смотришь вперёд, камера отъезжает назад на `ForwardPullBack` (0.5 м) и наклоняется вниз на
-`ForwardPitch` (12°): под столом остаётся место для окна звонка. Отъезд (`lean`) сглаживается отдельно от
+В офисе игрок сидит: на карте сборщик ставит камеру на высоту `CameraLook.SeatedEyeHeight` (0.85 м — стол
+низкий, 0.45; так виден рычаг под столешницей), без карты — 1.6 м. Угол обзора `FieldOfView` — 70° по вертикали
+(ставит `CameraLook.Start`). Когда смотришь вперёд, камера отъезжает назад на `ForwardPullBack` (0.45 м,
+`ForwardLean`) и наклоняется вниз на `ForwardPitch` (3°): в кадре стол, монитор на нём и проход к дэнс полу, внизу —
+подлокотники кресла и место для окна звонка. У генератора (`GeneratorSpot`) — стоя, 1.6 м. Отъезд (`lean`) сглаживается отдельно от
 перемещения к генератору (`basePosition`) и с той же скоростью, что поворот, поэтому `Settled` его не ждёт.
 
 `IsLooking(Side side)` — смотрит ли камера сейчас в эту сторону офиса (`Side.Left / Forward /
@@ -184,10 +208,19 @@ Right`). Считается по **фактическому** повороту �
 
 ## CameraMonitor — монитор камер
 
+**Помехи** (`MonitorStatic`, объект `Static` между кадром и надписями): строки развёртки, «снег», ползущая полоса,
+тёмные края, редкие сбои (цветные полосы, кадр дёргается), вспышка при переключении камеры (`Burst` из `Select`);
+`Redraw` включает их только при работающем экране (`SetOn`).
+
+**Кадры камер** (`CameraFeeds`): `StreamingAssets/Cameras/<камера>/<кто в кадре>.jpg|png|mp4`, имена фурри через « и » или запятую,
+пустая комната — «пусто». В `Update` монитор берёт кадр для «в комнате ровно эти фурри» (`Night.In(room)`); есть —
+`Feed` (RawImage между фоном экрана и надписями) показывает картинку или видео (`VideoPlayer`: Url, по кругу, GameTime —
+на паузе стоит, RenderTexture 960×540; видно, когда подготовлено), текст тела пустой; нет кадра — текст, как раньше.
+
 `Assets/Scripts/CameraMonitor.cs`, висит на **MonitorPanel**.
 
 Поля (заполняет сборщик): `screen`, `title`, `body` (тексты экрана), `buttons` (8 кнопок по
-порядку `Rooms.Cameras`: 2, 3, 4, 5, 6, 7, 8, Г), `feedButton` (`HoldButton`) и `feedLabel`,
+порядку `Rooms.Cameras`: 1, 2, 3, 4, 5, 6, 7; камера 1 — `Room.Camera1`, «НЕТ СИГНАЛА» и сплошные помехи), `feedButton` (`HoldButton`) и `feedLabel`,
 `generator` (питание), `director` (`NightDirector`).
 
 - `Select(index)`: заголовок «КАМ 7 · Кормушка», выбранная кнопка зелёная. `Select(-1)` — ничего не выбрано.
@@ -234,15 +267,21 @@ Right`). Считается по **фактическому** повороту �
 **`NightDirector`** (объект `NightDirector` в `TestPlatform`) создаёт `Night` с уровнями из
 `Difficulty`, каждый кадр её тикает и:
 - реализует `IOffice` через `Door`, `DanceFloor`, `Generator`; звук (`SoundSignal.Fired`) → `Night.SoundFired`;
-- показывает фигуры фурри (`FurryAvatar`) в местах `atDoor`, `onDanceFloor`, `inPassage`, `atGenerator`;
+- показывает фигуры фурри (`FurryAvatar`) в местах `atDoor`, `onDanceFloor`, `inPassage`, `atGenerator` — лицом к
+  камере; Доли у двери не показывает, Стрея у двери ставит в `strayPeek` (выглядывает из-за края проёма), Дали в
+  проходе Г — вместо неё `daliHand` (рука из вентиляции генераторной);
 - пишет сверху «ДИР ГОЛОДЕН! N» и гудит, когда корм кончился;
-- звуки (два зацикленных `AudioSource`, создаются в `Awake`, не объёмные): рычание Доли
-  (`Tones.Growl`), пока он у двери или у генератора; бульканье (`Tones.Glug`), пока кто-то
+- звуки (не объёмные): рычание Доли (`Tones.Growl`) — один раз, когда она подошла к двери или генератору;
+  зацикленные `AudioSource` из `Awake` — бульканье (`Tones.Glug`), пока кто-то
   сливает бензин (`Roamer.Draining`);
 - **мог-батл:** `CameraLook.InputLocked` и выключенный `SpaceAction`, `CameraLook.FaceForward()`
   (Нова разворачивает к дэнс полу), генератор на паузе, Нова зажигает пол (`DanceFloor.SetForced`),
   запускает `MogBattle`, по итогу `Night.FinishMogBattle`;
-- **смерть:** красный экран с именем и причиной, через 2.5 с сцена офиса загружается заново
+- **смерть:** скример — `DeathScreamer` (головы фурри на сцене `DeathHeads` под картой, своя камера в RenderTexture,
+  RawImage на `deathPanel` оверлея `PauseHUD`, фон — чёрный с прозрачностью 0.55) и звук «Скример»; Дир — чёрный
+  фон и «СКОНЧАЛСЯ». У фурри: скример `ScreamerTime`, экран гаснет в чёрный (`DeathFadeTime`, голова исчезает —
+  `DeathScreamer.SetAlpha`/`Hide`), на чёрном кто и как убил. Тогда (у Дира — через секунду) всё
+  замирает (`GameFlow.EndNight`) и появляются кнопки «Начать заново» и «В меню» (через `SceneLoader`)
   (смена сначала).
 
 В Console: `[SSDFNC] Ночь: сложность …`, перемещения фурри, `Смерть: …`, `Мог-батл: …`, `Дир накормлен`.
@@ -258,7 +297,7 @@ Right`). Считается по **фактическому** повороту �
 генератору, пока `Dali.HeadingToGenerator`; Дали не идёт дальше прохода 8, пока `Doli.HeadingToGenerator`.
 
 **`MogBattle`** (на `FurryHUD`; такое же окно в меню и в редакторе раскладок, его строит
-`MogBattleBuilder`) — атака Новы по фазам: `Intro` (до первого чека раскладки)
+`MogBattleBuilder`; фона у окна нет — чеки «в воздухе», надписи с обводкой, окно ниже центра, `PanelPos`) — атака Новы по фазам: `Intro` (до первого чека раскладки)
 → `Checks` (группы чеков из раскладки) → `Outro` (`Balance.MogOutroTime`: Нова уходит или смерть)
 → `done(won)`. Ввод по виду чека: кружок и полоска — ПРОБЕЛ, кнопка — ЛКМ внутри круга кнопки (с запасом
 15%), стрелка — `Mouse.delta` копится с открытия окна попадания, набралось `MogSwipeDistance` × высота
@@ -275,12 +314,13 @@ Right`). Считается по **фактическому** повороту �
 модель стоит на дэнс полу; когда появятся, их будет включать её аниматор по `MogBattle.Current`.
 Раскладку берёт `MogCharts.LoadAll()` из `StreamingAssets/MogCharts/*.json` (случайную, не ту же,
 что в прошлый раз), музыку грузит `UnityWebRequestMultimedia`. Время чеков — по музыке
-(`timeSamples / frequency − offset`), без музыки — по `Time.deltaTime`. Надпись фазы `phaseLabel` —
-в правом верхнем углу под часами. Зоны уже после каждой победы игрока (`MogZoneShrinkPerWin`).
+(`timeSamples / frequency − offset`), без музыки — по `Time.deltaTime`. Надписей фазы и запаса мога
+на экране нет (только название чека и подсказка). Зоны уже после каждой победы игрока (`MogZoneShrinkPerWin`).
 
 **Звонки клиентов** — подробно в [CALLS.md](CALLS.md). Логика без сцены — `Assets/Scripts/Core/Calls`
 (`Schedule`, `CallTemplate`/`CallTypes`/`CallText`, `CallBuilder`, `CallPlan`). В сцене (`TestPlatform`):
-`Phone` на столе слева (клик — `PickedUp`), `ScheduleBoard` (мировой канвас справа над столом, клетки
+`Phone` на столе слева (клик — `PickedUp`), `ScheduleBoard` (мировой канвас; на карте — на передней стене
+слева от прохода, `MapBoardX/Y`, без карты — справа над столом; клетки
 создаются в `Show`), `CallHUD` с `CallDialog` (оверлей внизу, `CanvasGroup` прячет окно, когда не смотришь
 вперёд), `CallDirector` (план, состояния Idle → Ringing → ClientLine → Options → Reaction, пауза при
 `Night.Frozen`, `Wallet.Add`). Данные — `StreamingAssets/Calls` через `CallData`. Деньги — `Wallet`
@@ -420,32 +460,41 @@ Right`). Считается по **фактическому** повороту �
 | Поле | По умолчанию | Что это |
 |---|---|---|
 | `Duration` | константа в коде, сейчас 90 | длина смены в секундах (по дизайну 600 = 10 минут) |
-| `menuScene` | `MainMenu` | куда вернуться после смены |
-| `clock` | `Shift/Clock` | текст часов; можно не задавать |
+| `menuScene` | `MainMenu` | куда вернуться, если нет экрана конца ночи |
+| `nightEnd` | `PauseHUD` | экран «Ночь окончена» |
+| `clock` | `MonitorPanel/Clock` | текст часов «m:ss» на мониторе (прячет `CameraMonitor` без питания); можно не задавать |
 
 - `Update()` копит прошедшее время `elapsed` и считает `TimeLeft = Duration − elapsed`.
 - `Duration` — это **константа** (`const`), а не поле в инспекторе. Так сделано намеренно:
   раньше это было поле, и правка числа в коде ни на что не влияла, потому что у объекта в сцене
   было записано своё значение (600). Теперь длина смены задаётся только в коде.
 - В часы пишется оставшееся время в виде `м:сс` (округление вверх, поэтому в начале видно
-  `10:00`). На нуле таймер выключается и грузит меню.
+  `10:00`). На нуле таймер выключается и показывает экран «Ночь окончена» (`nightEnd.Show()`).
 - **F9** (если `Debug.isDebugBuild`, то есть в редакторе и dev-сборке) ставит
   `elapsed = Duration`, то есть сразу заканчивает смену.
-- Конец смены пишет в Console `[SSDFNC] Смена окончена, возврат в меню`. `MainMenu` так же
+- Конец смены пишет в Console `[SSDFNC] Смена окончена`. `MainMenu` так же
   пишет `[SSDFNC] Начать ночь` и `[SSDFNC] Выйти`.
 - `TimeLeft` и `ShiftTimer.Duration` открыты для чтения. Пригодятся генератору: расход
   бензина = 150 / `Duration`.
 
-Пауз пока нет. Если потом что-то должно останавливать смену, это делается через
-`Time.timeScale` или флаг в таймере.
+Пауза (Esc) останавливает смену через `Time.timeScale = 0` (`GameFlow`).
 
 ## MainMenu — главное меню
 
-Три вкладки (`mainTab`, `settingsTab`, `checksTab`, выбранная подсвечена, `ShowTab(i)`):
-«Главная» — «Начать ночь», «Выйти»; «Настройка ночи» — `NightSettingsTab` (уровни фурри − / +,
-пресеты, «Только Нова», «По умолчанию») и своя кнопка «Начать ночь»; «Скилл-чеки» — `MogTestTab`
-(список раскладок с примерами, клик — пройти её в окне `MogBattle` на канвасе `MogTestHUD` через
-`BeginTest`, меню прячется через `CanvasGroup`, Esc — прервать).
+Экраны (`Show(Screen)`): Home («Играть», «Настройки», «Выход»), Nights, Settings («Громкость», «Звуки», «Скилл-чеки»),
+Volume, Checks, Sounds. Каждая кнопка / панель — `Item`: своё место из сборщика (`home`), цель, прозрачность
+(`CanvasGroup`, добавляется сам); анимация простая (пользователь: «сделай попроще»): кнопка сразу на своём месте
+(сменила место — там и проявляется заново) и за `FadeTime` проявляется / гаснет. Nights: «Играть» встаёт в `PlayAside`, видимые ночи (`NightVisible`: 1–6 открытые, 7-я при
+`Passed ≥ 6`, «Своя ночь» при `Passed ≥ 7`) встают сеткой `Cell(n)` (`Columns` 2 × `Rows` 3, `ByColumns`, `GridX/GridTop`, `ColumnStep/RowStep`;
+7-я — следующим рядом посередине); цвет: пройденная `ItemPassed`, нет — `ItemNew`, выбранная `ItemSelected`; `Select(n)` красит выбранную
+(`ItemOn`), подпись `selectionLabel`, «Играть» неактивна, если ночь закрыта. «Своя ночь» — отдельная кнопка под списком
+(`CustomGap`); нажали — экран Custom: ночи гаснут, кнопка едет на место первой ночи, под ней `customPanel`
+(`NightSettingsTab`), «Играть» → `StartNight(0)`, Back → Nights. Сразу выбрана `NightProgress.LastUnlocked`. «Назад» / Esc — `Back()` (Esc не трогает идущую
+проверку скилл-чеков — там он её прерывает). «Звуки» — `SoundSettingsPanel` (тот же класс, что в паузе; `Closed` →
+Settings). «Скилл-чеки» — `MogTestTab` (`Refresh` при открытии; меню прячется через `CanvasGroup` на канвасе).
+**Громкость** — `GameSounds`: `VolumeGroup` (Master → `AudioListener.volume`, Music → `MogBattle.music`, Ambient,
+Generator, Effects), `VolumeOf(slot)` = своя громкость события × группа, `VolumeChanged` → `SoundBinding` и музыка
+меняют громкость на ходу; `VolumeSettingsPanel` — ползунки (`DefaultControls.CreateSlider` в сборщике).
 
 **`NightSettings`** (статический) — уровни ночи из меню; хранятся в PlayerPrefs (ключ
 `SSDFNC.NightLevels`), без сохранения — `Difficulty.Levels(Difficulty.Preset)`. `NightDirector` берёт
@@ -465,12 +514,13 @@ Right`). Считается по **фактическому** повороту �
 `Assets/Editor/MainMenuBuilder.cs`, меню **SSDFNC → Build Main Menu**.
 
 1. Предлагает сохранить открытые сцены, если в них есть изменения. Отказ отменяет сборку.
-2. Создаёт пустую сцену, наполняет её (см. «Главное меню» выше) и сохраняет в
+2. Собирает `Assets/Scenes/Boot.unity`: камера и `Boot` (загрузочный экран и переход в меню).
+3. Создаёт пустую сцену, наполняет её (см. «Главное меню» выше) и сохраняет в
    `Assets/Scenes/MainMenu.unity`, перезаписывая старую.
-3. Прописывает Build Settings: `MainMenu`, `SampleScene` (редактор раскладок — отдельная программа).
+4. Прописывает Build Settings: `Boot`, `MainMenu`, `SampleScene` (редактор раскладок — отдельная программа).
 
-Кнопки 520×110. Цвет задаёт `ColorTint`: обычный тёмно-фиолетовый, при наведении светлее,
-при нажатии темнее. Для текста используются `NewText`, `NewImage`, `Stretch` из
+Кнопки 560×100 (список ночей — 520×74, `ItemButton`: ColorTint почти белый, цвет выбранной ставит `MainMenu`).
+Цвет задаёт `ColorTint`: обычный тёмно-фиолетовый, при наведении светлее, при нажатии темнее. Для текста используются `NewText`, `NewImage`, `Stretch` из
 `TestPlatformBuilder` (они `internal`).
 
 ## PlayFromMenu — Play всегда с меню
@@ -494,6 +544,26 @@ Right`). Считается по **фактическому** повороту �
 ## TestPlatformBuilder — сборщик офиса
 
 `Assets/Editor/TestPlatformBuilder.cs`, меню **SSDFNC → Build Test Platform**.
+
+**С 2026-11-04 офис стоит на карте клуба** (`MapBuilder`, версия сборщика 20). Если есть
+`Assets/Models/Map/Map.fbx`, вместо платформы, дорожек и стен строится карта, а точки берутся из неё:
+
+| Что | Где на карте |
+|---|---|
+| игрок (0, 1.6, 0) | над креслом ресепшена (`Marker_Seat`) |
+| генератор | `Marker_Generator`, (−4.21, 0, −0.06); поворот и размер — как у генератора автора (`Layout.generatorFront/Size`: пульт смотрит туда же, масштаб ≈ 1); глаза у генератора в 1.7 м от него — сразу за дверью генераторной, стоя |
+| дверь | шторка рольставня `ShutterCurtain` справа (x ≈ 2.9): закрыта — как в `.blend`, открыта — на 2.5 м выше |
+| рычаг и табличка двери | на правой стене (Blender x −1.53, y −1.05), впереди от рольставня |
+| дэнс пол | 120 плиток `DanceTile_*`, свет над серединой на 2.4 м (потолок 3 м) |
+| кнопки дэнс пола и звука | розовая и красная кнопки карты (`DanceButton`, `SoundButton`) на внутренней стороне стола; `PressControl` на пустом объекте в центре кнопки, область клика 3.5 × 6 × 7 см (выше кнопки и ближе к игроку — над ними телефон), шляпка утапливается в стол (`PressControl.pressDirection`). Нет в карте — свои на бортике |
+| рычаг двери | рычаг карты (`DoorLeverHandle` и крепление `DoorLeverBase`) перенесён под край столешницы справа, у правого подлокотника (`MapLeverTip`, поворот `MapLeverYaw` 90° — ручкой к креслу): `DoorLeverMount` не качается, `DoorLever` (ось у дальнего конца ручки) — закрыто: ручка на 35° вниз (`Door.leverOpen/leverClosed`); область клика выступает к креслу и над столешницей. Вид вправо наклонён на `CameraLook.RightPitch` (15°), иначе рычаг ниже кадра; табличка двери — на 1.45 м. Нет в карте — рычаг на стене |
+| телефон | белый телефон карты (`DeskPhone`): весь аппарат дрожит, когда звонят (`Phone.lift` = 0), рядом лампа-шарик, коллайдер ровно по аппарату. Нет в карте — коробка на бортике |
+| табличка расписания | ровно на передней стене офиса слева от прохода (`MapBoardX/Y`), без столба |
+| монитор камер | на экране монитора `Monitor` на столе (из `monitorScreen`), кнопки камер внизу экрана |
+| места фурри | за рольставнем, на дэнс полу, в проходе Г (видно в окошко генераторной), в глубине генераторной |
+
+Все эти числа — константы `Map…` в начале `TestPlatformBuilder.cs`. Ниже — как собирается старый полигон
+(без карты).
 
 Скрипт лежит в папке `Editor`, поэтому в сборку игры не попадает. Что он делает по порядку:
 
@@ -556,7 +626,6 @@ Right`). Считается по **фактическому** повороту �
 |---|---|---|
 | Desk | (0.1, 0.45, 1.3) | 1.9 × 0.9 × 1.0, верх на 0.9 |
 | DanceButton / SoundButton | (−0.45 / −0.15, 0.9, 1.45) | шляпка ⌀ 0.13 м |
-| DeskLabels | (−0.3, 0.98, 1.72) | 900 × 90 px, масштаб 0.0006 |
 | DanceTile1..9 | сетка 3×3 вокруг (0, 0.01, 6.5), шаг 1 м | 0.95 × 0.02 × 0.95 |
 | DanceLight | (0, 2.5, 6.5) | точечный, range 7, intensity 4 |
 | DoorSlab | закрыта (3.5, 1.1, 0), открыта (3.5, 1.1, 1.25) — внутри стены | 0.08 × 2.2 × 1.2 |
@@ -576,7 +645,8 @@ Right`). Считается по **фактическому** повороту �
 
 | Канвас | Пиксели | Метры | Направление от глаз |
 |---|---|---|---|
-| `MonitorPanel` | 500 × 300 | 0.5 × 0.3 | 28° вправо, 12° вниз, ≈ (0.64, 1.31, 1.21) |
+| `MonitorPanel` | 500 × 300 | 0.5 × 0.3 | 28° вправо, 12° вниз, ≈ (0.64, 1.31, 1.21) — только без карты |
+| `MonitorPanel` на карте | 760 × 425, кнопки камер внизу | 0.605 × 0.338 (экран монитора) | на 4 мм перед экраном монитора на столе, ≈ (0.54, 0.71, 0.47), лицом к креслу |
 | `CameraButtons` | 500 × 80 | 0.5 × 0.08 | 28° вправо, 24° вниз, ≈ (0.60, 1.03, 1.13) |
 
 Кнопки 70×70 px с шагом 86 px, шесть штук ровно занимают 500 px. Текст — legacy
@@ -592,13 +662,54 @@ Right`). Считается по **фактическому** повороту �
 | Редактор | 6000.6.0f1 |
 | Рендер | URP 17.6, два уровня качества: PC и Mobile (`Assets/Settings`) |
 | Ввод | только **Input System** (`activeInputHandler: 1`) — `UnityEngine.Input` не работает |
-| Сцены в сборке | `MainMenu`, `SampleScene` (редактор раскладок — своя сборка, `MogEditor`) |
+| Сцены в сборке | `Boot`, `MainMenu`, `SampleScene` (редактор раскладок — своя сборка, `MogEditor`) |
 | Enter Play Mode Options | включены, **без перезагрузки домена и сцены** (`m_EnterPlayModeOptions: 3`) |
 | Имя продукта | `My project (1)`, компания `DefaultCompany` — стоит переименовать |
 | Контроль версий | git (ветка `main`), `.gitignore` для Unity, музыка и модели — Git LFS (`.gitattributes`) |
 
 Пакеты из шаблона, которые сейчас не используются: AI Assistant, AI Inference, AI Navigation,
 Visual Scripting, Timeline, Collab Proxy. Мешать они не мешают.
+
+## Звуки: GameSounds, SoundSettingsPanel, GeneratorSound
+
+- `GameSounds` (статический): таблица событий `Slots` (название, звук по умолчанию, громкость, петля, есть ли
+  встроенный) по `SoundSlot`. Выбор — PlayerPrefs `SSDFNC.Sound.<событие>`: имя файла, `""` (нет) или `"*"`
+  (встроенный — клип из кода, его регистрируют сами скрипты через `SetBuiltin`). Файлы — `StreamingAssets/Sounds`,
+  грузятся `UnityWebRequestMultimedia` один раз (mp3/ogg — сжатыми в памяти) и держатся ссылкой из невидимого
+  объекта `GameSounds` (DontDestroyOnLoad) — иначе выгрузка ресурсов при смене сцены их удалит. На нём же три
+  источника: разовые звуки, «ui» (играет и на паузе / на «Ночь окончена», `ignoreListenerPause`) и прослушка.
+- `GameSounds.Play(slot)` — разовый звук; `Bind(source, slot)` → `SoundBinding`: клип и громкость ставятся сами и
+  меняются при смене выбора, играть — `SetPlaying` (можно каждый кадр; на паузе не трогает источник).
+- Кто что играет: `NightDirector` (фон, рычание Доли, слив, голод Дира, сбой монитора, «подошёл» при переходе в
+  Door / DanceFloor / Generator, удар об дверь — пришёл к закрытой или закрыли при нём), `GeneratorSound`
+  (PowerChanged: запуск → петля через `PlayScheduled` ровно за ним; выключение — петля затихает 0.3 с, поверх
+  глушение), `Door` (закрылась / открылась), `SoundSignal`, `Phone`, `CallDirector` (верный ответ),
+  `SceneLoader` (загрузка `SampleScene`; перед загрузкой `StopUi`: «Конец ночи» затихает, не начавшийся замок — сразу),
+  `NightEndScreen` (`PlayPair`: «Конец ночи» и замок вместе, `LockDelay` — задержка замка, `PlayScheduled`).
+- `SoundSettingsPanel` строит окно сам при первом открытии (строки из `Slots`, файлы — при каждом открытии),
+  поэтому новое событие или файл не требуют пересборки сцены. Сборщик офиса кладёт только пустой объект в
+  затемнение паузы и кнопку «Звуки»; `PauseMenu` прячет карточку, пока открыты «Звуки», Esc там — назад.
+
+Начало ночи: `SceneLoader` сам играет «Загрузку перед ночью» (свой источник, `PlayScheduled`, конец — по часам
+звука `soundEnd`), держит экран, пока от звука не останется `ActivationTime + FadeTime`, после включения сцены ждёт
+ещё кадр на первую отрисовку и уходит за оставшееся время звука (от `MinFadeOut` до `MaxFadeOut`). `SceneLoader.Covering`
+— экран ещё закрывает всё; `CameraLook` начинает появление (`Intro…`: вперёд/выше/наклон/шире обзор → на место по
+EaseOutBack с рывком `IntroJerk`), когда экран начал уходить; поворот камеры теперь в `baseRotation`, появление
+накладывается сверху, `Settled` ждёт его конца.
+
+## OfficeLights — свет клуба
+
+Лампы ставит `MapBuilder` (таблица `Lamps`: точка в Blender, дальность, яркость, цвет, роль Office / Generator / Corridor /
+Corridor2 / Passage) под объект `MapLamps` с `OfficeLights`; сборщик офиса отдаёт ему генератор и настраивает ночь
+(`SetupLighting`: солнце шаблона выключено, фон Flat `MapAmbient`, отражения `MapReflections`, виньетка `MapVignette`,
+Bloom `MapBloom` — в профиле Global Volume). `OfficeLights.Update`: яркость лампы = база × питание (`Power`: при
+выключении `OffFlickerTime` мигает по Perlin-шуму и гаснет, при включении `OnFlickerTime` моргает) × мигание
+(`LampFlicker`: события `PlanFlickers` — редкие у 1–2 ламп раз в `IdleEveryMin–Max`, в генераторной — от доли бензина:
+с `LowFuelStart` частота `LowFuelRateWeak` и неглубоко, к `LowFuelStrong` — `LowFuelRateStrong` и до темноты).
+Светящиеся материалы карты и неоновые полосы гаснут по офисной лампе (`MaterialPropertyBlock` `_EmissionColor`).
+Неон (`NeonEnabled`, PlayerPrefs `SSDFNC.Neon`, F4): `neonRoot` (полосы `Map_Neon0/1`) и лампы роли Neon, обычные
+лампы × `NeonLampScale`. Комнаты для неона — от ламп `NeonRooms`: лучи вверх и в 4 стороны по временным
+`MeshCollider` карты (`Physics.queriesHitBackfaces` на время), полосы по краям потолка, лампы в углах.
 
 ## Известные особенности и что можно улучшить
 

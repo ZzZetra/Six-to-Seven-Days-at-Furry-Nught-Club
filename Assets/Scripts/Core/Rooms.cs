@@ -12,26 +12,27 @@ public enum Room
     DanceFloor, // коридор с дэнс полом перед офисом
     Door,       // за правой дверью офиса
     Generator,  // у генератора
+    Camera1,    // камера 1 на мониторе: не работает, за ней никого (пользователь, 2026-11-06: вместо камеры Г)
 }
 
 public static class Rooms
 {
-    // Камеры на мониторе по порядку кнопок
+    // Камеры на мониторе по порядку кнопок: 1 (не работает), 2–7. Камер в проходе Г и в вентиляции (8) нет —
+    // туда не посмотреть (пользователь, 2026-11-06: «камеру 8 убери, в ней нет смысла»)
     public static readonly Room[] Cameras =
-        { Room.Corridor2, Room.Hall, Room.RestRoom, Room.Corridor5, Room.Server, Room.Feeding, Room.Vent, Room.PassageG };
+        { Room.Camera1, Room.Corridor2, Room.Hall, Room.RestRoom, Room.Corridor5, Room.Server, Room.Feeding };
 
     public static string CameraLabel(Room room)
     {
         switch (room)
         {
+            case Room.Camera1: return "1";
             case Room.Corridor2: return "2";
             case Room.Hall: return "3";
             case Room.RestRoom: return "4";
             case Room.Corridor5: return "5";
             case Room.Server: return "6";
             case Room.Feeding: return "7";
-            case Room.Vent: return "8";
-            case Room.PassageG: return "Г";
             default: return "";
         }
     }
@@ -40,6 +41,7 @@ public static class Rooms
     {
         switch (room)
         {
+            case Room.Camera1: return "Не работает";
             case Room.RestRoom: return "Комната отдыха";
             case Room.Hall: return "Концертный зал";
             case Room.Corridor2: return "Коридор к двери";

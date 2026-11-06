@@ -16,8 +16,9 @@ using UnityEngine.UI;
 //             не в ту сторону — не считается; не успел — стрелка краснеет, дальше следующий чек;
 //   полоска — метка ездит (скорость меняется, у краёв отскакивает), ПРОБЕЛ, когда она в зелёной зоне.
 // Чеки идут один за другим: следующий виден сразу, как решён предыдущий, и ждёт своего времени.
-// Фаза пишется в правом верхнем углу. Время чеков считается по музыке (если она есть). Запас мога: с 3,
+// Время чеков считается по музыке (если она есть). Запас мога (на экране его нет): с 3,
 // попал — +1 (до 4), промах — −1; на нуле Нова нападает сразу, дожил до конца хотя бы с 1 — она уходит.
+// Надписей фазы и запаса мога нет (пользователь, 2026-11-06) — только название чека и подсказка.
 // Этот же компонент проигрывает раскладку в «Проверке скилл-чеков» в главном меню (MogTestTab) и в
 // редакторе раскладок (MogChartEditor), там же он показывает выбранный чек неподвижно (ShowStill).
 // Анимаций Новы пока нет: модель стоит на дэнс полу. Под фазы их будет подключать её аниматор по Current.
@@ -36,9 +37,6 @@ public class MogBattle : MonoBehaviour
     public GameObject panel;       // окно скилл-чека
     public Text title;             // «Полоска 2/5»
     public Text hint;              // что нажимать
-    public Text score;             // запас мога: «Мог: 3 / 4»
-    public Text phaseLabel;        // правый верхний угол: «Фаза 3/5: Полоска · 2/5»
-    public GameObject phaseBack;   // тёмная плашка под надписью фазы
     public AudioSource music;
 
     [Header("Полоска")]
@@ -89,6 +87,7 @@ public class MogBattle : MonoBehaviour
 
     void Awake()
     {
+        GameSounds.VolumeChanged += ApplyMusicVolume; // громкость «Музыка мог-батла» в настройках
         circleRing.sprite = MogShapes.Ring;
         circleZone.sprite = MogShapes.Ring;
         circleZone.type = Image.Type.Filled;
@@ -142,7 +141,6 @@ public class MogBattle : MonoBehaviour
         swipeIndex = -1;
         Current = Phase.Intro;
         panel.SetActive(false);
-        score.text = "";
         Debug.Log($"[SSDFNC] Мог-батл: раскладка «{chart.name}», чеков {Timeline.Count}, фаз {Timeline.PhaseCount}, музыка: " +
                   $"{(string.IsNullOrEmpty(chart.music) ? "нет" : chart.music)}, зоны ×{zoneScale:0.0}");
         StartCoroutine(StartMusic(chart, startAt));
@@ -162,6 +160,13 @@ public class MogBattle : MonoBehaviour
         Finish();
     }
 
+    void OnDestroy() => GameSounds.VolumeChanged -= ApplyMusicVolume;
+
+    void ApplyMusicVolume()
+    {
+        if (music != null) music.volume = GameSounds.Volume(VolumeGroup.Music);
+    }
+
     // Музыка грузится, пока идёт появление; время раскладки стартует вместе с музыкой
     IEnumerator StartMusic(MogChart chart, float startAt)
     {
@@ -172,6 +177,7 @@ public class MogBattle : MonoBehaviour
                 if (clip == null) return;
                 music.clip = clip;
                 music.time = Mathf.Clamp(startAt + chart.offset, 0f, clip.length - 0.05f);
+                ApplyMusicVolume();
                 music.Play();
             });
         clockRunning = true;
@@ -208,7 +214,7 @@ public class MogBattle : MonoBehaviour
     // Управление зависит от вида чека: ПРОБЕЛ, клик по кнопке или взмах мышью
     void ReadInput()
     {
-        if (!Timeline.Active(clock)) return;
+        if (GameFlow.InputBlocked || !Timeline.Active(clock)) return; // пауза: нажатия не засчитываются
         var c = Timeline.Current;
         var kb = Keyboard.current;
         var mouse = Mouse.current;
@@ -278,8 +284,6 @@ public class MogBattle : MonoBehaviour
             music.clip = null;
         }
         panel.SetActive(false);
-        phaseLabel.text = "";
-        if (phaseBack != null) phaseBack.SetActive(false);
         Current = Phase.None;
         var callback = done;
         done = null;
@@ -288,19 +292,7 @@ public class MogBattle : MonoBehaviour
 
     void DrawUI()
     {
-        if (phaseBack != null) phaseBack.SetActive(Running);
-        switch (Current)
-        {
-            case Phase.Intro:
-                phaseLabel.text = $"Фаза 1/{Timeline.PhaseCount}: Появление";
-                break;
-            case Phase.Checks:
-                DrawCheck();
-                break;
-            case Phase.Outro:
-                phaseLabel.text = $"Фаза {Timeline.PhaseCount}/{Timeline.PhaseCount}: " + (won ? "Нова уходит" : "Смерть");
-                break;
-        }
+        if (Current == Phase.Checks) DrawCheck();
     }
 
     // Следующий чек показывается сразу, как решён предыдущий, и ждёт своего времени: стрелка кружка
@@ -312,7 +304,6 @@ public class MogBattle : MonoBehaviour
         string name = MogTimeline.PhaseName(type);
         var (number, total) = Timeline.ProgressInGroup();
         bool active = Timeline.Active(clock);
-        if (still == null) phaseLabel.text = $"Фаза {Timeline.Phase}/{Timeline.PhaseCount}: {name} · {number}/{total}";
         panel.SetActive(true);
         title.text = still == null ? $"{name} {number}/{total}" : name;
         hint.text = Hint(type);
@@ -348,8 +339,6 @@ public class MogBattle : MonoBehaviour
                 DrawApproach(arrowGroup, arrowRing, active);
                 break;
         }
-        if (still == null) DrawLives();
-        else score.text = "";
     }
 
     // Кнопка и стрелка как в osu: пока время не пришло — бледные; кольцо появляется втрое больше,
@@ -414,8 +403,6 @@ public class MogBattle : MonoBehaviour
         if (still != check) Timeline = new MogTimeline(new MogChart { checks = new[] { check } });
         still = check;
         clock = t;
-        phaseLabel.text = "";
-        if (phaseBack != null) phaseBack.SetActive(false);
         DrawCheck();
     }
 
@@ -478,13 +465,5 @@ public class MogBattle : MonoBehaviour
             case MogCheckType.Arrow: return "Проведи мышью по стрелке, пока кольцо не сомкнулось";
             default: return "ПРОБЕЛ — когда метка в зелёной зоне";
         }
-    }
-
-    // «Мог: ■■■□  3 / 4», на последней единице — красным
-    void DrawLives()
-    {
-        int lives = Timeline.Lives;
-        score.text = $"Мог: <size=70>{new string('■', lives)}{new string('□', Balance.MogMaxLives - lives)}</size>  {lives} / {Balance.MogMaxLives}";
-        score.color = lives <= 1 ? new Color(1f, 0.3f, 0.25f) : Color.white;
     }
 }

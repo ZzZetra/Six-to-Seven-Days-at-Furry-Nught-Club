@@ -15,7 +15,8 @@ public static class Difficulty
     public const int RampPerQuarter = 1;
 
     // Порядок: Дир, Стрей, Нова, Дали, Доли (как в FurryId).
-    // Подобраны симуляцией (меню SSDFNC → Balance Report) под смену 10 минут, см. docs/FURRY_AI.md
+    // Подобраны симуляцией (меню SSDFNC → Balance Report) под смену 10 минут, см. docs/FURRY_AI.md.
+    // Это для «Своей ночи» и панели F1; ночи 1–7 берут уровни из Nights.cs
     public static int[] Levels(DifficultyPreset preset)
     {
         switch (preset)

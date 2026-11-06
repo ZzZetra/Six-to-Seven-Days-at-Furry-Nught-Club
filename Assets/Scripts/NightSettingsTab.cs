@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-// Вкладка «Настройка ночи» в главном меню: уровень каждого фурри кнопками − / +, пресеты,
+// Вкладка «Своя ночь» в главном меню (как Custom Night во FNAF, вне прохождения): уровень каждого фурри кнопками − / +, пресеты,
 // «Только Нова», «По умолчанию» (сложность из Difficulty.cs). Пишет в NightSettings.
 public class NightSettingsTab : MonoBehaviour
 {
@@ -48,6 +48,6 @@ public class NightSettingsTab : MonoBehaviour
     {
         var levels = NightSettings.Levels;
         for (int i = 0; i < values.Length; i++) values[i].text = levels[i] == 0 ? "выкл" : levels[i].ToString();
-        summary.text = "Сложность ночи: " + NightSettings.Describe();
+        summary.text = "Своя ночь: " + NightSettings.Describe() + " — на прохождение ночей не влияет";
     }
 }

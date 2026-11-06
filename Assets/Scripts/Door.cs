@@ -11,8 +11,6 @@ public class Door : Deterrent
     public const float LockTime = Balance.DoorLockTime;
     const float MoveSharpness = 12f;        // скорость створки и рычага
 
-    static readonly Quaternion LeverOpen = Quaternion.Euler(0f, 0f, 30f);    // рычаг вверх
-    static readonly Quaternion LeverClosed = Quaternion.Euler(0f, 0f, 150f); // рычаг вниз
     static readonly Color OpenColor = new Color(0.2f, 0.85f, 0.3f);
     static readonly Color ClosedColor = new Color(0.9f, 0.15f, 0.15f);
     static readonly Color LockedColor = new Color(1f, 0.55f, 0.1f);
@@ -22,6 +20,8 @@ public class Door : Deterrent
     public Vector3 slabClosed;  // её локальная позиция, когда дверь закрыта
     public Vector3 slabOpen;    // и когда открыта (спрятана в стене)
     public Transform lever;     // ось рычага
+    public Quaternion leverOpen = Quaternion.Euler(0f, 0f, 30f);    // её поворот, когда открыто (рычаг на стене — вверх)
+    public Quaternion leverClosed = Quaternion.Euler(0f, 0f, 150f); // и когда закрыто (вниз); у рычага под столом — свои
     public Image lamp;
     public Text label;
 
@@ -51,7 +51,7 @@ public class Door : Deterrent
 
         float k = 1f - Mathf.Exp(-MoveSharpness * Time.deltaTime);
         slab.localPosition = Vector3.Lerp(slab.localPosition, IsClosed ? slabClosed : slabOpen, k);
-        lever.localRotation = Quaternion.Slerp(lever.localRotation, IsClosed ? LeverClosed : LeverOpen, k);
+        lever.localRotation = Quaternion.Slerp(lever.localRotation, IsClosed ? leverClosed : leverOpen, k);
 
         var (text, color) =
             !HasPower ? ("НЕТ ПИТАНИЯ", NoPowerColor) :
@@ -66,6 +66,7 @@ public class Door : Deterrent
     protected override void OnActiveChanged(bool closed)
     {
         ClosedFor = 0f;
+        GameSounds.Play(closed ? SoundSlot.DoorClose : SoundSlot.DoorOpen);
         Debug.Log(closed ? "[SSDFNC] Дверь закрыта" : "[SSDFNC] Дверь открыта");
     }
 }

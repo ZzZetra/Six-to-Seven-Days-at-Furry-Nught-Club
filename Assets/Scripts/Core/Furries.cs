@@ -44,7 +44,7 @@ public class NovaAI : Roamer
     public int Wins { get; private set; } // сколько раз игрок её уже победил
     public bool InBattle { get; private set; }
     public float RestLeft { get; private set; } // после проигранного батла сидит дома
-    public event Action<NovaAI> ReachedDanceFloor;
+    public event Action<NovaAI> ReachedDanceFloor;  
 
     public override string Name => "Нова";
     protected override float Interval => Balance.NovaInterval;
@@ -89,7 +89,7 @@ public class NovaAI : Roamer
 }
 
 // Дали: из серверной (6) через 8, 5 и проход Г к генератору. Кнопка звука, пока она в проходе Г, —
-// и она убегает домой. У генератора глушит или сливает бензин; начатое звук не остановит.
+// и она убегает домой. У генератора глушит (звук уже не остановит) или сливает бензин — пока не нажмут звук.
 // К генератору вдвоём с Доли не ходят: пока Доли идёт к генератору или ломает его, Дали ждёт в проходе 8.
 public class DaliAI : Roamer
 {
@@ -124,7 +124,7 @@ public class DaliAI : Roamer
 
     public override void HearSound()
     {
-        if (Room == Room.PassageG) GoHome();
+        if (Room == Room.PassageG || Draining) GoHome();
     }
 }
 

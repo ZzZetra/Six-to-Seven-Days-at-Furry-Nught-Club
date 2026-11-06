@@ -15,7 +15,7 @@ public class DifficultyPanel : MonoBehaviour
     public Text[] values;             // по FurryId
     public Button[] minus;            // по FurryId
     public Button[] plus;             // по FurryId
-    public Button easy, normal, hard, onlyNova, novaBattle, ringCall, monitorReboot;
+    public Button easy, normal, hard, onlyNova, novaBattle, ringCall, monitorReboot, bossCall, triggerCall;
     public CallDirector calls;
     public Text info;
 
@@ -44,6 +44,18 @@ public class DifficultyPanel : MonoBehaviour
             Debug.Log(rang ? "[SSDFNC] Панель F1: звонок"
                            : "[SSDFNC] Панель F1: звонок не вызван — телефон занят или идёт мог-батл");
         });
+        if (bossCall != null)
+            bossCall.onClick.AddListener(() =>
+            {
+                bool rang = calls != null && calls.RingBossNow();
+                Debug.Log(rang ? "[SSDFNC] Панель F1: звонок начальства" : "[SSDFNC] Панель F1: звонок начальства не вызван — телефон занят");
+            });
+        if (triggerCall != null)
+            triggerCall.onClick.AddListener(() =>
+            {
+                Debug.Log("[SSDFNC] Панель F1: звонок по условию «test»");
+                if (calls != null) calls.Request("test");
+            });
         if (monitorReboot != null)
             monitorReboot.onClick.AddListener(() =>
             {
@@ -57,7 +69,7 @@ public class DifficultyPanel : MonoBehaviour
     void Update()
     {
         var kb = Keyboard.current;
-        if (Debug.isDebugBuild && kb != null && kb.f1Key.wasPressedThisFrame) panel.SetActive(!panel.activeSelf);
+        if (Debug.isDebugBuild && kb != null && !GameFlow.InputBlocked && kb.f1Key.wasPressedThisFrame) panel.SetActive(!panel.activeSelf);
         if (!panel.activeSelf) return;
 
         for (int i = 0; i < values.Length; i++)

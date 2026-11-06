@@ -215,7 +215,7 @@ class SimBot
         bool strayFront = stray.Active && stray.Room == Room.DanceFloor;
         bool doliAtDoor = doli.Active && doli.Room == Room.Door;
         bool doorThreat = (stray.Active && stray.Room == Room.Door) || doliAtDoor;
-        bool saboteur = (night.Dali.Active && night.Dali.Room == Room.PassageG)
+        bool saboteur = (night.Dali.Active && (night.Dali.Room == Room.PassageG || night.Dali.Draining))
                         || (doli.Active && (doli.Room == Room.PassageG || (doli.Room == Room.Generator && doli.Sabotaging)));
         bool dirHungry = night.Dir.Active && (night.Dir.Food < FeedBelow || night.Dir.Starving);
         bool genDown = office.Stalled && !office.Broken && office.Fuel > 0f;
@@ -301,10 +301,10 @@ public static class NightSimulator
 {
     public const float Step = 0.05f;
 
-    public static NightResult Run(int[] levels, BotProfile bot, float duration, int seed)
+    public static NightResult Run(int[] levels, BotProfile bot, float duration, int seed, float monitorRebootPerMinute = -1f)
     {
         var office = new SimOffice();
-        var night = new Night(office, levels, duration, seed);
+        var night = new Night(office, levels, duration, seed, monitorRebootPerMinute);
         var player = new SimBot(bot, night, office, new Random(seed * 7919 + 17));
         int battles = 0;
         float t = 0f;
@@ -358,12 +358,13 @@ public static class NightSimulator
         public int DeathsBy(FurryId id) => Deaths.TryGetValue(id, out int n) ? n : 0;
     }
 
-    public static Summary RunMany(int[] levels, BotProfile bot, float duration, int nights, int firstSeed = 1)
+    public static Summary RunMany(int[] levels, BotProfile bot, float duration, int nights, int firstSeed = 1,
+        float monitorRebootPerMinute = -1f)
     {
         var s = new Summary();
         for (int i = 0; i < nights; i++)
         {
-            var r = Run(levels, bot, duration, firstSeed + i);
+            var r = Run(levels, bot, duration, firstSeed + i, monitorRebootPerMinute);
             s.Nights++;
             if (r.Survived) s.Survived++;
             else if (r.Killer.HasValue) s.Deaths[r.Killer.Value] = s.DeathsBy(r.Killer.Value) + 1;
@@ -382,6 +383,29 @@ public static class NightSimulator
             s.Feeds /= s.Nights;
         }
         return s;
+    }
+
+    // Таблица markdown: ночи прохождения 1–7 (Nights.cs) × боты, смена Balance.ShiftDuration
+    public static string NightsReport(int nights)
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine($"Смена {Balance.ShiftDuration:0} с, {nights} ночей на каждую клетку. Бот звонки не учитывает.");
+        sb.AppendLine();
+        sb.AppendLine("| Ночь | Уровни Дир/Стрей/Нова/Дали/Доли | Бот | Выжил | Дир | Стрей | Нова | Дали | Доли | Мог-батлов |");
+        sb.AppendLine("|---|---|---|---|---|---|---|---|---|---|");
+        for (int n = 1; n <= Nights.Count; n++)
+        {
+            var cfg = Nights.Get(n);
+            foreach (var bot in BotProfile.All)
+            {
+                var s = RunMany(cfg.Levels, bot, Balance.ShiftDuration, nights, 1, cfg.MonitorRebootChancePerMinute);
+                string D(FurryId id) => $"{100f * s.DeathsBy(id) / s.Nights:0}%";
+                sb.AppendLine($"| {n} | {string.Join("/", cfg.Levels)} | {bot.Name} | **{100f * s.SurvivalRate:0}%** | " +
+                              $"{D(FurryId.Dir)} | {D(FurryId.Stray)} | {D(FurryId.Nova)} | {D(FurryId.Dali)} | {D(FurryId.Doli)} | " +
+                              $"{s.Battles:0.0} |");
+            }
+        }
+        return sb.ToString();
     }
 
     // Таблица markdown: сложности × боты

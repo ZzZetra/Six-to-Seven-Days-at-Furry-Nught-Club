@@ -159,7 +159,7 @@ public abstract class Roamer : Furry
         SabotageStarted?.Invoke(this);
     }
 
-    // Глушение и слив звук уже не остановит; поломку останавливает (см. DoliAI.HearSound)
+    // Глушение звук уже не остановит; слив и поломку останавливает только звук (DaliAI / DoliAI.HearSound)
     protected void SabotageUpdate(float dt)
     {
         sabotageTime += dt;
@@ -175,8 +175,7 @@ public abstract class Roamer : Furry
                 break;
             case Sabotage.Drain:
                 office.DrainFuel(Balance.DrainPerSecond * dt);
-                if (sabotageTime < Balance.DrainTime) return;
-                break;
+                return; // пока не спугнут звуком
             default:
                 return;
         }
